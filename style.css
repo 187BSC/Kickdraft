@@ -1,0 +1,70 @@
+/* Kickdraft – Website. Farben wie im Spiel (Kenney-Stil, Tag und Nacht). */
+@font-face { font-family: 'Fredoka'; font-weight: 600; font-display: swap; src: url('schrift/fredoka-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Fredoka'; font-weight: 700; font-display: swap; src: url('schrift/fredoka-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Rubik'; font-weight: 400; font-display: swap; src: url('schrift/rubik-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Rubik'; font-weight: 500; font-display: swap; src: url('schrift/rubik-latin-500-normal.woff2') format('woff2'); }
+
+:root {
+  --bg: #f4e3c1; --karte: #fffdf9; --karte2: #f6ead2; --rand: #8a5a2b; --rand-hell: #dcc39a;
+  --text: #2c3e50; --text2: #5c4a36; --text3: #846d52;
+  --gruen: #74bb5d; --gruen-rand: #4f8a3c; --gruen-text: #1d3314;
+  --gold: #f1c40f;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #12141d; --karte: #1e2230; --karte2: #262a3a; --rand: #3b4158; --rand-hell: #2c2f40;
+    --text: #f5f6fa; --text2: #c3cad6; --text3: #8d97a8; --gruen: #6cc28a; --gruen-rand: #3f8a5a; --gruen-text: #0f2216; }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 17px/1.55 'Rubik', system-ui, sans-serif; }
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+.rahmen { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+h1, h2, h3, .marke { font-family: 'Fredoka', 'Rubik', system-ui, sans-serif; line-height: 1.15; }
+
+/* Kopf */
+.kopf { display: flex; align-items: center; gap: 12px; padding: 18px 0; }
+.marke { display: block; text-decoration: none; }
+.marke img { width: clamp(170px, 32vw, 230px); height: auto; }
+.marke-unter { font: 500 14px/1.2 'Rubik', sans-serif; color: var(--text3); margin-top: 6px; }
+
+/* Bühne */
+.buehne { display: grid; gap: 28px; align-items: center; padding: 20px 0 36px; }
+.buehne h1 { font-size: clamp(34px, 6vw, 56px); margin: 0 0 14px; }
+.buehne p.leit { font-size: 19px; color: var(--text2); margin: 0 0 24px; max-width: 34em; }
+.knopf { display: inline-flex; align-items: center; gap: 10px; padding: 14px 22px; border-radius: 16px; font: 700 18px 'Fredoka', sans-serif;
+  background: var(--gruen); color: var(--gruen-text); border: 3px solid var(--gruen-rand); box-shadow: 0 5px 0 var(--gruen-rand); text-decoration: none; }
+.knopf[aria-disabled="true"] { opacity: .75; cursor: default; }
+.klein { font-size: 14px; color: var(--text3); margin-top: 14px; }
+.buehne-bild { justify-self: center; width: min(300px, 80vw); border-radius: 28px; border: 4px solid var(--rand); box-shadow: 0 8px 0 var(--rand); overflow: hidden; background: var(--karte); }
+@media (min-width: 820px) { .buehne { grid-template-columns: 1.2fr .8fr; padding: 40px 0 56px; } }
+
+/* Karten */
+.karten { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin: 0 0 48px; }
+.karte { background: var(--karte); border: 3px solid var(--rand); border-radius: 20px; box-shadow: 0 5px 0 var(--rand); padding: 18px 18px 16px; }
+.karte h3 { font-size: 21px; margin: 0 0 6px; }
+.karte p { margin: 0; color: var(--text2); font-size: 16px; }
+.zahl { font: 700 30px 'Fredoka', sans-serif; color: var(--text); display: block; margin-bottom: 4px; }
+
+/* Bilder */
+h2 { font-size: 30px; margin: 0 0 16px; }
+.bilder { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(220px, 1fr); gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory;
+  padding: 4px 4px 18px; margin: 0 -4px 40px; }
+.bilder figure { margin: 0; scroll-snap-align: start; }
+.bilder img { border-radius: 22px; border: 3px solid var(--rand); box-shadow: 0 5px 0 var(--rand); background: var(--karte); }
+.bilder figcaption { font-size: 15px; color: var(--text2); text-align: center; margin-top: 12px; }
+
+/* Fuß */
+.fuss { border-top: 2px solid var(--rand-hell); padding: 24px 0 40px; font-size: 15px; color: var(--text3); }
+.fuss nav { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-bottom: 10px; }
+.fuss nav a { color: var(--text2); font-weight: 500; }
+.fuss p { margin: 6px 0; }
+
+/* Textseiten (Datenschutz, Impressum) */
+.text h1 { font-size: 36px; margin: 8px 0 4px; }
+.text .unter { color: var(--text3); margin: 0 0 24px; }
+.text section { background: var(--karte); border: 3px solid var(--rand-hell); border-radius: 18px; padding: 16px 18px; margin: 0 0 14px; }
+.text h2 { font-size: 21px; margin: 0 0 8px; }
+.text p, .text ul { margin: 0 0 8px; } .text p:last-child, .text ul:last-child { margin-bottom: 0; }
+.text ul { padding-left: 22px; }
+.zurueck { display: inline-block; margin: 4px 0 8px; color: var(--text2); font-weight: 500; }
