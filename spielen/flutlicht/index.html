@@ -2,6 +2,7 @@
 <html lang="de" class="freundlich kenney dark">
 <head>
 <script src="../gesamt/web_demo.js"></script>
+<link rel="stylesheet" href="../gesamt/web_demo.css">
 <meta charset="utf-8">
 <!-- Sicherheit (2026-10-18): nur eigene Dateien laden – kein fremdes Skript, kein fremder Server (Werbung läuft nativ in der App) -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; connect-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
@@ -48,6 +49,7 @@ if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) window.
   <link rel="stylesheet" href="css/kickstil.css">
 </head>
 <body>
+<div id="web-lade" role="status" aria-label="Vereinskarriere lädt"><img src="icons/flutlicht_icon_192.png" alt="" width="96" height="96"><b>Vereinskarriere</b><span class="wl-balken"><i></i></span></div>
 <div class="app">
 
   <!-- APP NAVIGATION -->
@@ -476,164 +478,17 @@ if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) window.
   </div>
   </div>
 </div>  <script src="js/storage_polyfill.js"></script>
-  <script src="vendor/lz-string/lz-string.min.js"></script>
-  <script src="data/game_data.js"></script>
-  <script src="data/euro_clubs.js"></script>
-  <script src="data/nationen.js"></script>
-  <script src="data/stars_2627.js"></script>
-  <script src="js/engine_main.js"></script>
-  <script src="js/bundle_tactics_core.js"></script>
-  <script src="js/club_colors.js"></script>
-  <script src="js/app_main.js"></script>
-  <script src="js/bundle_europa.js"></script>
-  <script src="js/kickstil_tabellenpfeile.js"></script>
-  <script src="js/bundle_squad.js"></script>
-  <script src="js/bundle_finance.js"></script>
-  <script src="js/merch_flach.js"></script>
-  <script src="js/bundle_match.js"></script>
-  <script src="js/spielzeit_entwicklung.js"></script>
-  <script src="js/events_config_patch.js"></script>
-  <script src="js/bundle_economy.js"></script>
-  <script src="js/scouting_patch.js"></script>
-  <script src="js/kickstil_nationen.js"></script>
-  <script src="js/npc_real_transfers_patch.js"></script>
-  <script src="js/match_simulation_patch.js"></script>
-  <script src="js/fitness_patch.js"></script>
-  <script src="js/prep_camps_patch.js"></script>
-  <script src="js/contracts_patch.js"></script>
-  <script src="js/buy_negotiation_patch.js"></script>
-  <script src="js/toast_patch.js"></script>
-  <script src="js/info_cards_patch.js"></script>
-  <script src="js/matchday_fx_patch.js"></script>
-  <script src="js/flags_patch.js"></script>
-  <script src="js/tab_headers_patch.js"></script>
-  <script src="js/chronicle_patch.js"></script>
-  <script src="js/lineup_guard_patch.js"></script>
-  <script src="js/cohesion_patch.js"></script>
-  <script src="js/engine_v2_adapter.js"></script>
-  <script src="js/player_attributes.js"></script>
-  <script src="js/match_engine_v3.js"></script>
-  <script src="js/engine_v3_adapter.js"></script>
-  <script src="js/match_2d_view.js"></script>
-  <script src="js/player_attributes_ui.js"></script>
-  <script src="js/lineup_auto_patch.js"></script>
-  <script src="js/market_scope_patch.js"></script>
-  <script src="js/career_start_patch.js"></script>
-  <script src="js/philosophy_patch.js"></script>
-  <script src="js/attribute_cache_patch.js"></script>
-  <script src="js/substitution_stats_patch.js"></script>
-  <script src="js/newspaper_patch.js"></script>
-  <script src="js/intro_patch.js"></script>
-  <script src="js/mobile_patch.js"></script>
+<script src="../gesamt/paket_flutlicht_1.js"></script>
   <!-- Welt & Kader: Vereinsstärke folgt dem Kader, Auslandskader, NPC-Kaderleben -->
-  <script src="js/kaderstaerke.js"></script>
-  <script src="js/euro_kader.js"></script>
-  <script src="js/npc_kaderleben.js"></script>
+<script src="../gesamt/paket_flutlicht_2.js"></script>
   <!-- Transfermarkt: Leihen, Charaktereigenschaften, Beobachtung -->
-  <script src="js/leihmarkt.js"></script>
-  <script src="js/traits.js"></script>
-  <script src="js/beobachtung.js"></script>
+<script src="../gesamt/paket_flutlicht_3.js"></script>
   <!-- Auswertung & Marktbalance -->
   <script src="js/match_analyse.js"></script>
   <!-- Kickstil: Spiel als Text (Ticker aus Kickdraft D77) – Kern ohne DOM, Patch hängt sich an Anpfiff/Simulieren -->
-  <script src="js/kickstil_anbindung.js"></script>
-  <script src="js/dfl_textspiel.js"></script>
-  <script src="js/dfl_textspiel_patch.js"></script>
-  <script src="js/transfermarkt_balance.js"></script>
+<script src="../gesamt/paket_flutlicht_4.js"></script>
   <!-- Kickstil Phase 2 (aus Kickdraft): Wappen-Generator, Gesichter, Spiel-Icons, App-Oberfläche, Kenney statt Emoji, Transferkarten -->
-  <script src="data/dfl_wappen.js"></script>
-  <script src="data/wappen_figuren_extra.js"></script>
-  <script src="data/wappen_prunk.js"></script>
-  <script src="data/vereinsnamen.js"></script>
-  <script src="js/dfl_icons.js"></script>
-  <script src="vendor/facesjs/facesjs.js"></script>
-  <script src="js/dfl_identitaet.js"></script>
-  <script src="data/dfl_spielicons.js"></script>
-  <script src="js/dfl_spielicons.js"></script>
-  <script src="js/dfl_ui_teile.js"></script>
-  <script src="js/kickstil_verein.js"></script>
-  <script src="js/kickstil_app_shell.js"></script>
-  <script src="js/dfl_kenney_patch.js"></script>
-  <script src="js/kickstil_transfer_karten.js"></script>
-<script src="js/kickstil_laufband.js"></script>
-<script src="js/kickstil_simulieren.js"></script>
-<script src="js/kickstil_deadline_day.js"></script>
-<script src="app/gelaende6/gelaende6_daten.js"></script>
-<script src="app/gelaende6/gelaende6_rund.js"></script>
-<script src="js/dfl_kulisse.js"></script>
-<script src="js/dfl_gelaende6.js"></script>
-  <script src="data/ks_altnamen.js"></script>
-  <script src="data/ks_namen2.js"></script>
-<script src="js/kickstil_namen.js"></script>
-<script src="js/kickstil_anzeigenamen.js"></script>
-<script src="js/kickstil_vereinsnamen.js"></script>
-<script src="js/kickstil_vereinsblatt.js"></script>
-<script src="js/kickstil_alterskurve.js"></script>
-<script src="js/kickstil_lebende_welt.js"></script>
-<script src="js/kickstil_ki_markt.js"></script>
-<script src="js/kickstil_saisonplus.js"></script>
-<script src="js/kickstil_akademien.js"></script>
-<script src="js/kickstil_werbung.js"></script>
-<script src="js/kickstil_messung.js"></script>
-<script src="js/kickstil_alter.js"></script>
-<script src="js/kickstil_rechtliches.js"></script>
-<script src="js/kickstil_joker.js"></script>
-<script src="js/kickstil_euro_ticker.js"></script>
-<script src="js/kickstil_scouting.js"></script>
-<script src="js/kickstil_spielstaende.js"></script>
-<script src="js/kickstil_karten_deko.js"></script>
-<script src="js/kickstil_karten.js"></script>
-<script src="js/kickstil_saisonabschluss.js"></script>
-<script src="js/kickstil_mindestkader.js"></script>
-<script src="js/kickstil_trainerteam.js"></script>
-<script src="js/kickstil_derby.js"></script>
-<script src="js/kickstil_grosse_spiele.js"></script>
-<script src="js/kickstil_laenderspiele.js"></script>
-<script src="js/kickstil_national.js"></script>
-<script src="js/kickstil_push.js"></script>
-<script src="js/kickstil_erfolge.js"></script>
-<script src="js/kickstil_trainer.js"></script>
-<script src="js/kickstil_laden.js"></script>
-<script src="js/kickstil_bewertung.js"></script>
-<script src="js/kickstil_pro.js"></script>
-<script src="js/kickstil_neu.js"></script>
-<script src="js/dfl_anlagen_bilder.js"></script>
-<script src="js/kickstil_zeitmaschine.js"></script>
-<script src="js/kickstil_vitrine.js"></script>
-<script src="js/kickstil_trikots.js"></script>
-<script src="js/dfl_auswahl.js"></script>
-<script src="js/kickstil_kader_ui.js"></script>
-<script src="js/kickstil_taktik.js"></script>
-<script src="js/kickstil_pokal_runden.js"></script>
-<script src="js/kickstil_pc_spieltag.js"></script>
-<script src="js/kickstil_pc_taktik_live.js"></script>
-<script src="js/kickstil_pc_uebersicht.js"></script>
-<script src="js/kickstil_pc_kader.js"></script>
-<script src="js/kickstil_pc_vorspiel.js"></script>
-<script src="js/kickstil_pc_raster.js"></script>
-<script src="js/kickstil_pc_scouting.js"></script>
-<script src="js/kickstil_pc_finanzen.js"></script>
-<script src="js/kickstil_pc_transfer.js"></script>
-<script src="js/kickstil_pc_liga.js"></script>
-<script src="js/kickstil_pc_verein.js"></script>
-<script src="js/kickstil_pc_sicherheit.js"></script>
-<script src="js/kickstil_pc_komfort.js"></script>
-<script src="js/kickstil_pc_nlz.js"></script>
-<script src="data/ks_geo.js"></script>
-<script src="js/kickstil_pc_nlz_karte.js"></script>
-<script src="js/kickstil_pc_nlz_ausbau.js"></script>
-<script src="js/kickstil_pc_nlz_ehemalige.js"></script>
-<script src="js/kickstil_postfach.js"></script>
-<script src="js/kickstil_frage.js"></script>
-<script src="js/kickstil_kader_neu.js"></script>
-<script src="js/kickstil_mehr_neu.js"></script>
-<script src="js/kickstil_frontoffice.js"></script>
-<script src="js/kickstil_transfersuche.js"></script>
-<script src="js/kickstil_positionen.js"></script>
-<script src="js/kickstil_prunkkarte.js"></script>
-<script src="js/kickstil_kartenpacks.js"></script>
-<script src="js/init_bootstrap.js"></script>
-<script src="../gesamt/modus.js"></script>
+<script src="../gesamt/paket_flutlicht_5.js"></script>
 <script>window.KS_LITE = { saisons: 2, spiel: 'Unter Flutlicht', kaufen: '', app: '' };</script>
 <script src="../gesamt/lite.js"></script>
 </body>

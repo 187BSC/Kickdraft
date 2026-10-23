@@ -2,6 +2,7 @@
 <html lang="de" class="freundlich kenney dark">
 <head>
 <script src="../gesamt/web_demo.js"></script>
+<link rel="stylesheet" href="../gesamt/web_demo.css">
 <meta charset="utf-8">
 <!-- Sicherheit (2026-10-18): nur eigene Dateien laden – kein fremdes Skript, kein fremder Server (Werbung läuft nativ in der App) -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; connect-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
@@ -70,6 +71,7 @@ setTimeout(function () { window.dflVorhangWeg(); }, 12000);</script>
   <link rel="stylesheet" href="css/dfl_laden.css">
 </head>
 <body>
+<div id="web-lade" role="status" aria-label="Kickdraft lädt"><img src="app/icon-192.png" alt="" width="96" height="96"><b>Kickdraft</b><span class="wl-balken"><i></i></span></div>
 <div id="dfl-vorhang" aria-hidden="true"><img class="vh-ic" src="app/icon.svg" alt="" width="132" height="132"><img class="vh-sz" src="app/logo-schriftzug.svg" alt="" width="1000" height="290"></div>
 <div class="app">
 
@@ -457,170 +459,14 @@ setTimeout(function () { window.dflVorhangWeg(); }, 12000);</script>
   </div>
   </div>
 </div>  <script src="js/storage_polyfill.js"></script>
-  <script src="vendor/lz-string/lz-string.min.js"></script>
-  <script src="js/dfl_speicher.js"></script>
-  <script src="data/dfl_ereignisse.js"></script>
-  <script src="js/engine_main.js"></script>
-  <script src="js/bundle_tactics_core.js"></script>
-  <script src="js/club_colors.js"></script>
-  <script src="js/app_main.js"></script>
-  <script src="js/bundle_squad.js"></script>
-  <script src="js/bundle_finance.js"></script>
-  <script src="js/merch_flach.js"></script>
-  <script src="js/bundle_match.js"></script>
-  <script src="js/spielzeit_entwicklung.js"></script>
-  <script src="js/events_config_patch.js"></script>
-  <script src="js/bundle_economy.js"></script>
-  <script src="js/match_simulation_patch.js"></script>
-  <script src="js/fitness_patch.js"></script>
-  <script src="js/prep_camps_patch.js"></script>
-  <script src="js/contracts_patch.js"></script>
-  <script src="js/toast_patch.js"></script>
-  <script src="js/info_cards_patch.js"></script>
-  <script src="js/matchday_fx_patch.js"></script>
-  <script src="js/flags_patch.js"></script>
-  <script src="js/tab_headers_patch.js"></script>
-  <script src="js/chronicle_patch.js"></script>
-  <script src="js/lineup_guard_patch.js"></script>
-  <script src="js/match_moments_patch.js"></script>
-  <script src="js/cohesion_patch.js"></script>
-  <script src="js/match_engine_v2.js"></script>
-  <script src="js/engine_v2_adapter.js"></script>
-  <script src="js/player_attributes.js"></script>
-  <script src="js/match_engine_v3.js"></script>
-  <script src="js/engine_v3_adapter.js"></script>
-  <script src="js/player_attributes_ui.js"></script>
-  <script src="js/lineup_auto_patch.js"></script>
-  <script src="js/career_start_patch.js"></script>
-  <script src="js/attribute_cache_patch.js"></script>
-  <script src="js/substitution_stats_patch.js"></script>
-  <script src="js/intro_patch.js"></script>
-  <script src="js/mobile_patch.js"></script>
+<script src="../gesamt/paket_kickdraft_1.js"></script>
   <!-- Welt & Kader: Vereinsstärke folgt dem Kader, Auslandskader, NPC-Kaderleben -->
   <!-- Transfermarkt: Leihen, Charaktereigenschaften, Beobachtung -->
   <script src="js/traits.js"></script>
   <!-- Auswertung & Marktbalance -->
-  <script src="js/match_analyse.js"></script>
-  <script src="js/transfermarkt_balance.js"></script>
+<script src="../gesamt/paket_kickdraft_2.js"></script>
   <!-- DFL: Liga-Welt (Generator, Saisonlauf, Spieltiefe) und Design; Einbau als Patch-Module -->
-  <script src="data/dfl_liga.js"></script>
-  <script src="js/dfl_namen.js"></script>
-  <script src="data/dfl_wappen.js"></script>
-  <script src="data/wappen_prunk.js"></script>
-  <script src="js/dfl_liga_generator.js"></script>
-  <script src="js/dfl_finanzen.js"></script>
-  <script src="js/dfl_saisonlauf.js"></script>
-  <script src="js/dfl_stimmung.js"></script>
-  <script src="js/dfl_handel.js"></script>
-  <script src="js/dfl_historie.js"></script>
-  <script src="js/dfl_icons.js"></script>
-  <script src="vendor/facesjs/facesjs.js"></script>
-  <script src="js/dfl_identitaet.js"></script>
-  <script src="js/dfl_liga_patch.js"></script>
-  <script src="js/dfl_kader_patch.js"></script>
-  <script src="js/dfl_trade_patch.js"></script>
-  <script src="js/dfl_anfragen_patch.js"></script>
-  <script src="js/dfl_trainingsgruppe_patch.js"></script>
-  <script src="js/dfl_finanz_patch.js"></script>
-  <script src="js/dfl_vertraege_patch.js"></script>
-  <script src="js/dfl_eigentuemer_patch.js"></script>
-  <script src="js/dfl_playoffs_patch.js"></script>
-  <script src="js/dfl_ehrungen_patch.js"></script>
-  <script src="js/dfl_analysten_patch.js"></script>
-  <script src="js/dfl_taktik_patch.js"></script>
-  <script src="js/dfl_engine_patch.js"></script>
-  <script src="js/dfl_statistik_patch.js"></script>
-  <script src="js/dfl_design_patch.js"></script>
-  <script src="js/dfl_app_patch.js"></script>
-  <script src="data/dfl_spielicons.js"></script>
-  <script src="js/dfl_spielicons.js"></script>
-  <script src="js/dfl_ui_teile.js"></script>
-  <script src="js/dfl_tickets_patch.js"></script>
-  <script src="js/dfl_werbung_patch.js"></script>
-  <script src="js/dfl_kulisse.js"></script>
-  <script src="app/gelaende6/gelaende6_daten.js"></script>
-  <script src="app/gelaende6/gelaende6_rund.js"></script>
-  <script src="js/dfl_gelaende6.js"></script>
-  <script src="js/dfl_app_shell.js"></script>
-  <script src="js/dfl_speicher_patch.js"></script>
-  <script src="js/dfl_werte_alter_patch.js"></script>
-  <script src="js/dfl_laufband_patch.js"></script>
-  <script src="js/dfl_position_patch.js"></script>
-  <script src="js/dfl_kaderliste_patch.js"></script>
-  <script src="js/dfl_textspiel.js"></script>
-  <script src="js/dfl_textspiel_patch.js"></script>
-  <script src="js/dfl_medizin_patch.js"></script>
-  <script src="js/dfl_auswahl.js"></script>
-  <script src="js/dfl_kenney_patch.js"></script>
-  <script src="js/dfl_saisonwechsel_patch.js"></script>
-  <script src="js/dfl_blick_patch.js"></script>
-  <script src="js/dfl_anlagen_patch.js"></script>
-  <script src="js/dfl_anlagen_bilder.js"></script>
-  <script src="js/dfl_simulieren_patch.js"></script>
-  <script src="js/dfl_testkit.js"></script>
-  <script src="js/dfl_scouting_patch.js"></script>
-  <script src="js/dfl_wechsel_patch.js"></script>
-  <script src="js/dfl_oberflaeche_patch.js"></script>
-  <script src="js/dfl_bilder_patch.js"></script>
-  <script src="js/dfl_lage_patch.js"></script>
-  <script src="js/dfl_lernen_patch.js"></script>
-  <script src="js/dfl_ebenen_patch.js"></script>
-  <script src="js/dfl_trainer.js"></script>
-  <script src="js/dfl_trainerteam_patch.js"></script>
-  <script src="js/dfl_chefscout_patch.js"></script>
-  <script src="js/dfl_wege_patch.js"></script>
-  <script src="js/dfl_sponsoren_patch.js"></script>
-  <script src="data/dfl_geschichten.js"></script>
-  <script src="js/dfl_bank_patch.js"></script>
-  <script src="js/dfl_tutorial.js"></script>
-  <script src="js/dfl_start.js"></script>
-  <script src="js/dfl_zeitung_text.js"></script>
-  <script src="js/dfl_zeitung.js"></script>
-  <script src="js/dfl_vereinswechsel.js"></script>
-  <script src="js/dfl_draftboard.js"></script>
-  <script src="js/dfl_missionen.js"></script>
-  <script src="js/dfl_startdraft.js"></script>
-  <script src="js/dfl_erfolge.js"></script>
-  <script src="js/dfl_laden.js"></script>
-  <script src="js/kickstil_trainer.js"></script>
-  <script src="js/kickstil_prunkkarte.js"></script>
-  <script src="js/kickstil_draftpack.js"></script>
-  <script src="js/dfl_woche_patch.js"></script>
-  <script src="js/dfl_wunder_patch.js"></script>
-  <script src="js/dfl_abschluss_patch.js"></script>
-  <script src="js/kickstil_zeitmaschine.js"></script>
-  <script src="js/kickstil_vitrine.js"></script>
-  <script src="js/kickstil_trikots.js"></script>
-  <script src="js/kickstil_postfach.js"></script>
-  <script src="js/kickstil_frage.js"></script>
-  <script src="js/kickstil_kader_neu.js"></script>
-  <script src="js/kickstil_mehr_neu.js"></script>
-  <script src="js/init_bootstrap.js"></script>
-<script src="../gesamt/saisonplus.js"></script>
-<script src="../gesamt/kickdraft_saisonplus.js"></script>
-<script src="../gesamt/werbung.js"></script>
-<script src="../gesamt/kickdraft_werbung.js"></script>
-<script src="../gesamt/alter.js"></script>
-<script src="../gesamt/rechtliches.js"></script>
-<script src="../gesamt/messung.js"></script>
-<script src="../gesamt/pc_uebersicht.js"></script>
-<script src="../gesamt/pc_raster.js"></script>
-<script src="../gesamt/pc_kader.js"></script>
-<script src="../gesamt/pc_spieltag.js"></script>
-<script src="../gesamt/pc_vorspiel.js"></script>
-<script src="../gesamt/pc_taktik_live.js"></script>
-<script src="../gesamt/pc_handel.js"></script>
-<script src="../gesamt/pc_scouting.js"></script>
-<script src="../gesamt/pc_finanzen.js"></script>
-<script src="../gesamt/pc_liga.js"></script>
-<script src="../gesamt/pc_verein.js"></script>
-<script src="../gesamt/pc_sicherheit.js"></script>
-<script src="../gesamt/pc_komfort.js"></script>
-<script src="../gesamt/kickdraft_push.js"></script>
-<script src="../gesamt/push.js"></script>
-<script src="../gesamt/bewertung.js"></script>
-<script src="../gesamt/pro.js"></script>
-<script src="../gesamt/modus.js"></script>
+<script src="../gesamt/paket_kickdraft_3.js"></script>
 <script>window.KS_LITE = { saisons: 1, spiel: 'Kickdraft', kaufen: '', app: '' };</script>
 <script src="../gesamt/lite.js"></script>
 </body>
