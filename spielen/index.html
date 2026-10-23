@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<script src="gesamt/web_demo.js" data-fl="2" data-kd="1"></script>
+<meta charset="utf-8">
+<!-- Sicherheit (2026-10-18): nur eigene Dateien laden – kein fremdes Skript, kein fremder Server (Werbung läuft nativ in der App) -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; connect-src 'self' data: blob:; worker-src 'self' blob:; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unter Flutlicht</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#8b5a2b">
+<link rel="icon" type="image/png" href="gesamt/icons/icon-48.png">
+<link rel="apple-touch-icon" href="gesamt/icons/apple-touch-icon.png">
+<!-- Moduswahl der Gesamt-App (2026-10-15; Name „Unter Flutlicht“ mit Spielarten Vereinskarriere und Kickdraft seit 2026-10-19). Jedes Spiel liegt in seinem Ordner und hat
+     eigene Spielstände (Kickdraft: Präfix fm_, Flutlicht: fl_). Der zuletzt gespielte Modus steht oben. -->
+<style>
+  @font-face { font-family: Fredoka; font-weight: 600; src: url(flutlicht/vendor/fonts/fredoka-latin-600-normal.woff2) format('woff2'); }
+  @font-face { font-family: Fredoka; font-weight: 700; src: url(flutlicht/vendor/fonts/fredoka-latin-700-normal.woff2) format('woff2'); }
+  @font-face { font-family: Rubik; font-weight: 500; src: url(flutlicht/vendor/fonts/rubik-latin-500-normal.woff2) format('woff2'); }
+  :root { --sand: #f4e3c1; --holz: #8b5a2b; --holz-tief: #5e3b1a; --karte: #fffaf0; --text: #2b2a26; --text2: #7a6a55;
+          --gruen: #25c065; --gruen-tief: #188a46; --blau: #2c7cb5; --blau-tief: #1d5a86; --punkt: rgba(139,90,43,.12); }
+  @media (prefers-color-scheme: dark) {
+    :root { --sand: #12141d; --karte: #1e2230; --text: #eef0f6; --text2: #9aa3b8; --holz: #3a4258; --holz-tief: #0b0d14; --punkt: rgba(255,255,255,.05); }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--sand); background-image: radial-gradient(var(--punkt) 1.5px, transparent 1.6px); background-size: 18px 18px;
+         color: var(--text); font-family: Rubik, system-ui, sans-serif; display: flex; justify-content: center;
+         padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)); }
+  main { width: 100%; max-width: 520px; }
+  h1 { font-family: Fredoka, Rubik, sans-serif; font-weight: 700; font-size: 30px; text-align: center; margin: 12px 0 4px; }
+  p.unter { text-align: center; color: var(--text2); margin: 0 0 22px; }
+  .modus { display: flex; align-items: center; gap: 16px; width: 100%; text-align: left; cursor: pointer; text-decoration: none; color: inherit;
+           background: var(--karte); border: 4px solid var(--holz); border-radius: 20px; padding: 16px; margin-bottom: 16px;
+           box-shadow: 0 6px 0 var(--holz-tief); transition: transform .08s, box-shadow .08s; }
+  .modus:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--holz-tief); }
+  .modus img { width: 84px; height: 84px; border-radius: 18px; flex: none; }
+  .modus .txt { flex: 1; min-width: 0; }
+  .modus b { display: block; font-family: Fredoka, Rubik, sans-serif; font-size: 22px; line-height: 1.15; }
+  .modus small { display: block; color: var(--text2); font-size: 14px; margin-top: 4px; line-height: 1.35; }
+  .modus .stand { display: inline-block; margin-top: 8px; font-size: 12px; font-weight: 500; padding: 3px 9px; border-radius: 99px;
+                  background: color-mix(in srgb, var(--gruen) 18%, transparent); color: var(--gruen-tief); }
+  .modus .stand[hidden] { display: none; }
+  .modus .zuletzt { display: none; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--blau); margin-bottom: 4px; }
+  .modus.letzter .zuletzt { display: block; }
+  .modus .los { flex: none; font-family: Fredoka, Rubik, sans-serif; font-weight: 700; color: #fff; background: var(--gruen);
+                border-radius: 14px; padding: 10px 14px; box-shadow: 0 4px 0 var(--gruen-tief); }
+  footer { text-align: center; color: var(--text2); font-size: 12px; margin-top: 22px; }
+  footer img.studio { display: block; width: 200px; height: auto; margin: 0 auto 6px; }
+  /* PC-App (Stolperstein 7): Startseite wächst am großen Bildschirm mit, Handy unverändert */
+  @media (min-width: 1400px) and (min-height: 820px) { html.pc main { zoom: 1.3; } }
+  @media (min-width: 1800px) and (min-height: 1000px) { html.pc main { zoom: 1.55; } }
+  @media (max-width: 380px) { .modus img { width: 64px; height: 64px; } .modus b { font-size: 19px; } .modus .los { display: none; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Unter Flutlicht</h1>
+  <p class="unter">Welche Spielart heute? Deine Spielstände bleiben je Spielart getrennt.</p>
+
+  <a class="modus" id="m-flutlicht" href="flutlicht/index.html" data-modus="flutlicht">
+    <img src="flutlicht/icons/flutlicht_icon_192.png" alt="">
+    <span class="txt"><span class="zuletzt">Zuletzt gespielt</span><b>Vereinskarriere</b>
+      <small>Klassisch: Ligapyramide mit Auf- und Abstieg, Pokal, Europapokal, Transfermarkt</small>
+      <span class="stand" id="s-flutlicht" hidden></span></span>
+    <span class="los">Los</span>
+  </a>
+
+  <a class="modus" id="m-kickdraft" href="kickdraft/index.html" data-modus="kickdraft">
+    <img src="kickdraft/app/icon-192.png" alt="">
+    <span class="txt"><span class="zuletzt">Zuletzt gespielt</span><b>Kickdraft</b>
+      <small>Fußball mit NFL-Regeln: Franchise-Liga ohne Abstieg, Draft, Salary Cap, Playoffs</small>
+      <span class="stand" id="s-kickdraft" hidden></span></span>
+    <span class="los">Los</span>
+  </a>
+
+  <footer>
+    <picture><source srcset="gesamt/studio_logo_dunkel.png" media="(prefers-color-scheme: dark)">
+      <img class="studio" src="gesamt/studio_logo.png" alt="Langer Hafer Studios" width="700" height="240"></picture>
+    <span>Ein Spiel von Langer Hafer Studios · Alle Vereine und Spieler sind erfunden.</span>
+  </footer>
+</main>
+<script>
+  try { if (window.FcmPc || localStorage.getItem('pcs-test') === 'an') document.documentElement.classList.add('pc'); } catch (e) { /* Handy */ }
+  (function () {
+    'use strict';
+    // Spielstände je Spiel zählen (Index im eigenen Präfix) und den zuletzt gespielten Modus nach oben holen
+    function anzahl(praefix) {
+      try { const i = JSON.parse(localStorage.getItem(praefix + 'fcm-saves-index') || 'null'); return i && i.slots ? i.slots.length : 0; }
+      catch (e) { return 0; }
+    }
+    [['flutlicht', 'fl_'], ['kickdraft', 'fm_']].forEach(([m, p]) => {
+      const n = anzahl(p), el = document.getElementById('s-' + m);
+      if (n) { el.textContent = n === 1 ? '1 Spielstand' : n + ' Spielstände'; el.hidden = false; }
+    });
+    let letzter = null;
+    try { letzter = localStorage.getItem('gesamt-modus'); } catch (e) { /* ohne Speicher */ }
+    const karte = letzter && document.getElementById('m-' + letzter);
+    if (karte) { karte.classList.add('letzter'); karte.parentNode.insertBefore(karte, document.querySelector('.modus')); }
+    document.querySelectorAll('.modus').forEach(a => a.addEventListener('click', () => {
+      try { localStorage.setItem('gesamt-modus', a.dataset.modus); } catch (e) { /* egal */ }
+    }));
+  })();
+</script>
+<script src="gesamt/alter.js"></script>
+</body>
+</html>

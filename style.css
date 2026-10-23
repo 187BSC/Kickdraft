@@ -81,3 +81,10 @@ h2 { font-size: 30px; margin: 0 0 16px; }
 .spiel .karten { margin-bottom: 28px; }
 .spiel .bilder { margin-bottom: 22px; grid-auto-columns: 240px; }
 @media (max-width: 520px) { .knoepfe .knopf { width: 100%; justify-content: center; } .spiel > .knopf { width: 100%; justify-content: center; } }
+
+/* Eine Demo für beide Spielarten, PC-Bild (2026-10-23) */
+.direkt { margin: 14px 0 0; font-size: 15px; color: var(--text2); }
+.direkt a { font-weight: 500; }
+.pc-bild { margin: 0 0 28px; }
+.pc-bild img { width: 100%; height: auto; border-radius: 18px; border: 3px solid var(--rand); box-shadow: 0 5px 0 var(--rand); background: var(--karte); }
+.pc-bild figcaption { font-size: 15px; color: var(--text2); text-align: center; margin-top: 12px; }

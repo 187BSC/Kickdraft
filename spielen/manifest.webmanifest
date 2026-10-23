@@ -1,0 +1,17 @@
+{
+  "name": "Unter Flutlicht",
+  "short_name": "Unter Flutlicht",
+  "description": "Ein Fußball-Manager, zwei Spielarten: Vereinskarriere (Ligapyramide) und Kickdraft (Franchise-Liga mit Draft).",
+  "lang": "de",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f4e3c1",
+  "theme_color": "#8b5a2b",
+  "icons": [
+    { "src": "gesamt/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "gesamt/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "gesamt/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
