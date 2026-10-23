@@ -1,0 +1,123 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   DFL-Theme „Freundlich“ · v1  (lädt NACH theme_dfl.css)
+   ─────────────────────────────────────────────────────────────────────────
+   Wärmer und runder, passend zu den Comic-Gesichtern (facesjs):
+     · Schriften: Baloo 2 (Überschriften, Zahlen) + Nunito (Text) – SIL OFL,
+       beide mit gleich breiten Ziffern für Tabellen
+     · Warme Grautöne aus Radix Colors „sand“ (MIT): hell (sand.css) oder
+       dunkel (sand-dark.css + Klasse .dark)
+     · Große Rundungen, weiche Schatten, Pillen-Navigation, Vereinsfarbe als Fläche
+   Aktivieren: <html class="freundlich"> (hell) bzw. <html class="freundlich dark">.
+   Hinweis Einbau: Für „hell“ müssen feste dunkle Farben im Spiel überschrieben
+   werden (siehe docs/konzept-design.md); „dunkel“ geht ohne diese Arbeit.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@font-face { font-family: 'Baloo 2'; font-weight: 400 800; font-display: swap;
+  src: url('../vendor/fonts/baloo-2-latin-wght-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Nunito'; font-weight: 200 1000; font-display: swap;
+  src: url('../vendor/fonts/nunito-latin-wght-normal.woff2') format('woff2'); }
+
+/* ── Tokens hell ────────────────────────────────────────────────────────────── */
+html.freundlich {
+  --bg: #f6f4ee;
+  --bg2: #ffffff; --bg3: var(--sand-3); --bg4: var(--sand-4);
+  --border: var(--sand-5); --text: var(--sand-12); --text2: var(--sand-11); --text3: var(--sand-10);
+  --gold: #b7791f; --red: #d6402f; --blue: #2f6fca;
+  --font-display: 'Baloo 2', 'Arial Rounded MT Bold', 'Segoe UI', sans-serif;
+  --font-text: 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --rund: 16px; --rund-klein: 12px;
+  --schatten: 0 1px 2px rgb(60 50 30 / .07), 0 6px 18px rgb(60 50 30 / .08);
+  --schatten-hoch: 0 2px 4px rgb(60 50 30 / .08), 0 12px 28px rgb(60 50 30 / .12);
+  color-scheme: light;
+}
+/* ── Tokens dunkel ──────────────────────────────────────────────────────────── */
+html.freundlich.dark {
+  /* Schriften und Rundungen wiederholen: :root.dark aus theme_dfl.css wäre sonst stärker */
+  --font-display: 'Baloo 2', 'Arial Rounded MT Bold', 'Segoe UI', sans-serif;
+  --font-text: 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --rund: 16px; --rund-klein: 12px;
+  --bg: var(--sand-1);
+  --bg2: var(--sand-2); --bg3: var(--sand-3); --bg4: var(--sand-5);
+  --border: var(--sand-5); --text: var(--sand-12); --text2: var(--sand-11); --text3: var(--sand-9);
+  --gold: #f0c05a; --red: #f07462; --blue: #7cb2f2;
+  --schatten: 0 1px 2px rgb(0 0 0 / .3), 0 6px 18px rgb(0 0 0 / .25);
+  --schatten-hoch: 0 2px 4px rgb(0 0 0 / .35), 0 12px 28px rgb(0 0 0 / .35);
+  color-scheme: dark;
+}
+html.freundlich body { background: var(--bg); }
+html.freundlich .app { background: var(--bg); color: var(--text); font-family: var(--font-text); border-radius: 20px; }
+html.freundlich body { font-family: var(--font-text); }   /* Overlays an <body> (Begrüßung, Draft …) */
+
+/* ── Typografie ─────────────────────────────────────────────────────────────── */
+html.freundlich .hc-big, html.freundlich .hc-club-name, html.freundlich .pcard-ovr, html.freundlich .pcard-name,
+html.freundlich .squad-ovr, html.freundlich .hm-name, html.freundlich .dfl-titel, html.freundlich .dfl-scorebug .name,
+html.freundlich .dfl-scorebug .mitte, html.freundlich .dfl-chip b, html.freundlich .dfl-ticker .label, html.freundlich .appnav-btn {
+  font-family: var(--font-display); letter-spacing: 0; text-transform: none;
+}
+html.freundlich .hc-big { font-size: 32px; font-weight: 800; line-height: 1; }
+html.freundlich .hc-label { font-family: var(--font-text); font-weight: 800; letter-spacing: .04em; color: var(--text3); }
+html.freundlich .news-title, html.freundlich .squad-name { font-weight: 700; }
+
+/* ── Navigation als Pillen ──────────────────────────────────────────────────── */
+html.freundlich .appnav { gap: 6px; padding: 10px 14px; border: 0; background: transparent; }
+html.freundlich .appnav-btn { font-size: 15px; font-weight: 700; border: 0; border-radius: 999px; padding: 8px 16px;
+  color: var(--text2); background: var(--bg2); box-shadow: var(--schatten); }
+html.freundlich .appnav-btn:hover { color: var(--text); background: var(--bg2); transform: translateY(-1px); }
+html.freundlich .appnav-btn.active { color: var(--accent-ink); background: var(--accent); border: 0; }
+
+/* ── Flächen ────────────────────────────────────────────────────────────────── */
+html.freundlich .home-card, html.freundlich .news-item, html.freundlich .squad-row, html.freundlich .pcard-box,
+html.freundlich .lg-wrap, html.freundlich .dfl-karte {
+  background: var(--bg2); border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+  border-radius: var(--rund); box-shadow: var(--schatten);
+}
+html.freundlich .home-card:hover, html.freundlich .squad-row:hover { box-shadow: var(--schatten-hoch); border-color: var(--accent); }
+html.freundlich .squad-row { border-radius: var(--rund-klein); }
+html.freundlich .squad-row.selected { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 35%, transparent); }
+html.freundlich .squad-pos { border-radius: 999px; background: var(--bg3); color: var(--text2); }
+html.freundlich .squad-ovr { font-weight: 800; color: var(--text); }
+html.freundlich .news-item { border-left: 0; display: flex; gap: 12px; align-items: center; }
+html.freundlich .news-icon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0;
+  background: color-mix(in oklab, var(--accent) 16%, var(--bg2)); color: var(--accent-text); font-size: 20px; }
+html.freundlich .news-item.cat-club .news-icon { background: color-mix(in oklab, #8b6cf0 18%, var(--bg2)); color: #6b4fd8; }
+html.freundlich .news-item.cat-transfer .news-icon { background: color-mix(in oklab, #e8a33d 20%, var(--bg2)); color: #a8681a; }
+html.freundlich .news-item.cat-season .news-icon { background: color-mix(in oklab, #e0533f 18%, var(--bg2)); color: #c03a28; }
+html.freundlich .news-item.cat-cup .news-icon { background: color-mix(in oklab, #3d86e0 18%, var(--bg2)); color: #2b6cc0; }
+html.freundlich.dark .news-item .news-icon { color: color-mix(in oklab, currentColor 55%, #fff); }
+html.freundlich .lg-table tr.fcm-row { background: color-mix(in oklab, var(--accent) 16%, transparent); }
+html.freundlich .lg-table tr.fcm-row td:first-child { box-shadow: inset 4px 0 0 var(--accent); }
+html.freundlich .lg-table tr.fcm-row td, html.freundlich .lg-table tr.fcm-row .lg-name { color: var(--text); font-weight: 800; }
+html.freundlich .lg-table tbody tr:nth-child(even) { background: color-mix(in oklab, var(--bg3) 50%, transparent); }
+html.freundlich .lg-table td, html.freundlich .lg-table th { border-color: color-mix(in oklab, var(--border) 50%, transparent); }
+
+/* ── Vereinskopf: Vereinsfarbe als Fläche ───────────────────────────────────── */
+html.freundlich .dfl-kopf { margin: 14px; border-radius: 22px; border: 0; box-shadow: var(--schatten-hoch);
+  color: var(--accent-ink);
+  background:
+    repeating-linear-gradient(135deg, rgb(255 255 255 / .07) 0 14px, transparent 14px 28px),
+    linear-gradient(120deg, var(--accent), color-mix(in oklab, var(--accent) 70%, var(--verein-2))); }
+html.freundlich .dfl-kopf .dfl-wappen { width: 76px; height: 80px; filter: drop-shadow(0 4px 8px rgb(0 0 0 / .25)); }
+html.freundlich .dfl-kopf .dfl-titel { font-size: 36px; font-weight: 800; text-transform: none; color: var(--accent-ink); }
+html.freundlich .dfl-kopf .dfl-unter { color: color-mix(in oklab, var(--accent-ink) 78%, transparent); }
+html.freundlich .dfl-chip { border-radius: 999px; border: 0; background: rgb(255 255 255 / .9); color: #55524a; box-shadow: 0 2px 6px rgb(0 0 0 / .12); }
+html.freundlich .dfl-chip b { color: #1d1c19; font-weight: 800; }
+
+/* ── Spielstandsanzeige & Ticker ────────────────────────────────────────────── */
+html.freundlich .dfl-scorebug { border-radius: 999px; border: 0; background: var(--bg3); box-shadow: inset 0 0 0 1px var(--border); }
+html.freundlich .dfl-scorebug .name { text-transform: none; font-weight: 800; }
+html.freundlich .dfl-scorebug .mitte { border-radius: 999px; margin: 6px 0; padding: 6px 18px; text-transform: none; }
+html.freundlich .dfl-ticker { margin: 0 14px 14px; border: 0; border-radius: 999px; background: var(--bg2); box-shadow: var(--schatten); }
+html.freundlich .dfl-ticker .label { border-radius: 999px; text-transform: none; margin: 4px; padding: 6px 14px;
+  box-shadow: 0 0 0 5px var(--bg2); }
+
+/* ── Gesichter & Wappen ─────────────────────────────────────────────────────── */
+html.freundlich .dfl-face { border: 2px solid var(--bg2); box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 45%, transparent);
+  background: radial-gradient(circle at 50% 35%, color-mix(in oklab, var(--verein-1) 28%, #fff), color-mix(in oklab, var(--verein-1) 55%, #fff)); }
+html.freundlich.dark .dfl-face { border-color: var(--bg2);
+  background: radial-gradient(circle at 50% 35%, color-mix(in oklab, var(--verein-1) 45%, var(--bg3)), color-mix(in oklab, var(--verein-1) 25%, var(--bg2))); }
+html.freundlich .dfl-face.gross { border-width: 4px; box-shadow: 0 0 0 3px var(--accent), var(--schatten); }
+html.freundlich .lg-crest { width: 22px !important; height: 23px !important; }
+
+/* ── Bausteine der Spieltiefe (Stimmung, Handel, Ranking, Historie) ─────────── */
+html.freundlich .dfl-balken { background: var(--bg3); border-radius: 999px; }
+html.freundlich .dfl-pill { border-radius: 999px; }

@@ -68,3 +68,16 @@ h2 { font-size: 30px; margin: 0 0 16px; }
 .text p, .text ul { margin: 0 0 8px; } .text p:last-child, .text ul:last-child { margin-bottom: 0; }
 .text ul { padding-left: 22px; }
 .zurueck { display: inline-block; margin: 4px 0 8px; color: var(--text2); font-weight: 500; }
+
+/* Studio-Seite mit zwei Spielarten (2026-10-23) */
+:root { --blau: #2c7cb5; --blau-rand: #1e5a85; }
+.studio-logo { width: clamp(180px, 34vw, 260px); height: auto; }
+.vorzeile { font: 700 14px/1 'Rubik', sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); margin: 0 0 10px; }
+.knoepfe { display: flex; flex-wrap: wrap; gap: 14px; }
+.knopf-blau { background: var(--blau); color: #fff; border-color: var(--blau-rand); box-shadow: 0 5px 0 var(--blau-rand); }
+.spiel { padding: 8px 0 44px; }
+.spiel > .leit { font-size: 18px; color: var(--text2); margin: 0 0 22px; max-width: 40em; }
+.spiel h2 { font-size: clamp(30px, 5vw, 42px); }
+.spiel .karten { margin-bottom: 28px; }
+.spiel .bilder { margin-bottom: 22px; grid-auto-columns: 240px; }
+@media (max-width: 520px) { .knoepfe .knopf { width: 100%; justify-content: center; } .spiel > .knopf { width: 100%; justify-content: center; } }

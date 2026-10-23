@@ -1,0 +1,58 @@
+/* Anlagen-Bilder (aus Kickdraft css/dfl_anlagen.css, 2026-10-17): Gebäude des Geländes je Stufe statt der alten Zeichnungen */
+
+/* Zustandsbalken (Kenney: 12 px, 2-px-Rand, Strich bei 30 %) */
+.anl-akku { position: relative; display: block; height: 12px; border: 2px solid var(--k-rand, var(--border, #3b3a37)); border-radius: 6px;
+  background: var(--bg4, #343a50); box-sizing: border-box; overflow: hidden; min-width: 0; }
+.anl-akku > i { display: block; height: 100%; }
+.anl-akku > em { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--text, #f5f6fa); opacity: .55; }
+.anl-akku.klein { height: 10px; }
+.anl-akku > i.gut, .anl-ok > i.gut { background: var(--app-gut, #3d9a2a); }
+.anl-akku > i.mittel, .anl-ok > i.mittel { background: var(--app-mittel, #d29a0c); }
+.anl-akku > i.schlecht, .anl-ok > i.schlecht { background: var(--app-schlecht, #d0402f); }
+.fc-img-wrap.anl-wrap { height: auto; aspect-ratio: 576 / 320; background: var(--k-info-bg, var(--bg3, #262a3a)); }
+.anl-bild { background-position: center; background-size: contain; background-repeat: no-repeat; }
+.fc-img.anl-bild { width: 100%; height: 100%; }
+.anl-bild-stadion-1 { background-image: url('../app/anlagen/stadion-1.webp'); }
+.anl-bild-stadion-2 { background-image: url('../app/anlagen/stadion-2.webp'); }
+.anl-bild-stadion-3 { background-image: url('../app/anlagen/stadion-3.webp'); }
+.anl-bild-stadion-4 { background-image: url('../app/anlagen/stadion-4.webp'); }
+.anl-bild-stadion-5 { background-image: url('../app/anlagen/stadion-5.webp'); }
+.anl-bild-rund-1 { background-image: url('../app/anlagen/rund-1.webp'); }
+.anl-bild-rund-2 { background-image: url('../app/anlagen/rund-2.webp'); }
+.anl-bild-rund-3 { background-image: url('../app/anlagen/rund-3.webp'); }
+.anl-bild-rund-4 { background-image: url('../app/anlagen/rund-4.webp'); }
+.anl-bild-rund-5 { background-image: url('../app/anlagen/rund-5.webp'); }
+.anl-bild-training-1 { background-image: url('../app/anlagen/training-1.webp'); }
+.anl-bild-training-2 { background-image: url('../app/anlagen/training-2.webp'); }
+.anl-bild-training-3 { background-image: url('../app/anlagen/training-3.webp'); }
+.anl-bild-training-4 { background-image: url('../app/anlagen/training-4.webp'); }
+.anl-bild-training-5 { background-image: url('../app/anlagen/training-5.webp'); }
+.anl-bild-fanshop-1 { background-image: url('../app/anlagen/fanshop-1.webp'); }
+.anl-bild-fanshop-2 { background-image: url('../app/anlagen/fanshop-2.webp'); }
+.anl-bild-fanshop-3 { background-image: url('../app/anlagen/fanshop-3.webp'); }
+.anl-bild-fanshop-4 { background-image: url('../app/anlagen/fanshop-4.webp'); }
+.anl-bild-fanshop-5 { background-image: url('../app/anlagen/fanshop-5.webp'); }
+.anl-bild-scouting-1 { background-image: url('../app/anlagen/scouting-1.webp'); }
+.anl-bild-scouting-2 { background-image: url('../app/anlagen/scouting-2.webp'); }
+.anl-bild-scouting-3 { background-image: url('../app/anlagen/scouting-3.webp'); }
+.anl-bild-scouting-4 { background-image: url('../app/anlagen/scouting-4.webp'); }
+.anl-bild-scouting-5 { background-image: url('../app/anlagen/scouting-5.webp'); }
+.fc-roi-ico.anl-vorschau { width: 72px; height: 40px; flex: none; margin: -2px 2px -2px -2px; border-radius: 8px;
+  background-color: var(--k-info-bg, var(--bg3, #262a3a)); border: 2px solid var(--k-linie, var(--border, #30363d)); }
+.fc-roi:has(.anl-vorschau) { align-items: center; }
+.anl-bau { display: flex; flex-direction: column; gap: 7px; margin-top: 10px; padding: 10px 12px; border-radius: 12px;
+  background: var(--k-mittel-bg, var(--bg3, #262a3a)); border: 2px solid var(--k-linie, var(--border, #30363d)); }
+.anl-bau-kopf { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--k-mittel-fg, var(--text, #f5f6fa)); }
+.anl-bau-kopf > i { font-size: 18px; flex: none; }
+.fc-maxed > i, .anl-zurueck > i { font-size: 1.15em; vertical-align: -2px; }
+.anl-bild-jugend-1 { background-image: url('../app/anlagen/jugend-1.webp'); }
+.anl-bild-jugend-2 { background-image: url('../app/anlagen/jugend-2.webp'); }
+.anl-bild-jugend-3 { background-image: url('../app/anlagen/jugend-3.webp'); }
+.anl-bild-jugend-4 { background-image: url('../app/anlagen/jugend-4.webp'); }
+.anl-bild-jugend-5 { background-image: url('../app/anlagen/jugend-5.webp'); }
+
+/* Stadionform wählen (2026-10-17) */
+.anl-form { display: flex; align-items: center; gap: 6px; margin: 8px 0 2px; font-size: 13px; color: var(--text2); }
+.anl-form > span { margin-right: 4px; font-weight: 600; }
+.anl-form-k { flex: 1; min-height: 36px; border-radius: 10px; border: 2px solid var(--k-rand); background: var(--bg2); color: var(--text); font: inherit; font-weight: 600; cursor: pointer; }
+.anl-form-k.an { background: var(--accent); color: var(--accent-ink, #fff); border-color: var(--accent); }

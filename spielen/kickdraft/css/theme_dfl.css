@@ -1,0 +1,136 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   DFL-Theme · v1  (lädt NACH styles.css und theme_broadcast.css)
+   ─────────────────────────────────────────────────────────────────────────
+   Weniger „generisch“, mehr Verein:
+     · Schriften: Big Shoulders Display (Überschriften, Zahlen) + Archivo (Text,
+       Tabellen) – beide SIL Open Font License, lokal in vendor/fonts/
+     · Neutrale Grautöne aus Radix Colors „slate-dark“ (MIT, vendor/radix/)
+     · Akzent = Farbe des gewählten Vereins (setzt js/dfl_identitaet.js zur Laufzeit)
+     · Wappen statt Initialenkreise, Gesichter (facesjs) in Kader und Spielerkarte
+     · Weniger Rundungen, kein Leuchten, Fernseh-Elemente (Spielstandsanzeige, Ticker)
+   Voraussetzung: <html class="dark"> und vendor/radix/slate-dark.css geladen.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@font-face { font-family: 'Big Shoulders Display'; font-weight: 700; font-display: swap;
+  src: url('../vendor/fonts/big-shoulders-display-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Big Shoulders Display'; font-weight: 800; font-display: swap;
+  src: url('../vendor/fonts/big-shoulders-display-latin-800-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Archivo'; font-weight: 400; font-display: swap;
+  src: url('../vendor/fonts/archivo-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Archivo'; font-weight: 500; font-display: swap;
+  src: url('../vendor/fonts/archivo-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Archivo'; font-weight: 600; font-display: swap;
+  src: url('../vendor/fonts/archivo-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Archivo'; font-weight: 700; font-display: swap;
+  src: url('../vendor/fonts/archivo-latin-700-normal.woff2') format('woff2'); }
+
+/* ── Tokens: Namen des Spiels bleiben, Werte kommen aus Radix slate-dark ─────── */
+:root.dark {
+  --bg: var(--slate-1);  --bg2: var(--slate-2); --bg3: var(--slate-3); --bg4: var(--slate-5);
+  --border: var(--slate-6); --text: var(--slate-12); --text2: var(--slate-11); --text3: var(--slate-9);
+  --gold: #e8b64c; --red: #f0614f; --blue: #6aa8f0;
+  /* Vereinsfarben (überschreibt DFLIdentitaet.vereinsTheme) */
+  --accent: #2fb36b; --accent-text: #57d18c; --accent-ink: #0b1a12; --verein-1: #2fb36b; --verein-2: #ffffff;
+  --akzent-tief: color-mix(in oklab, var(--accent), #000 38%);
+  --font-display: 'Big Shoulders Display', 'Arial Narrow', 'Roboto Condensed', sans-serif;
+  --font-text: 'Archivo', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --rund: 4px;
+  color-scheme: dark;
+}
+:root.dark body { background: var(--bg); }
+.dark .app { background: var(--bg); font-family: var(--font-text); border-radius: var(--rund); }
+/* auch für alles, was direkt an <body> hängt (Begrüßung, Draft, Meldungen) – sonst Times als Browser-Standard */
+.dark body { font-family: var(--font-text); }
+
+/* ── Typografie: Anzeigeschrift für Namen, Zahlen und Navigation ────────────── */
+.dark .hc-big, .dark .hc-club-name, .dark .pcard-ovr, .dark .pcard-name, .dark .score-box, .dark .squad-ovr,
+.dark .tp-name, .dark .hm-name, .dark .hm-vs-x, .dark .dfl-titel {
+  font-family: var(--font-display); letter-spacing: .01em;
+}
+.dark .hc-big { font-size: 30px; font-weight: 800; line-height: 1; }
+.dark .hc-label, .dark .lg-table th { font-family: var(--font-text); letter-spacing: .09em; }
+.dark .appnav-btn { font-family: var(--font-display); font-size: 16px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
+.dark .appnav-btn.active { color: var(--text); border-bottom: 3px solid var(--accent); background: transparent; }
+.dark .lg-table, .dark .squad-row, .dark .pcard-row { font-variant-numeric: tabular-nums; }
+
+/* ── Flächen: weniger Rundung, kein grünes Leuchten, Akzent aus dem Verein ──── */
+.dark .home-card { border-radius: var(--rund); background: var(--bg2); box-shadow: none; }
+.dark .home-card:hover { border-color: var(--slate-7); }
+.dark .home-card.home-club {
+  background: linear-gradient(100deg, color-mix(in oklab, var(--verein-1) 42%, var(--bg2)) 0 86px, var(--bg2) 86.5px);
+  border-color: color-mix(in oklab, var(--accent) 60%, var(--border));
+}
+.dark .hc-action { color: var(--accent-text); }
+.dark .cal-next, .dark .cal-next:hover { background: var(--accent); color: var(--accent-ink); }
+.dark .squad-row { border-radius: var(--rund); }
+.dark .squad-row:hover { border-color: var(--accent); }
+.dark .lg-table tr.fcm-row { background: color-mix(in oklab, var(--accent) 18%, transparent); }
+.dark .lg-table tr.fcm-row td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+.dark .news-item { border-radius: var(--rund); background: var(--bg2); }
+.dark .news-item.cat-match { border-left-color: var(--accent); }
+
+/* ── Wappen: Kreise mit Initialen werden zu Schilden (crestStyle liefert das Bild) ─ */
+.dark .hc-club-badge, .dark .hm-crest, .dark .lg-crest, .dark .tp-crest {
+  border-radius: 0 !important; box-shadow: none !important; color: transparent;
+}
+.dark .hc-club-badge { width: 54px; height: 56px; background-color: transparent; }
+.dfl-wappen { display: inline-block; line-height: 0; }
+.dfl-wappen svg { width: 100%; height: 100%; display: block; }
+
+/* ── Gesichter ──────────────────────────────────────────────────────────────── */
+.dfl-face { display: inline-block; vertical-align: middle; flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; overflow: hidden;
+  background: color-mix(in oklab, var(--verein-1) 30%, var(--bg3)); border: 1px solid var(--border); }
+.dfl-face svg { width: 100%; height: 150%; display: block; margin-top: -4%; }
+.dfl-face.gross { width: 96px; height: 96px; border-width: 2px; border-color: var(--accent); }
+.dfl-face.gross svg { margin-top: 2%; }
+
+/* ── Icons statt Emoji ──────────────────────────────────────────────────────── */
+.dfl-icon { width: 1.1em; height: 1.1em; vertical-align: -0.18em; flex-shrink: 0; }
+.dark .news-icon { color: var(--accent-text); }
+
+/* ── Kopfzeile des Vereins ──────────────────────────────────────────────────── */
+.dfl-kopf { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; padding: 14px 18px;
+  /* Farbband nur hinter dem Wappen: Text steht immer auf dunklem Grund, auch bei hellen Vereinsfarben */
+  background: linear-gradient(100deg, color-mix(in oklab, var(--verein-1) 55%, var(--bg)) 0 104px, var(--bg2) 104.5px);
+  border-bottom: 3px solid var(--accent); }
+.dfl-kopf .dfl-wappen { width: 64px; height: 67px; }
+.dfl-kopf .dfl-titel { font-size: 34px; font-weight: 800; line-height: .95; text-transform: uppercase; }
+.dfl-kopf .dfl-unter { color: var(--text2); font-size: 13px; margin-top: 4px; }
+.dfl-kopf .dfl-chips { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+.dfl-chip { font: 600 12px/1 var(--font-text); padding: 7px 10px; border: 1px solid var(--border); background: var(--bg);
+  border-radius: var(--rund); color: var(--text2); white-space: nowrap; }
+.dfl-chip b { color: var(--text); font: 800 16px/1 var(--font-display); margin-left: 4px; }
+
+/* ── Spielstandsanzeige (Scorebug) ──────────────────────────────────────────── */
+.dfl-scorebug { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: stretch; border-radius: var(--rund);
+  overflow: hidden; border: 1px solid var(--border); background: var(--bg); }
+.dfl-scorebug .seite { display: flex; align-items: center; gap: 10px; padding: 10px 12px; min-width: 0; }
+.dfl-scorebug .seite.gast { flex-direction: row-reverse; text-align: right; }
+.dfl-scorebug .seite .dfl-wappen { width: 40px; height: 42px; flex-shrink: 0; }
+.dfl-scorebug .name { font: 800 20px/1 var(--font-display); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dfl-scorebug .bilanz { font-size: 12px; color: var(--text2); margin-top: 3px; font-variant-numeric: tabular-nums; }
+.dfl-scorebug .mitte { display: grid; place-items: center; padding: 6px 14px; background: var(--accent); color: var(--accent-ink);
+  font: 800 13px/1.15 var(--font-display); text-transform: uppercase; text-align: center; letter-spacing: .04em; }
+.dfl-scorebug .mitte b { font-size: 22px; display: block; }
+.dfl-scorebug .name .kurz { display: none; }
+@media (max-width: 560px) {
+  .dfl-scorebug .seite { flex-direction: column; text-align: center; gap: 6px; padding: 10px 6px; }
+  .dfl-scorebug .seite.gast { flex-direction: column; text-align: center; }
+  .dfl-scorebug .name { font-size: 17px; }
+  .dfl-scorebug .name .lang { display: none; }
+  .dfl-scorebug .name .kurz { display: inline; }
+  .dfl-scorebug .mitte { padding: 6px 8px; }
+  .dfl-kopf { background: linear-gradient(180deg, color-mix(in oklab, var(--verein-1) 55%, var(--bg)) 0 95px, var(--bg2) 95.5px); }
+}
+
+/* ── Nachrichtenticker ──────────────────────────────────────────────────────── */
+.dfl-ticker { display: flex; align-items: stretch; border-top: 1px solid var(--border); background: var(--bg2); overflow: hidden; }
+.dfl-ticker .label { background: var(--accent); color: var(--accent-ink); font: 800 14px/1 var(--font-display); text-transform: uppercase;
+  padding: 10px 12px; display: flex; align-items: center; letter-spacing: .05em; flex-shrink: 0;
+  position: relative; z-index: 1; }   /* über dem laufenden Text */
+.dfl-ticker .lauf { display: flex; gap: 34px; padding: 10px 16px; white-space: nowrap; font-size: 13px; color: var(--text2);
+  animation: dfl-ticker 40s linear infinite; }
+.dfl-ticker .lauf span { display: inline-flex; gap: 6px; align-items: center; }
+.dfl-ticker .lauf .dfl-icon { color: var(--accent-text); }
+@keyframes dfl-ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .dfl-ticker .lauf { animation: none; } }

@@ -1,0 +1,326 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   DFL · Alte Oberfläche im Kenney-Stil  ·  v1   (D85, freigegeben 2026-10-10; js/dfl_oberflaeche_patch.js)
+   ─────────────────────────────────────────────────────────────────────────
+   Lädt als eines der letzten Stylesheets (nach dfl_kenney_reste.css, dfl_blick.css). Nur Tokens – Tag und Nacht;
+   Positionsfarben wie theme_dfl_kenney.css in beiden Stilen gleich (TW gold, Abwehr blau, Mittelfeld grün, Sturm rot).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── A) Positionsmarke: eine Marke überall ─────────────────────────────────── */
+.kpm { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; height: 20px; padding: 0 6px; border-radius: 7px;
+  font: 800 11px/1 var(--font-zahl, var(--font-text, system-ui)); letter-spacing: .02em; white-space: nowrap; vertical-align: middle;
+  box-sizing: border-box; flex: none; border: 0; text-transform: none; }
+.kpm-tw { background: #f1c40f !important; color: #2a1c02 !important; }
+.kpm-abw { background: #2563eb !important; color: #fff !important; }
+.kpm-mf { background: #22c55e !important; color: #052e14 !important; }
+.kpm-st { background: #dc2626 !important; color: #fff !important; }
+.kpm.kpm-paar { background: none !important; padding: 0 !important; min-width: 0; gap: 0; align-items: stretch; overflow: visible; }
+.kpm-paar .kpm-t { display: inline-grid; place-items: center; padding: 0 5px; min-width: 22px; box-sizing: border-box; }
+.kpm-paar .kpm-t:first-child { border-radius: 7px 0 0 7px; padding: 0 6px; min-width: 30px; }
+.kpm-paar .kpm-t:last-child { border-radius: 0 7px 7px 0; }
+.kpm-paar .kpm-t.neben { font-size: 9.5px; box-shadow: inset 2px 0 0 var(--bg2); }
+.kpm.gross { height: 26px; min-width: 40px; font-size: 13px; border-radius: 9px; }
+/* Altmarken bekommen die Größe der Marke, behalten ihren Platz in der Zeile */
+.squad-row .squad-pos.kpm { min-width: 34px; width: auto; height: 22px; padding: 0 5px; border: 0; border-radius: 7px; }
+.squad-row .squad-pos.kpm.kpm-paar { padding: 0; }
+.pm-rating-pos.kpm { min-width: 34px; height: 20px; padding: 0 5px; font-size: 10.5px; }
+/* eigene Positionen neben dem Namen in der Startelf-Liste: klein */
+.squad-ppos.kpm { height: 16px; min-width: 0; padding: 0 4px; margin-left: 4px; font-size: 9px; border-radius: 5px; background-color: transparent; }
+.squad-ppos.kpm-paar .kpm-t { padding: 0 3px; min-width: 0; font-size: 9px; }
+.squad-ppos.kpm-paar .kpm-t:first-child { border-radius: 5px 0 0 5px; min-width: 0; padding: 0 4px; }
+.squad-ppos.kpm-paar .kpm-t:last-child { border-radius: 0 5px 5px 0; }
+.squad-ppos.kpm-paar .kpm-t.neben { font-size: 8px; }
+.sqo-row .pos-badge-sm.kpm-paar, .tg-zeile .pos-badge-sm.kpm-paar { height: 20px; }
+/* Feld: Platz-Marke klein am Gesicht (Lage aus dfl_app_shell.css), Passung als Haken an der Stärke */
+.p-token .tk-pos.kpm { min-width: 0; height: 15px; padding: 0 4px; border-radius: 5px; font-size: 8.5px; box-shadow: 0 1px 0 rgb(0 0 0 / .35); }
+.p-ovr .kpm-passt { font-size: 10px; margin-left: 2px; color: #7ff0a8; vertical-align: -1px; }
+/* Bestenlisten (Ehrenhalle): Mannschaftsteil als Wort mit Farbpunkt */
+.ko-gruppe { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px 2px 6px; margin-right: 6px; border-radius: 999px;
+  border: 2px solid var(--k-linie, var(--border)); background: var(--bg2); color: var(--text); font: 800 11px/1.2 var(--font-text, inherit); vertical-align: middle; }
+.ko-gruppe > i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; }
+
+/* ── Bausteine ───────────────────────────────────────────────────────────── */
+.ko-gesicht { display: inline-block; width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: var(--bg3); border: 2px solid var(--k-rand, var(--border));
+  flex: none; vertical-align: middle; box-sizing: border-box; }
+.ko-gesicht svg { width: 100%; height: 150%; display: block; margin-top: -4%; }
+
+/* ── B) Spieltag: Anzeigetafel ───────────────────────────────────────────── */
+html.kenney .topbar.kt-an { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); grid-template-areas: "heim mitte gast";
+  align-items: center; gap: 4px 8px; padding: 10px 12px 12px; background: var(--bg2); box-shadow: none; }
+.topbar.kt-an .kt-tafel { display: contents; }
+.topbar.kt-an > .kt-alt { display: none !important; }
+.topbar.kt-an > .kt-mitte { grid-area: mitte; }
+.kt-seite { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "w ort" "w st" "w unter"; column-gap: 8px; align-items: center; min-width: 0; }
+.kt-seite.heim { grid-area: heim; }
+.kt-seite.gast { grid-area: gast; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "ort w" "st w" "unter w"; text-align: right; }
+html .kt-seite .kt-wappen.lg-crest { grid-area: w; width: 38px !important; height: 41px !important; font-size: 0 !important; }
+.kt-ort { grid-area: ort; font: 800 14px/1.15 var(--font-display, inherit); color: var(--text); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kt-st { grid-area: st; font: 800 22px/1 var(--font-zahl, inherit); color: var(--text); font-variant-numeric: tabular-nums; }
+.kt-unter { grid-area: unter; font: 700 10.5px/1.2 var(--font-text, inherit); color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kt-unter .ti { font-size: 11px; margin-right: 2px; vertical-align: -1px; }
+html.kenney .topbar.kt-an .score-box { background: var(--bg3); color: var(--text); border: 3px solid var(--k-rand); border-radius: 12px; box-shadow: 0 4px 0 var(--k-rand);
+  font: 800 26px/1 var(--font-zahl, inherit); letter-spacing: 2px; padding: 6px 12px; min-width: 86px; }
+html.kenney .topbar.kt-an .time-badge { border-radius: 999px; border: 2px solid var(--k-linie); background: var(--bg3); color: var(--text2); font: 800 11px/1 var(--font-zahl, inherit); padding: 3px 9px; }
+html.kenney .topbar.kt-an .time-badge:not(.ht):not(.ft) { padding-left: 18px; }
+html.kenney .topbar.kt-an .time-badge.ht { background: var(--k-mittel-bg); color: var(--k-mittel-fg); border-color: color-mix(in oklab, var(--k-mittel-fg) 35%, transparent); }
+.kt-ortchip { font: 800 9.5px/1.1 var(--font-text, inherit); letter-spacing: .05em; text-transform: uppercase; color: var(--text3); white-space: nowrap; }
+
+/* ── C) Spielplan ───────────────────────────────────────────────────────── */
+.kf { display: flex; flex-direction: column; gap: 6px; }
+.kf-titel { display: flex; align-items: center; gap: 6px; margin: 8px 2px 2px; font: 800 12px/1.2 var(--font-text, inherit); letter-spacing: .06em; text-transform: uppercase; color: var(--text3); }
+.kf-titel .ti { font-size: 15px; }
+.kf-liste { display: flex; flex-direction: column; gap: 6px; }
+.kf-zeile { display: grid; grid-template-columns: 30px 26px minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 8px 10px; background: var(--bg2);
+  border: 3px solid var(--k-rand, var(--border)); border-radius: 14px; }
+.kf-zeile.naechst { border-color: var(--k-gold, #f1c40f); box-shadow: 0 4px 0 var(--k-gold-tief, #b7950b); }
+.kf-nr { font: 800 13px/1 var(--font-zahl, inherit); color: var(--text2); text-align: center; }
+html .kf-zeile .kf-wappen.lg-crest { width: 24px !important; height: 26px !important; font-size: 0 !important; }
+.kf-wer { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+.kf-wer b { font-size: 14px; font-weight: 800; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kf-wer small { font-size: 10.5px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--text3); }
+.kf-erg { display: inline-flex; align-items: center; gap: 6px; }
+.kf-erg b { font: 800 16px/1 var(--font-zahl, inherit); font-variant-numeric: tabular-nums; color: var(--text); min-width: 34px; text-align: right; }
+.kf-pill { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 7px; font: 800 12px/1 var(--font-text, inherit); font-style: normal; }
+.kf-pill.s { background: var(--app-gut); color: #fff; } .kf-pill.u { background: var(--bg4); color: var(--text); } .kf-pill.n { background: var(--app-schlecht); color: #fff; }
+.kf-kw { font: 700 11px/1.2 var(--font-text, inherit); color: var(--text3); white-space: nowrap; }
+html.kenney .kf-spielen { background: var(--k-blau-knopf); color: #fff; border-color: var(--k-blau-schatten); box-shadow: 0 3px 0 var(--k-blau-schatten); padding: 6px 12px; }
+.kf-zeile.gespielt { opacity: .96; }
+
+/* ── D) Torjäger, Wertliste: Zeilen mit großer Zahl ─────────────────────── */
+.kt-liste-kopf { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 2px 2px 8px; }
+.kt-liste-kopf h3 { display: flex; align-items: center; gap: 6px; margin: 0; font: 800 15px/1.2 var(--font-display, inherit); }
+.kt-liste-kopf small { font-size: 11px; color: var(--text3); }
+.kz-liste, .kw-liste { display: flex; flex-direction: column; gap: 6px; }
+.kz-zeile { display: grid; grid-template-columns: 26px 24px minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 7px 10px; background: var(--bg2);
+  border: 3px solid var(--k-rand, var(--border)); border-radius: 14px; }
+.kz-zeile.eigen, .kw-zeile.eigen { border-color: var(--k-blau); box-shadow: 0 0 0 1px var(--k-blau) inset; }
+.kz-rang, .kw-rang { font: 800 14px/1 var(--font-zahl, inherit); color: var(--text2); text-align: center; }
+html .kz-zeile .kz-wappen.lg-crest { width: 22px !important; height: 24px !important; font-size: 0 !important; }
+.kz-wappen.leer { display: inline-block; width: 22px; }
+.kz-wer, .kw-wer { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+.kz-wer b, .kw-wer b, .kw-wer .sc-namelink { font-size: 14px; font-weight: 800; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.kw-st .sc-zahl { font-size: 15px; color: var(--text2); }
+.kz-wer small, .kw-wer small { font-size: 11px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kz-zahl, .kw-st, .kw-wert { display: flex; flex-direction: column; align-items: flex-end; line-height: 1; }
+.kz-zahl b { font: 800 22px/1 var(--font-zahl, inherit); color: var(--text); font-variant-numeric: tabular-nums; }
+.kz-zahl small, .kw-st small, .kw-wert small { font-size: 10px; font-weight: 700; color: var(--text3); margin-top: 3px; }
+.kw-zeile { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto auto; align-items: center; gap: 8px; padding: 7px 10px; background: var(--bg2);
+  border: 2px solid var(--k-linie, var(--border)); border-radius: 12px; }
+.kw-st { font: 800 15px/1 var(--font-zahl, inherit); color: var(--text2); }
+.kw-wert { font: 800 20px/1 var(--font-zahl, inherit); color: var(--text); min-width: 36px; }
+.kw-picks { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 74px), 1fr)); gap: 6px; margin-bottom: 10px; }
+.kw-pick { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 7px 4px; background: var(--bg2); border: 2px dashed var(--k-rand, var(--border));
+  border-radius: 12px; text-align: center; }
+.kw-pick small { font: 800 10.5px/1.1 var(--font-text, inherit); color: var(--text3); }
+.kw-pick b { font: 800 20px/1 var(--font-zahl, inherit); color: var(--text); }
+.kw-pick em { font: 700 10px/1.1 var(--font-text, inherit); font-style: normal; color: var(--text2); }
+.kw-pick em span { display: none; }
+.kw-legende { margin: -2px 2px 8px; font-size: 11px; color: var(--text3); }
+/* Wertliste am Handy: Spalten untereinander in ganzer Länge – keine Kästen mit eigenem Scrollbalken (schnitten Zeilen ab) */
+body.dfl-shell #tr-sub-werte .dfl-tr-spalte { max-height: none; overflow: visible; }
+
+/* ── E) Tiefenkader ─────────────────────────────────────────────────────── */
+.kd { display: flex; flex-direction: column; gap: 14px; }
+.kd-kopf { display: flex; align-items: center; gap: 8px; margin: 0 2px 6px; font: 800 12px/1.2 var(--font-text, inherit); letter-spacing: .07em; text-transform: uppercase; color: var(--text3); }
+.kd-kopf small { font-size: 11px; color: var(--text3); letter-spacing: 0; }
+.kd-punkt { display: inline-block; width: 12px; height: 12px; border-radius: 4px; }
+html.kenney .depth-row.kd-zeile, .depth-row.kd-zeile { display: grid; grid-template-columns: 26px auto minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 7px 10px;
+  margin-bottom: 6px; background: var(--bg2); border: 3px solid var(--k-rand, var(--border)); border-radius: 14px; cursor: pointer; }
+html.kenney .depth-row.kd-zeile.is-starter { background: var(--bg2); border-color: var(--k-rand); box-shadow: 0 4px 0 var(--k-rand); }
+.kd-rang { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; font: 800 12px/1 var(--font-zahl, inherit);
+  color: var(--text2); background: var(--bg3); border: 2px solid var(--k-linie, var(--border)); box-sizing: border-box; }
+.kd-rang.m1 { background: #f1c40f; border-color: #b7950b; color: #2a1c02; }
+.kd-rang.m2 { background: #d5dbe1; border-color: #8e9aa6; color: #1f2a35; }
+.kd-rang.m3 { background: #d39b62; border-color: #9a6332; color: #2b1606; }
+.kd-wer { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.kd-wer b { font-size: 14px; font-weight: 800; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kd-zeile.unavailable .kd-wer b { text-decoration: line-through; color: var(--text3); }
+.kd-aus { position: absolute; }
+.kd-wer .kd-aus { position: static; display: inline-flex; align-items: center; gap: 2px; font-size: 11px; font-weight: 800; color: var(--k-schlecht-fg); }
+.kd-fit { display: block; width: 46px; height: 10px; border: 2px solid var(--k-rand, var(--border)); border-radius: 5px; background: var(--bg4); overflow: hidden; box-sizing: border-box; }
+.kd-fit i { display: block; height: 100%; }
+.kd-ovr { font: 800 20px/1 var(--font-zahl, inherit); color: var(--text); text-align: right; font-variant-numeric: tabular-nums; }
+.kd-ovr small { display: block; font-size: 10px; margin-top: 2px; }
+.kd-ovr small.auf { color: var(--k-gut-fg); } .kd-ovr small.ab { color: var(--k-schlecht-fg); }
+
+/* ── F) Training ────────────────────────────────────────────────────────── */
+.ktr { display: flex; flex-direction: column; gap: 12px; padding: 12px 12px 0; max-width: 680px; }
+.ktr-steuerung { display: flex; flex-direction: column; gap: 10px; padding: 12px; background: var(--bg2); border: 3px solid var(--k-rand, var(--border)); border-radius: 16px;
+  box-shadow: 0 5px 0 var(--k-rand, var(--border)); }
+.ktr-titel { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin: 0; font: 800 16px/1.2 var(--font-display, inherit); color: var(--text); }
+.ktr-titel small { flex-basis: 100%; font: 700 11.5px/1.2 var(--font-text, inherit); color: var(--text2); }
+.ktr-hinweis { display: flex; align-items: center; gap: 6px; padding: 7px 10px; border-radius: 12px; font: 700 12px/1.3 var(--font-text, inherit); }
+.ktr-hinweis.gut { background: var(--k-gut-bg); color: var(--k-gut-fg); } .ktr-hinweis.schlecht { background: var(--k-schlecht-bg); color: var(--k-schlecht-fg); }
+.ktr-seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 4px; background: var(--bg2); border: 3px solid var(--k-rand, var(--border)); border-radius: 14px; }
+.ktr-seg button { display: flex; flex-direction: column; align-items: center; gap: 1px; min-height: 44px; border: 0 !important; border-radius: 10px !important; box-shadow: none !important;
+  background: none; color: var(--text2); cursor: pointer; padding: 4px; }
+.ktr-seg button b { font: 800 13px/1.1 var(--font-text, inherit); }
+.ktr-seg button small { font: 700 10.5px/1.1 var(--font-zahl, inherit); opacity: .85; }
+.ktr-seg button.an { background: var(--k-blau-knopf); color: #fff; box-shadow: 0 3px 0 var(--k-blau-schatten) !important; }
+.ktr-seg button.zu { opacity: .5; cursor: not-allowed; }
+.ktr-seg button .ti { font-size: 12px; }
+.ktr-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ktr-chips button { display: inline-flex; align-items: center; gap: 5px; min-height: 34px; padding: 0 11px; border-radius: 999px !important; border: 2px solid var(--k-linie, var(--border)) !important;
+  background: var(--bg2); color: var(--text2); font: 800 12px/1 var(--font-text, inherit); box-shadow: none !important; cursor: pointer; }
+.ktr-chips button .ti { font-size: 16px; }
+.ktr-chips button.an { background: var(--k-info-bg); color: var(--k-info-fg); border-color: var(--k-blau) !important; }
+.ktr-liste { display: flex; flex-direction: column; gap: 6px; }
+.ktr-h { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin: 4px 2px 2px; font: 800 12px/1.2 var(--font-text, inherit); letter-spacing: .07em; text-transform: uppercase; color: var(--text3); }
+.ktr-h small { letter-spacing: 0; text-transform: none; font-weight: 700; }
+.ktr-zeile { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "pos wer rechts" "pos unten unten"; align-items: center; gap: 4px 8px;
+  padding: 8px 10px; background: var(--bg2); border: 3px solid var(--k-rand, var(--border)); border-radius: 14px; }
+.ktr-zeile > .kpm { grid-area: pos; align-self: start; margin-top: 2px; }
+.ktr-wer { grid-area: wer; display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+.ktr-wer b { font-size: 14px; font-weight: 800; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ktr-wer small { font-size: 11px; color: var(--text3); }
+.ktr-zeile.verletzt .ktr-wer b { color: var(--text3); text-decoration: line-through; }
+.ktr-rechts { grid-area: rechts; display: inline-flex; align-items: center; gap: 6px; }
+.ktr-ovr { font: 800 20px/1 var(--font-zahl, inherit); color: var(--text); font-variant-numeric: tabular-nums; }
+.ktr-delta { font: 800 12px/1 var(--font-zahl, inherit); padding: 3px 6px; border-radius: 999px; }
+.ktr-delta.auf { background: var(--k-gut-bg); color: var(--k-gut-fg); } .ktr-delta.ab { background: var(--k-schlecht-bg); color: var(--k-schlecht-fg); }
+.ktr-unten { grid-area: unten; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 11.5px; color: var(--text2); }
+.ktr-tempo { display: inline-flex; align-items: center; gap: 3px; font-weight: 800; }
+.ktr-tempo .ti { font-size: 14px; }
+.ktr-apps { display: inline-flex; gap: 2px; }
+.ktr-apps i { display: inline-block; width: 9px; height: 12px; border-radius: 2px; border: 2px solid var(--k-rand, var(--border)); background: var(--bg4); box-sizing: border-box; }
+.ktr-apps i.an { background: var(--app-gut); }
+.ktr-form { font-weight: 800; color: var(--text2); }
+.ktr-leer { color: var(--text3); }
+/* Trainingsgruppe (dfl_trainingsgruppe_patch.js): Abstand zur neuen Liste */
+#training-content .ktr + #dfl-trainingsgruppe { margin-top: 14px; }
+
+/* ── H) Vertragsverhandlung ─────────────────────────────────────────────── */
+html.kenney .nego-card.ko-nego { background: var(--bg2); border: 3px solid var(--k-rand); border-radius: 18px; box-shadow: 0 6px 0 var(--k-rand); }
+.ko-nego .nego-head { display: block; }
+.ko-nego .nego-head > div { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "g name" "g sub"; column-gap: 10px; align-items: center; }
+.ko-nego .nego-gesicht { grid-area: g; width: 50px; height: 50px; }
+.ko-nego .nego-name { grid-area: name; }
+.ko-nego .nego-sub { grid-area: sub; }
+.ko-nego .nego-sub .kpm { height: 18px; min-width: 26px; font-size: 10px; }
+html.kenney .ko-nego .nego-role-badge { border: 2px solid var(--k-gold-tief); background: var(--k-mittel-bg); color: var(--k-mittel-fg); border-radius: 999px; }
+html.kenney .ko-nego .nego-demand { background: var(--bg3); border: 2px solid var(--k-linie); border-radius: 12px; color: var(--text2); }
+.kn-vergleich { margin: -2px 0 12px; }
+.kn-bahn { position: relative; height: 26px; border: 3px solid var(--k-rand, var(--border)); border-radius: 10px; background: var(--bg4); overflow: visible; box-sizing: border-box; }
+.kn-angebot { position: absolute; left: 0; top: 0; bottom: 0; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; border-radius: 7px 0 0 7px;
+  font-style: normal; background: var(--k-blau-knopf); color: #fff; box-sizing: border-box; min-width: 54px; }
+.kn-angebot.drueber { background: var(--app-gut); color: #052e14; }
+.kn-angebot b { font: 800 11.5px/1 var(--font-zahl, inherit); white-space: nowrap; }
+.kn-forderung { position: absolute; top: -7px; bottom: -7px; width: 4px; margin-left: -2px; border-radius: 2px; background: var(--text); }
+.kn-skala { display: flex; justify-content: space-between; margin-top: 4px; font-size: 11px; color: var(--text3); }
+.kn-skala b { color: var(--text); }
+html.kenney .ko-nego .nego-row { background: var(--bg3); border: 2px solid var(--k-linie); border-radius: 12px; }
+html.kenney .ko-nego .nego-step-btn { width: 34px; height: 34px; border: 3px solid var(--k-rand); border-radius: 10px; background: var(--bg2); color: var(--text);
+  box-shadow: 0 3px 0 var(--k-rand); font: 800 16px/1 var(--font-text, inherit); }
+html.kenney .ko-nego .nego-step-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--k-rand); }
+html.kenney .ko-nego .nego-pick { border: 3px solid var(--k-rand); border-radius: 10px; background: var(--bg2); color: var(--text); box-shadow: 0 3px 0 var(--k-rand);
+  font: 800 12.5px/1.2 var(--font-text, inherit); padding: 6px 10px; }
+.kn-jahre { flex-wrap: wrap; gap: 8px; }
+.kn-seg { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3px; flex: 1 1 180px; min-width: 0; padding: 3px; background: var(--bg2);
+  border: 3px solid var(--k-rand, var(--border)); border-radius: 12px; }
+.kn-seg button { min-height: 34px; border: 0; border-radius: 8px; background: none; color: var(--text2); font: 800 14px/1 var(--font-zahl, inherit); cursor: pointer; }
+.kn-seg button.an { background: var(--k-blau-knopf); color: #fff; box-shadow: 0 2px 0 var(--k-blau-schatten); }
+.kn-chance { display: flex; align-items: center; gap: 12px; }
+.kn-ring { width: 64px; height: 64px; flex: none; }
+.kn-ring circle { fill: none; stroke-width: 4; }
+.kn-ring .kn-ring-grund { stroke: var(--bg4); }
+.kn-ring .kn-ring-wert { stroke-linecap: round; }
+.kn-ring.gut .kn-ring-wert { stroke: var(--app-gut); } .kn-ring.mittel .kn-ring-wert { stroke: var(--app-mittel); } .kn-ring.schlecht .kn-ring-wert { stroke: var(--app-schlecht); }
+.kn-ring text { fill: var(--text); font: 800 8.5px var(--font-zahl, sans-serif); }
+.kn-chance-text { display: flex; flex-direction: column; gap: 3px; }
+.kn-chance-text b { font-size: 14px; color: var(--text); }
+.kn-chance-text small { font-size: 12px; color: var(--text2); }
+.kn-versuche { display: inline-flex; gap: 4px; }
+.kn-versuche i { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--k-rand, var(--border)); background: var(--bg4); box-sizing: border-box; }
+.kn-versuche i.an { background: var(--k-blau-knopf); border-color: var(--k-blau-schatten); }
+html.kenney .ko-nego .nego-btn { border: 3px solid var(--k-rand); border-radius: 12px; box-shadow: 0 3px 0 var(--k-rand); font: 800 13px/1.2 var(--font-text, inherit); min-height: 40px; }
+html.kenney .ko-nego .nego-btn.primary { background: var(--k-blau-knopf); border-color: var(--k-blau-schatten); box-shadow: 0 3px 0 var(--k-blau-schatten); color: #fff; }
+html.kenney .ko-nego .nego-msg { border-width: 2px; border-radius: 12px; }
+
+/* ── I) „Alle Details“ (#playercard-sec am PC, Kopie im Spieler-Blatt .app-blatt-details) ───── */
+:is(#playercard-sec, .app-blatt-details) .pcard-sub { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+html.kenney :is(#playercard-sec, .app-blatt-details) .pcard-statrow { display: grid; grid-template-columns: repeat(auto-fit, minmax(58px, 1fr)); gap: 6px; }
+html.kenney :is(#playercard-sec, .app-blatt-details) .pcard-stat { background: var(--bg3); border: 2px solid var(--k-linie); border-radius: 12px; padding: 8px 2px; }
+html.kenney :is(#playercard-sec, .app-blatt-details) .pcard-stat .v { font: 800 18px/1.1 var(--font-zahl, inherit); }
+html.kenney :is(#playercard-sec, .app-blatt-details) .pcard-stat .l { font-size: 10.5px; }
+html.kenney :is(#playercard-sec, .app-blatt-details) .pcard-row { border-top: 2px solid var(--k-linie); padding: 6px 0; font-size: 12.5px; align-items: center; }
+.pcard-row.kd-wert { display: grid !important; grid-template-columns: 82px minmax(0, 1fr) 30px; gap: 8px; border-top: 0 !important; padding: 4px 0 !important; }
+.pcard-row.kd-wert > span:first-child { font-weight: 800; color: var(--text2); }
+.pcard-row.kd-wert .kd-bahn { height: 14px; width: 100%; }
+.pcard-row.kd-wert .kd-bahn .k-fuell { display: block; height: 100%; background: var(--k-blau-knopf); }
+.pcard-row.kd-wert b { text-align: right; font: 800 14px/1 var(--font-zahl, inherit); }
+html.kenney :is(#playercard-sec, .app-blatt-details) .pcard-act { min-height: 40px; }
+html.kenney :is(#playercard-sec, .app-blatt-details) .ch-table th, html.kenney :is(#playercard-sec, .app-blatt-details) .ch-table td { border-color: var(--k-linie); }
+html.kenney .pcard-attr, html.kenney .pcard-career, html.kenney .pcard-styles { border-top: 2px solid var(--k-linie) !important; }
+html.kenney .pattr-bar { width: 72px; height: 12px; border: 2px solid var(--k-rand); border-radius: 6px; background: var(--bg4); box-sizing: border-box; }
+html.kenney .pattr-bar i { border-radius: 0; }
+/* Im Spieler-Blatt stehen Name, Gesicht, Stärke und Potenzial schon oben (FUT-Karte) */
+.app-blatt-details .pcard-name, .app-blatt-details .pcard-big, .app-blatt-details .pcard-radar { display: none; }
+
+/* ── J) Reiterkopf am Handy weg, Saison-Banner als Chips ───────────────── */
+body.dfl-shell .sb-tabhead { display: none !important; }
+html.kenney .season-banner.kb { display: flex; flex-direction: column; align-items: stretch; gap: 10px; padding: 10px; }
+.kb-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.kb-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 11px; border-radius: 999px; border: 2px solid var(--k-linie, var(--border)); background: var(--bg2);
+  font: 700 12.5px/1.2 var(--font-text, inherit); color: var(--text2); }
+.kb-chip b { color: var(--text); font-weight: 800; }
+.kb-chip .ti { font-size: 14px; }
+html.kenney .season-banner.kb .kb-knopf { width: 100%; min-height: 46px; font-size: 14px; margin: 0; }
+
+/* ── K) Office: Wochenleiste, Postfach-Filter als Segment ──────────────── */
+.kw-leiste { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(46px, 1fr); gap: 5px; margin-top: 10px; overflow-x: auto; padding-bottom: 6px;
+  scrollbar-width: none; }
+.kw-leiste::-webkit-scrollbar { display: none; }
+.kw-tag { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 2px; background: var(--bg3); border: 2px solid var(--k-linie, var(--border));
+  border-radius: 12px; min-width: 0; text-align: center; }
+.kw-tag small { font: 800 10.5px/1 var(--font-text, inherit); color: var(--text3); white-space: nowrap; }
+.kw-tag b { font: 800 11px/1 var(--font-text, inherit); color: var(--text2); white-space: nowrap; }
+.kw-tag .kw-ico { font-size: 20px; height: 24px; line-height: 24px; color: var(--text3); }
+html .kw-tag .kw-wappen.lg-crest { width: 22px !important; height: 24px !important; font-size: 0 !important; }
+.kw-tag.jetzt { border-color: var(--k-blau); background: var(--k-info-bg); box-shadow: 0 3px 0 var(--k-blau-tief, var(--k-blau)); }
+.kw-tag.jetzt small, .kw-tag.jetzt b { color: var(--k-info-fg); }
+.kw-tag.frei .kw-ico { color: var(--k-info-fg); } .kw-tag.po .kw-ico { color: var(--k-mittel-fg); }
+html.kenney .calendar-widget.kw-an .cal-head { gap: 8px; }
+html.kenney #pf-filters { display: flex; flex-wrap: wrap; gap: 3px; padding: 3px; background: var(--bg2); border: 3px solid var(--k-rand); border-radius: 14px; }
+html.kenney #pf-filters .pf-chip { flex: 1 1 auto; min-height: 36px; border: 0; border-radius: 10px; background: none; color: var(--text2); display: inline-flex;
+  align-items: center; justify-content: center; gap: 5px; padding: 0 8px; font: 800 12.5px/1 var(--font-text, inherit); box-shadow: none; }
+html.kenney #pf-filters .pf-chip > .ti { display: none; }
+html.kenney #pf-filters .pf-chip.active { background: var(--k-blau-knopf); color: #fff; box-shadow: 0 3px 0 var(--k-blau-schatten); }
+html.kenney #pf-filters .pf-cnt { display: inline-grid; place-items: center; min-width: 20px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--bg4);
+  color: var(--text); font: 800 10.5px/1 var(--font-zahl, inherit); }
+html.kenney #pf-filters .pf-chip.active .pf-cnt { background: rgb(255 255 255 / .25); color: #fff; }
+
+/* ── L) Kleinteile ──────────────────────────────────────────────────────── */
+/* Free Agent: helle Marke statt Navy im Tag-Stil */
+html.kenney .loan-tag { background: var(--k-info-bg) !important; color: var(--k-info-fg) !important; border: 2px solid color-mix(in oklab, var(--k-info-fg) 35%, transparent);
+  border-radius: 999px; font: 800 10px/1.4 var(--font-text, inherit); padding: 0 7px; }
+/* Moral · Form · Fitness als drei Mini-Säulen */
+.squad-dots.ko-mff { display: inline-flex; align-items: flex-end; gap: 2px; height: 18px; width: 22px; margin: 0 6px; flex: none; }
+.ko-mff i { display: block; width: 6px; border-radius: 2px 2px 1px 1px; background: var(--bg4); box-shadow: 0 0 0 1px color-mix(in oklab, var(--text) 25%, transparent) inset; }
+.ko-mff i.gut { background: var(--app-gut); } .ko-mff i.mittel { background: var(--app-mittel); } .ko-mff i.schlecht { background: var(--app-schlecht); }
+.ko-mff i.leer { background: var(--bg4); }
+/* Verein: Chronik und „Spiel neu starten“ mit Kenney-Rand statt 1 px (die Gefahrenzone setzt ihren Stil inline) */
+html.kenney .club-chronicle { border: 2px solid var(--k-linie, var(--border)); }
+html.kenney #club-danger-zone { border: 2px solid var(--app-schlecht) !important; border-radius: 14px !important; background: var(--k-schlecht-bg) !important; }
+
+/* ── Liga-Trade-Log und KI-Trades ───────────────────────────────────────── */
+.dfl-tr-log li.kh-zeile { list-style: none; display: flex; flex-direction: column; gap: 4px; padding: 8px 0; border-top: 2px solid var(--k-linie, var(--border)); break-inside: avoid; }
+.dfl-tr-log li.kh-zeile:first-child { border-top: 0; }
+.dfl-tr-log ul.dfl-draft-letzte { padding-left: 0; }
+.kh-zeit { font-size: 10.5px; font-weight: 700; color: var(--text3); }
+.kh { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: start; gap: 6px; }
+.kh-seite { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "w team" "teile teile"; align-items: center; gap: 4px 6px; min-width: 0; }
+html .kh-seite .kh-wappen.lg-crest { grid-area: w; width: 22px !important; height: 24px !important; font-size: 0 !important; }
+.kh-team { grid-area: team; font: 800 13px/1.2 var(--font-text, inherit); color: var(--text); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kh-teile { grid-area: teile; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.kh-sp { display: flex; align-items: center; gap: 5px; min-width: 0; font-size: 12px; }
+.kh-sp b { font-weight: 700; color: var(--text); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kh-sp em { font-style: normal; font: 800 12px/1 var(--font-zahl, inherit); color: var(--text2); margin-left: auto; }
+.kh-sp.pick .ti { color: var(--text3); }
+.kh-sp .kpm { height: 17px; min-width: 26px; font-size: 9.5px; padding: 0 4px; }
+.kh-pfeil { align-self: center; color: var(--text3); font-size: 18px; }
+.kh-team small { font-size: 10.5px; font-weight: 700; color: var(--text3); }
+/* Torjäger und Vorlagengeber mit Gesicht (Nutzer 2026-10-14) */
+.kz-gesicht { flex: 0 0 32px; width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: var(--bg3); border: 2px solid var(--border); }
+.kz-gesicht svg { width: 100%; height: 100%; display: block; }
+.kz-wer small { display: flex; align-items: center; gap: 4px; }
+html .kz-zeile .kz-wappen.mini.lg-crest { width: 14px !important; height: 16px !important; flex: 0 0 14px; }
+.kt-liste-kopf.kz-zweite { margin-top: 14px; }

@@ -1,0 +1,2 @@
+Maskottchen, Pflanze und Vitrine: Kenney „Cube Pets“ (CC0, kenney.nl), gerendert und eingefärbt wie in Kickdraft
+(spiel/tools/dfl_maskottchen_render.js im Kickdraft-Branch). Keine Namensnennung nötig.

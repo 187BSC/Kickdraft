@@ -1,0 +1,7 @@
+Kulisse für Office und Startbild (dfl_kulisse.js)
+
+Bilder aus „Background Elements Remastered“ von Kenney (www.kenney.nl), Lizenz CC0 1.0
+(http://creativecommons.org/publicdomain/zero/1.0/): hills, hillsLarge, mountains, sun, moonFull,
+cloud1/3/5/7, tree*, house*, tower, castleSmall.
+
+Unverändert übernommen; gefärbt wird erst im Spiel (Canvas).

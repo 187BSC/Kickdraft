@@ -1,0 +1,122 @@
+/* Erfolge, Winpunkte, Saisonbilanz und Laden (D122, D159 d/e) – dfl_erfolge.js, dfl_laden.js.
+   Flächen nur über Tokens (Tag und Nacht); Medaillen und Münze sind Inhalt (Metallfarben). */
+
+/* Münze und Zähler */
+.ef-wp { display: inline-flex; align-items: center; gap: 5px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--text); }
+.ef-muenze { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffe58a, #e3b21f 62%, #a57c0c);
+  border: 2px solid var(--k-rand); color: #2b2622; font-size: 11px; font-weight: 800; line-height: 1; flex: none; }
+.ef-chip { position: absolute; top: 8px; right: 8px; z-index: 3; display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 4px 10px 4px 6px;
+  border-radius: 999px; border: 2px solid var(--k-rand); background: var(--bg2); color: var(--text); font-weight: 800; font-variant-numeric: tabular-nums;
+  box-shadow: 0 2px 0 var(--k-rand); cursor: pointer; }
+#app-office-kopf { position: relative; }
+
+/* Medaillen */
+.ef-med { display: inline-grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--k-rand); flex: none; color: #2b2622; font-size: 19px; }
+.ef-gold { background: radial-gradient(circle at 35% 35%, #ffe58a, #d6a51c 62%, #8a6a10); }
+.ef-silber { background: radial-gradient(circle at 35% 35%, #ffffff, #c4ccd4 60%, #7f8a95); }
+.ef-bronze { background: radial-gradient(circle at 35% 35%, #f6c79a, #c47a3c 62%, #7a4518); }
+.ef-wertung { background: radial-gradient(circle at 35% 35%, #d9f2cf, #6cb35a 62%, #3f7d34); }
+.ef-aus { background: var(--bg3); color: var(--text3); }
+
+/* Pop-up oben, ohne Klick-Fläche */
+#ef-pop { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 62px); z-index: 9690; width: min(340px, calc(100vw - 32px));
+  display: flex; align-items: center; gap: 10px; padding: 8px 12px 8px 8px; background: var(--bg2); color: var(--text); border: 3px solid var(--gold, #d6a51c);
+  border-bottom-width: 6px; border-radius: 14px; box-shadow: 0 6px 18px rgba(0,0,0,.18); pointer-events: none; opacity: 0; transform: translate(-50%, -24px); transition: opacity .3s, transform .35s cubic-bezier(.2,1.3,.4,1); }
+#ef-pop.an { opacity: 1; transform: translate(-50%, 0); }
+#ef-pop.weg { opacity: 0; transform: translate(-50%, -12px); }
+#ef-pop b { display: block; font-size: 15px; }
+#ef-pop small { display: block; font-size: 13px; color: var(--text2); line-height: 1.3; }
+@media (prefers-reduced-motion: reduce) { #ef-pop { transition: opacity .2s; transform: translate(-50%, 0); } }
+
+/* Blätter */
+.ef-blatt, .ld-blatt { display: grid; gap: 10px; color: var(--text); }
+.ef-kopf { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-right: 52px; }
+.ef-ov-box .ef-kopf { padding-right: 44px; }
+.ef-kopf small, .ld-klein { color: var(--text2); font-size: 13px; }
+.ef-h3 { margin: 6px 0 0; font-size: 15px; display: flex; align-items: center; gap: 6px; color: var(--text); }
+.ef-liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.ef-liste li { display: grid; grid-template-columns: 38px 1fr auto; gap: 10px; align-items: center; padding: 6px 8px; border-radius: 12px; background: var(--bg3); }
+.ef-liste li b { display: block; font-size: 14px; }
+.ef-liste li small { display: block; font-size: 12px; color: var(--text2); line-height: 1.3; }
+.ef-liste li.nein { opacity: .72; }
+.ef-liste li.nein .ef-wp { color: var(--text3); }
+.ef-eyebrow { margin: 0; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--text2); font-weight: 700; }
+.ef-titel { margin: 0; font-size: 22px; font-family: var(--font-display, inherit); }
+.ef-gesamt { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-radius: 12px; border: 2px solid var(--k-rand); background: var(--bg2); font-weight: 700; }
+.ef-ov { position: fixed; inset: 0; z-index: 9550; background: rgba(15, 18, 24, .45); display: grid; place-items: center; padding: 16px; }
+.ef-ov-box { position: relative; width: min(520px, 100%); max-height: calc(100vh - 32px); overflow: auto; background: var(--bg2); color: var(--text);
+  border: 3px solid var(--k-rand); border-radius: 16px; padding: 18px; box-shadow: 0 4px 0 var(--k-rand); }
+.ef-ov-box .app-blatt-zu { position: absolute; right: 10px; top: 10px; }
+.ef-sim .ef-liste li { background: transparent; padding: 4px 0; }
+
+/* Laden */
+.ld-tiere { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.ld-tier { display: grid; justify-items: center; gap: 2px; padding: 4px 2px 6px; border-radius: 12px; border: 2px solid var(--k-rand); background: var(--bg3); color: var(--text);
+  font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 0 var(--k-rand); min-width: 0; }
+.ld-tier.an { outline: 3px solid var(--k-gruen-tief, #2f8f4e); outline-offset: -1px; }
+.ld-bild { width: 100%; max-width: 96px; aspect-ratio: 1; height: auto; display: block; }
+.ld-gitter { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
+.ld-ware { display: grid; justify-items: center; align-content: start; gap: 3px; text-align: center; padding: 6px 6px 8px; border-radius: 14px; border: 2px solid var(--k-rand);
+  background: var(--bg3); box-shadow: 0 2px 0 var(--k-rand); min-width: 0; }
+.ld-ware b { font-size: 13px; }
+.ld-ware small { font-size: 12px; color: var(--text2); line-height: 1.25; min-height: 2.5em; }
+.ld-ware.traegt { outline: 3px solid var(--k-gruen-tief, #2f8f4e); outline-offset: -1px; }
+.ld-knopf { width: 100%; min-height: 36px; justify-content: center; font-size: 13px; padding: 4px 6px; }
+.ld-knopf[disabled] { opacity: .55; cursor: default; }
+.ld-cap { display: grid; grid-template-columns: 44px 1fr auto; gap: 10px; align-items: center; padding: 8px; border-radius: 14px; border: 2px solid var(--gold, #d6a51c);
+  background: var(--bg3); }
+.ld-cap .ld-knopf { width: auto; }
+.ld-cap b { display: block; font-size: 14px; } .ld-cap small { display: block; font-size: 12px; color: var(--text2); }
+.ld-cap-plus { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 10px; background: var(--bg2); border: 2px solid var(--k-rand); font-weight: 800; font-size: 18px; color: var(--text); }
+
+/* Bildvorrat (der Service Worker cacht, was hier per url() steht) */
+.ld-v-bunny-brille { background-image: url(../app/maskottchen/bunny-brille.webp); }
+.ld-v-bunny-grund { background-image: url(../app/maskottchen/bunny-grund.webp); }
+.ld-v-bunny-krone { background-image: url(../app/maskottchen/bunny-krone.webp); }
+.ld-v-bunny-muetze { background-image: url(../app/maskottchen/bunny-muetze.webp); }
+.ld-v-bunny-schal { background-image: url(../app/maskottchen/bunny-schal.webp); }
+.ld-v-bunny-trikot { background-image: url(../app/maskottchen/bunny-trikot.webp); }
+.ld-v-cat-brille { background-image: url(../app/maskottchen/cat-brille.webp); }
+.ld-v-cat-grund { background-image: url(../app/maskottchen/cat-grund.webp); }
+.ld-v-cat-krone { background-image: url(../app/maskottchen/cat-krone.webp); }
+.ld-v-cat-muetze { background-image: url(../app/maskottchen/cat-muetze.webp); }
+.ld-v-cat-schal { background-image: url(../app/maskottchen/cat-schal.webp); }
+.ld-v-cat-trikot { background-image: url(../app/maskottchen/cat-trikot.webp); }
+.ld-v-chick-brille { background-image: url(../app/maskottchen/chick-brille.webp); }
+.ld-v-chick-grund { background-image: url(../app/maskottchen/chick-grund.webp); }
+.ld-v-chick-krone { background-image: url(../app/maskottchen/chick-krone.webp); }
+.ld-v-chick-muetze { background-image: url(../app/maskottchen/chick-muetze.webp); }
+.ld-v-chick-schal { background-image: url(../app/maskottchen/chick-schal.webp); }
+.ld-v-chick-trikot { background-image: url(../app/maskottchen/chick-trikot.webp); }
+.ld-v-dog-brille { background-image: url(../app/maskottchen/dog-brille.webp); }
+.ld-v-dog-grund { background-image: url(../app/maskottchen/dog-grund.webp); }
+.ld-v-dog-krone { background-image: url(../app/maskottchen/dog-krone.webp); }
+.ld-v-dog-muetze { background-image: url(../app/maskottchen/dog-muetze.webp); }
+.ld-v-dog-schal { background-image: url(../app/maskottchen/dog-schal.webp); }
+.ld-v-dog-trikot { background-image: url(../app/maskottchen/dog-trikot.webp); }
+.ld-v-fox-brille { background-image: url(../app/maskottchen/fox-brille.webp); }
+.ld-v-fox-grund { background-image: url(../app/maskottchen/fox-grund.webp); }
+.ld-v-fox-krone { background-image: url(../app/maskottchen/fox-krone.webp); }
+.ld-v-fox-muetze { background-image: url(../app/maskottchen/fox-muetze.webp); }
+.ld-v-fox-schal { background-image: url(../app/maskottchen/fox-schal.webp); }
+.ld-v-fox-trikot { background-image: url(../app/maskottchen/fox-trikot.webp); }
+.ld-v-lion-brille { background-image: url(../app/maskottchen/lion-brille.webp); }
+.ld-v-lion-grund { background-image: url(../app/maskottchen/lion-grund.webp); }
+.ld-v-lion-krone { background-image: url(../app/maskottchen/lion-krone.webp); }
+.ld-v-lion-muetze { background-image: url(../app/maskottchen/lion-muetze.webp); }
+.ld-v-lion-schal { background-image: url(../app/maskottchen/lion-schal.webp); }
+.ld-v-lion-trikot { background-image: url(../app/maskottchen/lion-trikot.webp); }
+.ld-v-panda-brille { background-image: url(../app/maskottchen/panda-brille.webp); }
+.ld-v-panda-grund { background-image: url(../app/maskottchen/panda-grund.webp); }
+.ld-v-panda-krone { background-image: url(../app/maskottchen/panda-krone.webp); }
+.ld-v-panda-muetze { background-image: url(../app/maskottchen/panda-muetze.webp); }
+.ld-v-panda-schal { background-image: url(../app/maskottchen/panda-schal.webp); }
+.ld-v-panda-trikot { background-image: url(../app/maskottchen/panda-trikot.webp); }
+.ld-v-penguin-brille { background-image: url(../app/maskottchen/penguin-brille.webp); }
+.ld-v-penguin-grund { background-image: url(../app/maskottchen/penguin-grund.webp); }
+.ld-v-penguin-krone { background-image: url(../app/maskottchen/penguin-krone.webp); }
+.ld-v-penguin-muetze { background-image: url(../app/maskottchen/penguin-muetze.webp); }
+.ld-v-penguin-schal { background-image: url(../app/maskottchen/penguin-schal.webp); }
+.ld-v-penguin-trikot { background-image: url(../app/maskottchen/penguin-trikot.webp); }
+.ld-v-pflanze { background-image: url(../app/maskottchen/pflanze.webp); }
+.ld-v-vitrine { background-image: url(../app/maskottchen/vitrine.webp); }

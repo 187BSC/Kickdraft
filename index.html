@@ -3,56 +3,109 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kickdraft – Fußball-Manager</title>
-<meta name="description" content="Kickdraft ist ein Fußball-Manager mit den Regeln der großen US-Ligen: 32 Franchises, kein Abstieg, harter Salary Cap, Draft, Trades und Playoffs.">
+<title>Unter Flutlicht – Fußball-Manager von Langer Hafer Studios</title>
+<meta name="description" content="Unter Flutlicht ist ein Fußball-Manager mit zwei Spielarten: Vereinskarriere mit Auf- und Abstieg und Kickdraft mit Draft, Salary Cap und Playoffs. Gratis im Browser testen.">
 <meta name="theme-color" content="#f4e3c1">
 <link rel="icon" href="bilder/icon-192.png">
 <link rel="apple-touch-icon" href="bilder/apple-touch-icon.png">
-<meta property="og:title" content="Kickdraft – Fußball-Manager">
-<meta property="og:description" content="32 Franchises, Salary Cap, Draft, Trades und Playoffs. Fußball mit den Regeln der US-Ligen.">
-<meta property="og:image" content="https://187bsc.github.io/Kickdraft/bilder/og.png">
+<meta property="og:title" content="Unter Flutlicht – Ein Fußball-Manager. Zwei Spielarten.">
+<meta property="og:description" content="Vereinskarriere mit Auf- und Abstieg oder Kickdraft mit Draft, Salary Cap und Playoffs. Gratis im Browser testen.">
+<meta property="og:image" content="https://langerhafer.com/bilder/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<link rel="preload" href="schrift/fredoka-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="rahmen">
   <header class="kopf">
-    <a class="marke" href="./"><img src="bilder/logo-schriftzug.svg" alt="Kickdraft" width="1000" height="290"></a>
-    <span class="marke-unter">Fußball-Manager</span>
+    <a class="marke" href="./">
+      <picture>
+        <source srcset="bilder/studio-logo-dunkel.webp" media="(prefers-color-scheme: dark)">
+        <img class="studio-logo" src="bilder/studio-logo.webp" alt="Langer Hafer Studios" width="520" height="178">
+      </picture>
+    </a>
   </header>
 
   <main>
     <section class="buehne">
       <div>
-        <h1>Dein Verein. Dein Draft. Deine Dynastie.</h1>
-        <p class="leit">Kickdraft ist ein Fußball-Manager mit den Regeln der großen US-Ligen: 32 Franchises, kein Abstieg, ein harter Salary Cap,
-          Talente nur über den Draft und am Ende Playoffs um die Meisterschaft.</p>
-        <a class="knopf" aria-disabled="true">Bald bei Google Play</a>
-        <p class="klein">Kostenlos · ohne Konto · spielbar ohne Internet</p>
+        <p class="vorzeile">Unter Flutlicht</p>
+        <h1>Ein Fußball-Manager. Zwei Spielarten.</h1>
+        <p class="leit">Führ deinen Verein von der Dritten Liga nach oben – oder bau in Kickdraft deine Franchise über Draft, Salary Cap
+          und Playoffs. Probier beides direkt hier im Browser aus.</p>
+        <div class="knoepfe">
+          <a class="knopf" href="spielen/flutlicht/">▶ Vereinskarriere spielen</a>
+          <a class="knopf knopf-blau" href="spielen/kickdraft/">▶ Kickdraft spielen</a>
+        </div>
+        <p class="klein">Kostenlos · ohne Konto · ohne Werbung im Browser · am Handy und am PC</p>
       </div>
-      <div class="buehne-bild"><img src="bilder/office.jpg" alt="Das Office mit Vereinsgelände, Kader, Cap und Kasse" width="390" height="844"></div>
+      <div class="buehne-bild">
+        <picture>
+          <img src="bilder/fl-wahl-390.webp" srcset="bilder/fl-wahl-390.webp 390w, bilder/fl-wahl-780.webp 780w"
+            sizes="(min-width: 820px) 300px, 80vw" alt="Vereinswahl in der Vereinskarriere" width="390" height="844">
+        </picture>
+      </div>
     </section>
 
-    <section class="karten" aria-label="Was Kickdraft ausmacht">
-      <div class="karte"><span class="zahl">32</span><h3>Franchises, kein Abstieg</h3><p>Zwei Conferences, acht Divisions, 26 Spieltage. Jeder Verein kann jedes Jahr oben angreifen.</p></div>
-      <div class="karte"><span class="zahl">120 Mio €</span><h3>Harter Salary Cap</h3><p>Verträge, Handgeld und Dead Cap. Wer zu viel ausgibt, zahlt Jahre später dafür.</p></div>
-      <div class="karte"><span class="zahl">4 Runden</span><h3>Draft statt Nachwuchs</h3><p>Talente kommen nur über den Draft. Die Schwächsten wählen zuerst, Picks lassen sich tauschen.</p></div>
-      <div class="karte"><span class="zahl">14 Teams</span><h3>Playoffs</h3><p>Division-Sieger und Wildcards spielen um den Titel der Deutschen Kickdraft Liga.</p></div>
+    <section class="spiel" id="vereinskarriere">
+      <p class="vorzeile">Spielart 1</p>
+      <h2>Vereinskarriere</h2>
+      <p class="leit">Der klassische Manager mit Auf- und Abstieg. Übernimm einen Verein aus der Ersten, Zweiten oder Dritten Liga,
+        verhandle Verträge, bau Stadion und Akademie aus und kämpf dich hoch – bis in den Europapokal.</p>
+      <div class="karten">
+        <div class="karte"><span class="zahl">4 Ligen</span><h3>Auf- und Abstieg</h3><p>Vom Abstiegskampf bis zur Meisterschaft – jede Saison zählt.</p></div>
+        <div class="karte"><span class="zahl">Live</span><h3>Spieltag im Ticker</h3><p>Derbys, Pokal und Finale mit eigener Stimmung, Zurufe von der Seitenlinie.</p></div>
+        <div class="karte"><span class="zahl">Vorstand</span><h3>Ziele und Vertrauen</h3><p>Tabelle, Finanzen, Ausbau – wer die Ziele verfehlt, fliegt.</p></div>
+      </div>
+      <div class="bilder">
+        <figure><img src="bilder/fl-wahl-390.webp" srcset="bilder/fl-wahl-390.webp 390w, bilder/fl-wahl-780.webp 780w" sizes="240px"
+          alt="Vereinswahl" width="390" height="844" loading="lazy"><figcaption>Verein wählen</figcaption></figure>
+        <figure><img src="bilder/fl-start-390.webp" srcset="bilder/fl-start-390.webp 390w, bilder/fl-start-780.webp 780w" sizes="240px"
+          alt="Der Vorstand erklärt die Ziele" width="390" height="844" loading="lazy"><figcaption>Der Vorstand misst dich</figcaption></figure>
+      </div>
+      <a class="knopf" href="spielen/flutlicht/">▶ Vereinskarriere im Browser spielen</a>
+      <p class="klein">Demo: zwei Saisons</p>
     </section>
 
-    <h2>So sieht es aus</h2>
-    <div class="bilder">
-      <figure><img src="bilder/wahl.jpg" alt="Auswahl der Franchise mit Wappen und Stärke" width="390" height="844" loading="lazy"><figcaption>Franchise wählen</figcaption></figure>
-      <figure><img src="bilder/squad.jpg" alt="Aufstellung auf dem Spielfeld mit Gesichtern und Stärke" width="390" height="844" loading="lazy"><figcaption>Aufstellung und Taktik</figcaption></figure>
-      <figure><img src="bilder/liga.jpg" alt="Tabelle der Division und Playoff-Bild der Conference" width="390" height="844" loading="lazy"><figcaption>Tabelle und Playoff-Rennen</figcaption></figure>
-      <figure><img src="bilder/office.jpg" alt="Office mit Vereinsgelände" width="390" height="844" loading="lazy"><figcaption>Dein Office</figcaption></figure>
-    </div>
+    <section class="spiel" id="kickdraft">
+      <p class="vorzeile">Spielart 2</p>
+      <h2>Kickdraft</h2>
+      <p class="leit">Fußball mit den Regeln der großen US-Ligen: 32 Franchises, kein Abstieg, ein harter Salary Cap, Talente nur über den
+        Draft und am Ende Playoffs um die Meisterschaft.</p>
+      <div class="karten">
+        <div class="karte"><span class="zahl">32</span><h3>Franchises, kein Abstieg</h3><p>Zwei Conferences, acht Divisions. Jeder Verein kann jedes Jahr oben angreifen.</p></div>
+        <div class="karte"><span class="zahl">120 Mio €</span><h3>Harter Salary Cap</h3><p>Verträge, Handgeld und Dead Cap. Wer zu viel ausgibt, zahlt Jahre später dafür.</p></div>
+        <div class="karte"><span class="zahl">4 Runden</span><h3>Draft statt Nachwuchs</h3><p>Die Schwächsten wählen zuerst, Picks lassen sich tauschen.</p></div>
+        <div class="karte"><span class="zahl">14 Teams</span><h3>Playoffs</h3><p>Division-Sieger und Wildcards spielen um den Titel.</p></div>
+      </div>
+      <div class="bilder">
+        <figure><img src="bilder/kd-wahl-390.webp" srcset="bilder/kd-wahl-390.webp 390w, bilder/kd-wahl-780.webp 780w" sizes="240px"
+          alt="Auswahl der Franchise mit Wappen und Stärke" width="390" height="844" loading="lazy"><figcaption>Franchise wählen</figcaption></figure>
+        <figure><img src="bilder/kd-kader-390.webp" srcset="bilder/kd-kader-390.webp 390w, bilder/kd-kader-780.webp 780w" sizes="240px"
+          alt="Aufstellung auf dem Spielfeld" width="390" height="844" loading="lazy"><figcaption>Aufstellung und Taktik</figcaption></figure>
+        <figure><img src="bilder/kd-liga-390.webp" srcset="bilder/kd-liga-390.webp 390w, bilder/kd-liga-780.webp 780w" sizes="240px"
+          alt="Tabelle der Division und Playoff-Bild" width="390" height="844" loading="lazy"><figcaption>Tabelle und Playoff-Rennen</figcaption></figure>
+        <figure><img src="bilder/kd-office-390.webp" srcset="bilder/kd-office-390.webp 390w, bilder/kd-office-780.webp 780w" sizes="240px"
+          alt="Office mit Vereinsgelände" width="390" height="844" loading="lazy"><figcaption>Dein Office</figcaption></figure>
+      </div>
+      <a class="knopf knopf-blau" href="spielen/kickdraft/">▶ Kickdraft im Browser spielen</a>
+      <p class="klein">Demo: eine Saison</p>
+    </section>
+
+    <section class="spiel" id="wo">
+      <h2>Am Handy oder am PC</h2>
+      <div class="karten">
+        <div class="karte"><span class="zahl">Jetzt</span><h3>Im Browser</h3><p>Beide Spielarten als Demo, am Handy und am PC. Der Spielstand bleibt in deinem Browser.</p></div>
+        <div class="karte"><span class="zahl">Bald</span><h3>Android-App</h3><p>Das ganze Spiel, kostenlos bei Google Play. Läuft auch ohne Internet.</p></div>
+        <div class="karte"><span class="zahl">Bald</span><h3>PC-Version</h3><p>Für Windows mit eigener PC-Bedienung und Streamer-Modus – zuerst bei itch.io, später bei Steam.</p></div>
+      </div>
+    </section>
   </main>
 
   <footer class="fuss">
     <nav><a href="datenschutz.html">Datenschutz</a><a href="mailto:kickdraft.spiel@gmail.com">Kontakt</a></nav>
-    <p>Alle Vereine, Spieler und Personen in Kickdraft sind erfunden.</p>
+    <p>Langer Hafer Studios · Alle Vereine, Spieler und Personen im Spiel sind erfunden.</p>
     <p>Grafiken im Spiel: Kenney (CC0), Armoria (CC0), game-icons.net (CC BY 3.0). Schriften Fredoka und Rubik (SIL OFL 1.1).</p>
   </footer>
 </div>

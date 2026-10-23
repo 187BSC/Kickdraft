@@ -1,0 +1,20 @@
+{
+  "name": "Kickdraft – Fußball-Manager",
+  "short_name": "Kickdraft",
+  "description": "Fußball-Manager mit NFL-Regeln: 32 Franchises, Salary Cap, Draft, Trades, Playoffs.",
+  "lang": "de",
+  "dir": "ltr",
+  "id": "./index.html",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#111110",
+  "theme_color": "#111110",
+  "categories": ["games", "sports"],
+  "icons": [
+    { "src": "app/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "app/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "app/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

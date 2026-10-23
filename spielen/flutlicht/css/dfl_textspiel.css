@@ -1,0 +1,306 @@
+/* DFL · Spiel als Text (D77, dfl_textspiel_patch.js): Ticker als Vollbild über dem Spieltag, Wahl am Anpfiff, Knopf im
+   Spielbericht. Nur Tokens des Kenney-Stils (Tag und Nacht), Fallbacks für ältere Stile. Vorlage: spiel/dfl_textspiel_vorschau.html.
+   --th/--tg = Vereinsfarben Heim/Gast (vom Modul gesetzt), --ch/--cg = lesbare Fassung je Stil. */
+
+.dfl-ts {
+  --ts-rand: var(--k-rand, var(--border, #3b3a37)); --ts-linie: var(--k-linie, var(--border, #3b3a37)); --ts-punkt: var(--k-punkt, transparent);
+  --ts-blau: var(--k-blau-knopf, #2c7cb5); --ts-blau-tief: var(--k-blau-schatten, #1d5a85);
+  --ts-gruen: var(--k-gruen, #2fb36b); --ts-gruen-tief: var(--k-gruen-tief, #1e8449); --ts-gruen-text: var(--k-gruen-text, #0b1a12);
+  --ts-gut: var(--app-gut, #3d9a2a); --ts-mittel: var(--app-mittel, #d29a0c); --ts-schlecht: var(--app-schlecht, #d0402f);
+  --ts-mittel-fg: var(--k-mittel-fg, #7a5800); --ts-schlecht-fg: var(--k-schlecht-fg, #a52a1e);
+  --ts-gelb: #f2c14e; --ts-rot: #e24b4a; --ts-rasen1: #2ecc71; --ts-rasen2: #31d978; --ts-feldlinie: rgb(255 255 255 / .9);
+  --ts-dimmer: rgb(44 30 14 / .45);
+  --ch: var(--th, #2c7cb5); --cg: var(--tg, #c0392b); --ch-auf: var(--th-auf, #fff); --cg-auf: var(--tg-auf, #fff);
+  position: fixed; inset: 0; z-index: 9300; display: flex; justify-content: center; align-items: stretch;
+  /* deckend: am PC stünde neben dem Ticker sonst der Spieltag mit dem Endstand (Spoiler) */
+  background-color: var(--bg, #f4e3c1); background-image: radial-gradient(var(--ts-punkt) 15%, transparent 16%); background-size: 26px 26px;
+  color: var(--text, #2c3e50); font-family: var(--font-text, system-ui, sans-serif);
+}
+html.dark .dfl-ts {
+  --ts-rot: #ff6b5b; --ts-rasen1: #239b56; --ts-rasen2: #27a85e; --ts-feldlinie: rgb(255 255 255 / .78); --ts-dimmer: rgb(0 0 0 / .55);
+  /* Vereinsfarben in der Nacht aufhellen (dunkelblau auf #1e2230 wäre unsichtbar) */
+  --ch: color-mix(in srgb, var(--th, #2c7cb5) 62%, #fff); --cg: color-mix(in srgb, var(--tg, #c0392b) 62%, #fff); --ch-auf: #12141d; --cg-auf: #12141d;
+}
+.dfl-ts[hidden] { display: none !important; }
+body.ts-offen { overflow: hidden; }
+.ts-box {
+  position: relative; width: 100%; max-width: 480px; height: 100%; display: flex; flex-direction: column; overflow: hidden;
+  background-color: var(--bg, #f4e3c1); background-image: radial-gradient(var(--ts-punkt) 15%, transparent 16%); background-size: 22px 22px;
+}
+@media (min-width: 560px) {
+  .ts-box { height: calc(100% - 32px); margin-top: 16px; border: 3px solid var(--ts-rand); border-radius: 26px; box-shadow: 0 6px 0 var(--ts-rand); }
+}
+
+/* Kopf */
+.ts-kopf { flex: none; display: flex; align-items: center; gap: 10px; min-height: 54px; padding: calc(6px + env(safe-area-inset-top, 0px)) 14px 6px;
+  background: var(--k-kopf, var(--bg2, #1e2230)); color: var(--k-kopf-text, var(--text, #fff)); }
+.ts-kopf .ts-wappen { width: 28px !important; height: 32px !important; flex: none; }
+.ts-kopf-txt { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.ts-kopf-txt b { font: 800 15px/1.15 var(--font-display, inherit); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ts-kopf-txt small { font-size: 12px; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ts-art { flex: none; display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 999px;
+  background: rgb(255 255 255 / .16); }
+
+/* Anzeigetafel */
+.ts-anzeige { flex: none; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 2px 8px; padding: 10px 12px 8px;
+  background: var(--bg2, #fffdf9); border-bottom: 3px solid var(--ts-linie); }
+.ts-team { display: flex; align-items: center; gap: 8px; font: 800 17px var(--font-display, inherit); min-width: 0; }
+.ts-team.g { justify-content: flex-end; }
+.ts-team .ts-wappen-k { width: 24px !important; height: 28px !important; flex: none; }
+.ts-mitte { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.ts-stand { display: flex; justify-content: center; gap: 2px; font: 800 30px/1 var(--font-zahl, var(--font-display, inherit)); font-variant-numeric: tabular-nums;
+  padding: 4px 12px; border-radius: 12px; background: var(--bg3, #f6ead2); border: 2px solid var(--ts-linie); min-width: 92px; }
+.ts-stand i { font-style: normal; opacity: .7; }
+.ts-uhr { font-size: 12px; font-weight: 800; color: var(--text2, #5c4a36); background: var(--bg4, #e8d3ab); border-radius: 999px; padding: 1px 10px;
+  display: inline-flex; gap: 5px; align-items: center; font-variant-numeric: tabular-nums; }
+.ts-uhr.live::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--ts-schlecht); }
+.ts-uhr.pause::before { content: ''; width: 7px; height: 7px; border-radius: 2px; background: var(--text3, #846d52); }
+.ts-tore { font-size: 11.5px; color: var(--text2, #5c4a36); line-height: 1.35; min-height: 15px; }
+.ts-tore.h { grid-column: 1; }
+.ts-tore.g { grid-column: 3; text-align: right; }
+.ts-tore span { white-space: nowrap; }
+.ts-ie { grid-column: 2; text-align: center; font-size: 12px; color: var(--text2, #5c4a36); }
+.ts-ie b { color: var(--text, #2c3e50); }
+
+/* Druckleiste (je Minute: oben Heim, unten Gast) */
+.ts-druck { flex: none; padding: 6px 12px 4px; background: var(--bg2, #fffdf9); border-bottom: 3px solid var(--ts-linie); }
+.ts-druck svg { display: block; width: 100%; height: 40px; }
+.dfl-ts .ts-null { stroke: var(--ts-linie); stroke-width: 1; }
+.dfl-ts .ts-hz { stroke: var(--text3, #846d52); stroke-width: 1; stroke-dasharray: 2 2; }
+.dfl-ts .ts-jetzt { stroke: var(--text, #2c3e50); stroke-width: 1.5; }
+.dfl-ts .ts-bh { fill: var(--ch); }
+.dfl-ts .ts-bg { fill: var(--cg); }
+.dfl-ts .ts-tp { stroke: var(--bg2, #fffdf9); stroke-width: 1.2; }
+.dfl-ts .ts-tp.h { fill: var(--ch); }
+.dfl-ts .ts-tp.g { fill: var(--cg); }
+.dfl-ts .ts-achse { font: 700 9px var(--font-text, inherit); fill: var(--text3, #846d52); }
+
+/* Lagebild: Mini-Feld + Zahlen */
+.ts-lagebild { flex: none; display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 10px; align-items: center; padding: 8px 12px; }
+.ts-feld { display: block; width: 100%; height: auto; border-radius: 10px; border: 3px solid var(--ts-rand); box-shadow: 0 3px 0 var(--ts-rand); background: var(--ts-rasen1); }
+.ts-feld .ts-ra { fill: var(--ts-rasen1); } .ts-feld .ts-rb { fill: var(--ts-rasen2); }
+.ts-feld .ts-linien { fill: none; stroke: var(--ts-feldlinie); stroke-width: .7; }
+.ts-feld .ts-s { stroke-width: .8; }
+.ts-feld .ts-s.h { stroke: var(--ch); fill: none; } .ts-feld .ts-s.g { stroke: var(--cg); fill: none; }
+.ts-feld .ts-s.drin { stroke: #fff; stroke-width: .9; }
+.ts-feld .ts-s.drin.h { fill: var(--ch); } .ts-feld .ts-s.drin.g { fill: var(--cg); }
+.ts-feld .ts-s.daneben { opacity: .55; }
+.ts-feld .ts-ballp { fill: #fff; stroke: #1d2b20; stroke-width: .6; }
+.ts-feld .ts-rtg { font: 800 5.5px var(--font-text, inherit); fill: rgb(255 255 255 / .85); }
+.ts-live { margin: 0; display: grid; gap: 3px; font-size: 12px; }
+.ts-live div { display: grid; grid-template-columns: 2.6em 1fr 2.6em; align-items: center; background: var(--bg2, #fffdf9); border: 2px solid var(--ts-linie); border-radius: 9px; padding: 2px 6px; }
+.ts-live dt { color: var(--text3, #846d52); font-weight: 700; text-align: center; font-size: 11px; }
+.ts-live dd { margin: 0; font-weight: 800; font-variant-numeric: tabular-nums; }
+.ts-live dd.g { text-align: right; }
+.ts-karten { display: inline-flex; gap: 2px; align-items: center; }
+.ts-kt { display: inline-block; width: 7px; height: 10px; border-radius: 1.5px; vertical-align: -1px; }
+.ts-kt.gelb { background: var(--ts-gelb); } .ts-kt.rot { background: var(--ts-rot); }
+.ts-kt.gelbrot { background: linear-gradient(135deg, var(--ts-gelb) 0 50%, var(--ts-rot) 50% 100%); }
+
+/* Hinweis (nach einem Neustart) */
+.ts-hinweis { flex: none; display: flex; gap: 8px; align-items: center; margin: 0 12px 6px; padding: 8px 10px; border-radius: 12px; font-size: 13px;
+  background: var(--bg2, #fffdf9); border: 2px dashed var(--ts-gut); color: var(--text2, #5c4a36); }
+.ts-hinweis[hidden] { display: none; }
+.ts-hinweis i { font-size: 18px; color: var(--k-gut-fg, var(--ts-gut)); flex: none; }
+.ts-hinweis b { color: var(--text, #2c3e50); }
+
+/* Ticker: neueste Minute oben, innerhalb der Minute der Reihe nach */
+.ts-ticker { flex: 1; min-height: 0; overflow-y: auto; margin: 0; padding: 4px 12px 12px; list-style: none; display: flex; flex-direction: column; gap: 6px;
+  overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.ts-blk { display: grid; grid-template-columns: 42px minmax(0, 1fr); gap: 8px; align-items: start; }
+.ts-min { font-size: 12.5px; font-weight: 800; color: var(--text2, #5c4a36); text-align: right; padding-top: 7px; font-variant-numeric: tabular-nums; }
+.ts-zz { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.ts-z { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 6px; align-items: start; background: var(--bg2, #fffdf9); border: 2px solid var(--ts-linie);
+  border-left: 5px solid var(--ts-linie); border-radius: 10px; padding: 6px 9px 6px 7px; font-size: 13.5px; line-height: 1.38; }
+.ts-z p { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.ts-z .ts-ic { width: 20px; height: 20px; display: grid; place-items: center; color: var(--text3, #846d52); margin-top: -1px; font-size: 17px; }
+.ts-z .ts-punkt { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.ts-z.s-h { border-left-color: var(--ch); } .ts-z.s-g { border-left-color: var(--cg); }
+.ts-z b.n-h, .ts-z b.n-g { font-weight: 700; }
+.ts-z b.n-h { box-shadow: inset 0 -2px 0 var(--ch); } .ts-z b.n-g { box-shadow: inset 0 -2px 0 var(--cg); }
+.ts-z.lage { background: transparent; border-style: dashed; border-left-width: 2px; color: var(--text2, #5c4a36); font-style: italic; }
+.ts-z.aktion { color: var(--text2, #5c4a36); }
+.ts-z.chance { border-color: var(--ts-mittel); }
+.ts-z.chance.s-h { border-left-color: var(--ch); } .ts-z.chance.s-g { border-left-color: var(--cg); }
+.ts-z.chance .ts-ic { color: var(--ts-mittel-fg); }
+.ts-z.elfmeter { border-color: var(--ts-schlecht); background: var(--bg3, #f6ead2); }
+.ts-z.elfmeter.s-h { border-left-color: var(--ch); } .ts-z.elfmeter.s-g { border-left-color: var(--cg); }
+.ts-z.elfmeter .ts-ic { color: var(--ts-schlecht-fg); }
+.ts-z.wechsel .ts-ic { color: var(--ts-blau); }
+.ts-z.elfer { grid-template-columns: 20px minmax(0, 1fr) auto; }
+.ts-z.elfer .ts-ic { color: var(--ts-schlecht-fg); }
+.ts-z.elfer .ti-circle-check { color: var(--k-gut-fg, var(--ts-gut)); }
+.ts-ie-stand { font-weight: 800; font-variant-numeric: tabular-nums; }
+.ts-z.tor { grid-template-columns: minmax(0, 1fr); border-width: 3px; border-left-width: 7px; border-color: var(--ts-rand); box-shadow: 0 3px 0 var(--ts-rand);
+  padding: 8px 10px; font-size: 14px; }
+.ts-z.tor.s-h { border-left-color: var(--ch); } .ts-z.tor.s-g { border-left-color: var(--cg); }
+.ts-tor-kopf { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-bottom: 3px; }
+.ts-tor-kopf > b { font: 800 18px var(--font-display, inherit); letter-spacing: .02em; text-transform: uppercase; }
+.ts-ball { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 17px; }
+.ts-z.tor.s-h .ts-ball { background: var(--ch); color: var(--ch-auf); } .ts-z.tor.s-g .ts-ball { background: var(--cg); color: var(--cg-auf); }
+.ts-tor-stand { font: 800 22px var(--font-zahl, var(--font-display, inherit)); font-variant-numeric: tabular-nums; }
+.ts-marken { margin-left: auto; display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
+.ts-marke { font-size: 11.5px; font-weight: 800; border-radius: 999px; padding: 1px 8px; background: var(--bg4, #e8d3ab); color: var(--text, #2c3e50); }
+.ts-marke.gold { background: var(--ts-mittel); color: #2a1c02; }
+.ts-z.tor small { display: block; margin-top: 3px; color: var(--text3, #846d52); font-size: 12px; }
+.ts-trenner { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 12px; background: var(--k-kopf, var(--bg3, #262a3a)); color: var(--k-kopf-text, var(--text, #fff)); }
+.ts-trenner > i { font-size: 22px; flex: none; }
+.ts-trenner > div { min-width: 0; flex: 1; }
+.ts-trenner b { font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+.ts-trenner small { display: block; font-size: 12px; opacity: .88; }
+.ts-trenner small.ts-verletzt { display: flex; gap: 5px; align-items: center; margin-top: 4px; opacity: 1; }
+.ts-tr-stand { font: 800 22px var(--font-zahl, var(--font-display, inherit)); margin-left: auto; text-align: right; font-variant-numeric: tabular-nums; flex: none; }
+.ts-tr-stand small { display: block; font-size: 11px; font-weight: 700; }
+.ts-rechnet { margin: auto 0; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 40px 12px; color: var(--text2, #5c4a36); text-align: center; }
+.ts-rechnet i { font-size: 34px; color: var(--text3, #846d52); }
+.ts-rechnet b { font: 800 18px var(--font-display, inherit); color: var(--text, #2c3e50); }
+/* Siegchance vor dem Spiel (unten = ganz am Anfang) */
+.ts-chance { display: flex; flex-direction: column; gap: 5px; padding: 8px 10px; border-radius: 12px; background: var(--bg2, #fffdf9); border: 2px solid var(--ts-linie); }
+.ts-chance-titel { display: flex; gap: 6px; align-items: center; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text3, #846d52); }
+.ts-dreier { display: flex; height: 22px; border-radius: 7px; overflow: hidden; border: 2px solid var(--ts-linie); }
+.ts-dreier span { display: grid; place-items: center; font-size: 11.5px; font-weight: 800; min-width: 0; white-space: nowrap; overflow: hidden; }
+.ts-dreier .h { background: var(--ch); color: var(--ch-auf); } .ts-dreier .g { background: var(--cg); color: var(--cg-auf); }
+.ts-dreier .x { background: var(--bg4, #e8d3ab); color: var(--text, #2c3e50); }
+.ts-dreier-l { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--text2, #5c4a36); font-weight: 700; }
+
+/* Steuerung */
+.ts-steuer { flex: none; display: flex; gap: 8px; align-items: center; padding: 10px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: var(--bg2, #fffdf9); border-top: 3px solid var(--ts-rand); }
+.ts-rund { width: 48px; height: 46px; flex: none; display: grid; place-items: center; border-radius: 14px; border: 3px solid var(--ts-rand); box-shadow: 0 3px 0 var(--ts-rand);
+  background: var(--bg3, #f6ead2); color: var(--text, #2c3e50); cursor: pointer; padding: 0; font-size: 22px; }
+.ts-rund:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ts-rand); }
+.ts-tempo { flex: 1; display: grid; grid-template-columns: 1fr 1fr 1.7fr; border: 3px solid var(--ts-rand); border-radius: 14px; overflow: hidden;
+  box-shadow: 0 3px 0 var(--ts-rand); background: var(--bg3, #f6ead2); }
+.ts-tempo button { border: 0; background: transparent; color: var(--text2, #5c4a36); font: 800 15px var(--font-text, inherit); padding: 0 4px; height: 40px; cursor: pointer;
+  display: inline-flex; gap: 5px; align-items: center; justify-content: center; }
+.ts-tempo button + button { border-left: 2px solid var(--ts-linie); }
+.ts-tempo button[aria-pressed="true"] { background: var(--ts-blau); color: #fff; }
+.ts-tempo .ts-sofort { color: var(--text, #2c3e50); }
+.ts-tempo i, .ts-knopf i { font-size: 19px; }
+.ts-knopf { flex: 1; font: 800 16px var(--font-text, inherit); color: var(--ts-gruen-text); background: var(--ts-gruen); border: 3px solid var(--ts-gruen-tief);
+  box-shadow: 0 4px 0 var(--ts-gruen-tief); border-radius: 14px; padding: 11px 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; min-height: 50px; }
+.ts-knopf:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ts-gruen-tief); }
+.ts-knopf.hell { color: var(--text, #2c3e50); background: var(--bg2, #fffdf9); border-color: var(--ts-rand); box-shadow: 0 4px 0 var(--ts-rand); }
+.dfl-ts button:focus-visible { outline: 3px solid var(--ts-mittel); outline-offset: 2px; }
+
+/* Kleiner Spielbericht nach einem Neustart (der große braucht den Spielzustand im Speicher) */
+.ts-bericht { position: absolute; inset: 54px 0 0 0; z-index: 2; display: flex; flex-direction: column; background: var(--ts-dimmer); }
+.ts-bericht[hidden] { display: none; }
+.ts-b-blatt { margin-top: 36px; flex: 1; min-height: 0; display: flex; flex-direction: column; background: var(--bg, #f4e3c1); border-top: 4px solid var(--ts-rand); border-radius: 22px 22px 0 0; }
+.ts-b-inhalt { flex: 1; min-height: 0; overflow: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.ts-b-erg { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; background: var(--bg2, #fffdf9); border: 3px solid var(--ts-rand);
+  border-radius: 16px; box-shadow: 0 4px 0 var(--ts-rand); padding: 12px; }
+.ts-b-erg .t { display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; }
+.ts-b-erg .ts-wappen-b { width: 34px !important; height: 40px !important; }
+.ts-b-erg .s { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.ts-b-erg .s b { font: 800 38px/1 var(--font-zahl, var(--font-display, inherit)); }
+.ts-b-erg .s small { font-size: 12px; color: var(--text2, #5c4a36); margin-top: 2px; }
+.ts-urteil { display: inline-block; margin-top: 6px; font-size: 12px; font-weight: 800; border-radius: 999px; padding: 2px 10px; }
+.ts-urteil.sieg { background: var(--ts-gut); color: #fff; } .ts-urteil.remis { background: var(--bg4, #e8d3ab); color: var(--text, #2c3e50); }
+.ts-urteil.niederlage { background: var(--ts-schlecht); color: #fff; }
+.ts-b-tore { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; }
+.ts-b-tore li { display: flex; align-items: center; gap: 8px; padding: 4px 8px; border-radius: 9px; background: var(--bg2, #fffdf9); border: 2px solid var(--ts-linie);
+  border-left: 5px solid var(--ch); }
+.ts-b-tore li.g { flex-direction: row-reverse; text-align: right; border-left-width: 2px; border-right: 5px solid var(--cg); }
+.ts-b-tore .m { font-weight: 800; color: var(--text2, #5c4a36); min-width: 38px; }
+.ts-b-tore small { display: block; color: var(--text3, #846d52); font-size: 11.5px; }
+.ts-b-stats { display: flex; flex-direction: column; gap: 7px; background: var(--bg2, #fffdf9); border: 3px solid var(--ts-rand); border-radius: 16px; box-shadow: 0 4px 0 var(--ts-rand); padding: 10px 12px; }
+.ts-bs { display: grid; grid-template-columns: 3.2em minmax(0, 1fr) 3.2em; gap: 2px 8px; align-items: center; font-size: 13px; }
+.ts-bs .w { font-weight: 800; font-variant-numeric: tabular-nums; } .ts-bs .w.g { text-align: right; }
+.ts-bs .lab { grid-column: 1 / -1; text-align: center; font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--text3, #846d52); margin-bottom: -2px; }
+.ts-bs .bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--bg4, #e8d3ab); gap: 2px; }
+.ts-bs .bar i { display: block; height: 100%; }
+.ts-bs .bar i.h { background: var(--ch); } .ts-bs .bar i.g { background: var(--cg); margin-left: auto; }
+.ts-b-druck { background: var(--bg2, #fffdf9); border: 3px solid var(--ts-rand); border-radius: 16px; box-shadow: 0 4px 0 var(--ts-rand); padding: 8px 10px; }
+.ts-b-druck b { display: block; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text3, #846d52); margin-bottom: 4px; }
+.ts-b-druck svg { display: block; width: 100%; height: 76px; }
+.ts-b-hinweis { margin: 0; display: flex; gap: 6px; align-items: center; font-size: 12.5px; color: var(--text2, #5c4a36); }
+.ts-b-fuss { flex: none; display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; padding: 10px 12px calc(14px + env(safe-area-inset-bottom, 0px));
+  border-top: 3px solid var(--ts-linie); background: var(--bg, #f4e3c1); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .ts-stand.tor { animation: ts-tor 1.2s ease-out; }
+  @keyframes ts-tor { 0% { transform: scale(1); } 15% { transform: scale(1.18); background: var(--ts-gruen); color: var(--ts-gruen-text); } 100% { transform: scale(1); } }
+  .dfl-ts .neu { animation: ts-rein .35s ease-out; }
+  @keyframes ts-rein { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+  .ts-feld .ts-ballp { transition: transform .45s ease-out; }
+  .ts-knopf, .ts-rund, .ts-tempo button { transition: background-color .15s, color .15s, transform .08s; }
+}
+/* 2D-Wiedergabe: Spieler in Vereinsfarben, Torhüter mit Rand */
+.ts-feld .ts-sp circle { stroke: #fff; stroke-width: .45; }
+.ts-feld .ts-sp .h { fill: var(--ch); } .ts-feld .ts-sp .g { fill: var(--cg); }
+.ts-feld .ts-sp .tw { stroke: #1d2b20; stroke-width: .7; }
+.ts-2d .ts-feld .ts-ballp { transition: none; }
+.ts-2d .ts-feld .ts-s { opacity: .35; }
+/* Kleine Handys (Nutzer 2026-10-17: Feld und Statistik fehlten): nicht ausblenden, sondern flacher – Feld und Zahlen nebeneinander, kleiner */
+@media (max-height: 700px) {
+  .ts-lagebild { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 6px; padding: 4px 10px; }
+  .ts-feld { border-width: 2px; box-shadow: none; }
+  .ts-live { gap: 2px; font-size: 11px; } .ts-live div { padding: 1px 5px; border-width: 1px; }
+  .ts-live div:nth-child(n+5) { display: none; }
+}
+
+/* ── Wahl am Anpfiff (Spieltag, unter dem Anpfiff-Knopf) ───────────────────── */
+.ts-wahl-box { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; font-family: var(--font-text, inherit); }
+.ts-wahl-box[hidden] { display: none; }
+.ts-wahl-kopf { display: flex; gap: 6px; align-items: center; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text3, #846d52); }
+.ts-wahl-kopf i { font-size: 15px; }
+.ts-wahl { display: grid; grid-template-columns: 1.1fr 1fr .7fr; border: 3px solid var(--k-rand, var(--border, #3b3a37)); border-radius: 14px; overflow: hidden;
+  background: var(--bg3, #f6ead2); box-shadow: 0 3px 0 var(--k-rand, var(--border, #3b3a37)); }
+.ts-wahl button { border: 0; background: transparent; color: var(--text2, #5c4a36); font: 800 13.5px var(--font-text, inherit); min-height: 40px; padding: 0 4px; cursor: pointer; }
+.ts-wahl button + button { border-left: 2px solid var(--k-linie, var(--border, #3b3a37)); }
+.ts-wahl button[aria-pressed="true"] { background: var(--k-blau-knopf, #2c7cb5); color: #fff; }
+.ts-wahl button:focus-visible { outline: 3px solid var(--app-mittel, #d29a0c); outline-offset: -3px; }
+.ts-wahl-tipp { font-size: 11.5px; color: var(--text3, #846d52); line-height: 1.35; }
+
+/* ── Spielbericht: Knopf „Ticker“ neben „Nächste Woche“ ───────────────────── */
+#pm-footer.ts-mit-ticker { display: flex; gap: 10px; align-items: stretch; }
+#pm-footer.ts-mit-ticker #pm-continue-btn { flex: 1; min-width: 0; }
+#pm-ticker-btn { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 14px; min-height: 48px; cursor: pointer;
+  border-radius: 12px; border: 3px solid var(--k-rand, var(--border, #3b3a37)); box-shadow: 0 3px 0 var(--k-rand, var(--border, #3b3a37));
+  background: var(--bg2, #fffdf9); color: var(--text, #2c3e50); font: 800 14px var(--font-text, inherit); }
+#pm-ticker-btn i { font-size: 18px; }
+#pm-ticker-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--k-rand, var(--border, #3b3a37)); }
+/* Hinweise beim Anpfiff (Aufstellung angepasst, Zurück in der Elf) nicht über die Anzeigetafel legen (2026-10-11) */
+body.ts-offen .toast-host { top: auto !important; bottom: calc(92px + env(safe-area-inset-bottom, 0px)) !important; }
+/* … und nicht über das Ergebnis im Spielbericht (Spiel als Text „Aus“: Hinweise kommen mit dem Bericht, Spieltest 2026-10-14) */
+body:has(#pm-overlay) .toast-host { top: auto !important; bottom: calc(104px + env(safe-area-inset-bottom, 0px)) !important; }
+/* Entscheidungsfenster (Ereignis, Sponsor, Briefing): schon sichtbare Hinweise hinter das Fenster, neue warten (dfl_kenney_patch.js) */
+body:has(.exp-overlay) .toast-host, body:has(.sw-briefing) .toast-host { z-index: 9700 !important; }
+
+/* Playoffs (Nachtschicht 2026-10-13): Flutlicht, Gold, Weg durch die Runden – in Tag und Nacht gleich dunkel wie ein Abendspiel */
+.dfl-ts.ts-po { --po-nacht: #141826; --po-nacht2: #1f2538; --po-nacht3: #2a3150; --po-fg: #f2f4f8; --po-leise: #b8c0d4; --po-gold: #f0b93a; --po-gold-tief: #b8861b; }
+.ts-po .ts-box { background-color: var(--po-nacht); background-image: none; color: var(--po-fg); }
+@media (min-width: 560px) { .ts-po .ts-box { border-color: var(--po-gold-tief); box-shadow: 0 6px 0 var(--po-gold-tief); } }
+.ts-po .ts-kopf { background: var(--po-nacht); color: var(--po-fg); }
+.ts-po .ts-art { background: rgb(240 185 58 / .18); color: var(--po-gold); }
+.ts-po-kopf { flex: none; padding: 6px 12px 8px; background: var(--po-nacht); display: flex; flex-direction: column; gap: 5px; align-items: center; }
+.ts-po-weg { list-style: none; margin: 0; padding: 0; display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
+.ts-po-weg li { font-size: 11.5px; font-weight: 800; padding: 3px 9px; border-radius: 999px; background: var(--po-nacht2); color: var(--po-leise);
+  border: 2px solid var(--po-nacht3); display: inline-flex; align-items: center; gap: 3px; }
+.ts-po-weg li.durch { color: var(--po-fg); border-color: var(--po-gold-tief); }
+.ts-po-weg li.jetzt { background: var(--po-gold); color: #2a1c02; border-color: var(--po-gold); }
+.ts-po .ts-anzeige { background: var(--po-nacht2); color: var(--po-fg); border-top: 3px solid var(--po-gold); border-bottom: 3px solid var(--po-gold); }
+.ts-po .ts-stand { background: var(--po-nacht); color: var(--po-fg); border-color: var(--po-gold); box-shadow: 0 0 0 3px rgb(240 185 58 / .18); }
+.ts-po .ts-uhr { background: var(--po-nacht3); color: var(--po-fg); }
+.ts-po .ts-tore, .ts-po .ts-team small { color: var(--po-leise); }
+.ts-seed { display: block; font: 700 11px var(--font-text, inherit); color: var(--po-gold, var(--text3, #846d52)); }
+.ts-team.g .ts-seed { text-align: right; }
+.ts-po .ts-team .ts-seed { color: var(--po-gold); }
+.ts-po .ts-druck, .ts-po .ts-lagebild, .ts-po .ts-steuer { background: var(--po-nacht); }
+.ts-po .ts-ticker { background: var(--po-nacht); }
+.ts-po .ts-z { background: var(--po-nacht2); color: var(--po-fg); border-color: var(--po-nacht3); }
+.ts-po .ts-z small, .ts-po .ts-z .ts-ic { color: var(--po-leise); }
+.ts-po .ts-z.tor { background: color-mix(in srgb, var(--po-gold) 16%, var(--po-nacht2)); border-color: var(--po-gold); box-shadow: 0 3px 0 var(--po-gold-tief); }
+.ts-po .ts-z.tor .ts-tor-kopf > b, .ts-po .ts-z.tor .ts-tor-stand { color: var(--po-gold); }
+.ts-po .ts-z.elfer, .ts-po .ts-z.elfmeter { background: var(--po-nacht3); }
+.ts-po .ts-live div { background: var(--po-nacht2); border-color: var(--po-nacht3); color: var(--po-fg); }
+.ts-po .ts-live dt { color: var(--po-leise); }
+.ts-po .ts-steuer { border-top-color: var(--po-gold-tief); }
+
+/* Bericht im Flutlicht-Layout (Pro Bowl, Playoffs nach Neustart): das Blatt ist hell im Tag-Stil → Schrift wie im Spiel */
+.ts-po .ts-b-blatt { color: var(--text, #2c3e50); }
+/* D158: Pro Bowl im Ticker – Stern statt Vereinswappen, Conference-Marken an Tafel und Bericht */
+.ts-kopf .ts-pb-stern { display: inline-flex; align-items: center; justify-content: center; border-radius: 9px; background: var(--po-gold, #f0b93a); color: #2a1c02; font-size: 18px; }
+.ts-team .ts-konf { width: 26px; height: 26px; font-size: 10.5px; }
+.ts-b-erg .ts-konf { width: 38px; height: 38px; border-radius: 11px; font-size: 14px; }

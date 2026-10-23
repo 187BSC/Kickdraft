@@ -1,0 +1,53 @@
+/* =====================================================================
+   DFL – App/Handy (lädt nach dfl_spiel.css)
+   Ergänzt mobile_patch.js um die DFL-Ansichten, die nach der Handyfassung
+   dazugekommen sind, und um die installierte App (Startbildschirm).
+   Gemessen auf 390×844: keine Seite ist breiter als der Bildschirm, aber
+   Namen in der Kaderliste waren auf 53 px gequetscht, die Playoff-Tabelle
+   brach „0-0-0“ auf drei Zeilen um.
+   ===================================================================== */
+
+@media (max-width: 819px) {
+  /* Kaderliste: Rolle und Marktwert weg, damit der Name Platz hat */
+  .sqo-row .role-badge, .sqo-row .sqo-val { display: none; }
+  .sqo-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Tabellen nach Division/Conference: ohne „Sp“, „Tore“ und „Status“ (Punkte bleiben sichtbar), Zahlen ohne Umbruch */
+  .dfl-div-tabelle .lg-table { min-width: 0; }
+  .dfl-tabelle th:nth-child(3), .dfl-tabelle td:nth-child(3),
+  .dfl-tabelle th:nth-child(5), .dfl-tabelle td:nth-child(5),
+  .dfl-tabelle th:nth-child(8), .dfl-tabelle td:nth-child(8):not([colspan]) { display: none; }   /* Status: die Playoff-Linie zeigt es */
+  .dfl-tabelle .num { white-space: nowrap; }
+  .dfl-tabelle .lg-club { min-width: 0; }
+
+  /* Verträge & Cap: Name und Laufzeit bleiben einzeilig lesbar */
+  .prospect-row .market-name { min-width: 0; }
+  .prospect-row > span[style*="min-width:96px"] { min-width: 64px !important; }
+  /* Ausgelaufen (zwei Knöpfe): Knöpfe in eine eigene Zeile, sonst wird der Name gequetscht */
+  .vt-aus { flex-wrap: wrap; }
+  .vt-aus .vt-knoepfe { flex: 1 0 100%; justify-content: flex-end; }
+
+  /* Draft-Dialog: weniger Rand, Platz für die untere Leiste */
+  .dfl-draft-ov { padding: 8px 8px calc(70px + env(safe-area-inset-bottom, 0px)); z-index: 9100; }
+  .dfl-draft-karte { padding: 12px; }
+}
+
+/* Als App (Startbildschirm oder Android, .dfl-app aus dfl_app_patch.js): Statusleiste/Notch
+   oben freihalten – index.html nutzt viewport-fit=cover, die Leiste unten hat ihren Abstand schon */
+html.dfl-app body { padding-top: env(safe-area-inset-top, 0px); }
+html.dfl-app, html.dfl-app body { overscroll-behavior-y: none; }
+
+/* Bestätigen ohne Browserdialog (dfl_app_patch.js, z. B. im Artifact) */
+#dfl-frage { position: fixed; inset: 0; z-index: 9800; background: rgb(0 0 0 / .6); display: flex;
+  align-items: center; justify-content: center; padding: 16px; }
+.dfl-frage-box { width: 100%; max-width: 420px; background: var(--bg2, #191918); color: var(--text, #eeeeec);
+  border: 1px solid var(--border, #3b3a37); border-radius: var(--rund, 16px); padding: 18px;
+  box-shadow: var(--schatten-hoch, 0 12px 28px rgb(0 0 0 / .35)); font-family: var(--font-text, system-ui, sans-serif); }
+.dfl-frage-text { white-space: pre-line; font-size: 14px; line-height: 1.45; }
+.dfl-frage-knoepfe { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
+.dfl-frage-knoepfe button { font: inherit; font-size: 14px; font-weight: 700; min-height: 44px; padding: 0 16px;
+  border-radius: var(--rund-klein, 12px); cursor: pointer; border: 1px solid var(--border, #3b3a37);
+  background: var(--bg3, #222221); color: var(--text, #eeeeec); }
+.dfl-frage-knoepfe .dfl-frage-ja { background: var(--accent, #2fb36b); border-color: var(--accent, #2fb36b);
+  color: var(--accent-ink, #0b1a12); }
+.dfl-frage-knoepfe button:focus-visible { outline: 2px solid var(--accent, #2fb36b); outline-offset: 2px; }

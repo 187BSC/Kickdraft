@@ -1,0 +1,185 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   DFL · Trade-Zentrale v2 (D84, D86, 2026-10-11) – js/dfl_trade_patch.js
+   Links deine Seite, rechts ihre: Karten mit Gesicht, Pick-Tickets, Vorrat zum Antippen, Trade-O-Meter, Cap-Balken
+   beider Vereine, Vertrag vorab. Dazu die Schritte im Vertragsblatt (Tausch-Modus, dfl_saisonwechsel_patch.js).
+   Stil wie die Vorschau spiel/dfl_trade_vorschau.html: nur Tokens (Kenney Tag/Nacht), lädt vor theme_dfl_kenney.css.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  --tz-rand: var(--k-rand, var(--border, #8b5a2b));
+  --tz-linie: var(--k-linie, var(--border, #e3c99a));
+  --tz-ich: var(--k-gut-fg, #2f6b1f);          /* Schrift „Du gibst“ */
+  --tz-er: var(--k-info-fg, #1f5f8f);          /* Schrift „Du bekommst“ */
+  --tz-ich-balken: var(--k-gruen-tief, #4d8236);
+  --tz-er-balken: var(--k-blau-knopf, #2c7cb5);
+  --tz-gold: var(--gold, #a86b12);
+  --tz-rot: var(--k-rot, #e74c3c);
+}
+
+.tz { display: flex; flex-direction: column; gap: 12px; font-size: 13px; color: var(--text); min-width: 0; }
+.tz-kopf { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.tz-kopf > b { font: 800 19px/1.1 var(--font-display, system-ui); }
+.tz-frist { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: var(--text2); background: var(--bg3);
+  border: 2px solid var(--tz-linie); border-radius: 999px; padding: 2px 10px; }
+.tz-frist.zu { color: var(--k-schlecht-fg, #a52a1e); background: var(--k-schlecht-bg, #f9dcd5); }
+.tz-lage { font-size: 12px; color: var(--text2); line-height: 1.4; }
+
+/* ── Zwei Seiten ───────────────────────────────────────────────────────────── */
+.tz-seiten { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: start; }
+.tz-seite { background: var(--bg2); border: 3px solid var(--tz-rand); border-radius: 16px; box-shadow: 0 4px 0 var(--tz-rand);
+  padding: 8px; display: flex; flex-direction: column; gap: 7px; min-width: 0; min-height: 150px; }
+.tz-seite-kopf { display: flex; align-items: center; gap: 6px; min-width: 0; flex-wrap: wrap; }
+.tz-seite-kopf > span:not(.lg-crest):not(.dfl-tr-badge) { display: flex; flex-direction: column; min-width: 0; flex: 1 1 70px; line-height: 1.15; }
+.tz-seite-kopf b { font: 800 12px/1.1 var(--font-text, system-ui); text-transform: uppercase; letter-spacing: .06em; }
+.tz-seite.ich .tz-seite-kopf b { color: var(--tz-ich); } .tz-seite.er .tz-seite-kopf b { color: var(--tz-er); }
+.tz-seite-kopf small { font-size: 11px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tz-seite-kopf .dfl-tr-badge { font-size: 9.5px; padding: 3px 6px; }
+html .tz .lg-crest.tz-wappen { width: 24px !important; height: 26px !important; min-width: 24px; flex: none; margin: 0; }
+html .tz .lg-crest.tz-wappen.klein { width: 20px !important; height: 22px !important; min-width: 20px; }
+.tz-leer { color: var(--text3); font-size: 12px; text-align: center; padding: 18px 4px; border: 2px dashed var(--tz-linie); border-radius: 12px; }
+.tz-leer.klein { padding: 8px 10px; flex: 1; }
+
+/* Karte im Tausch */
+.tz-karte { position: relative; display: flex; gap: 6px; align-items: flex-start; width: 100%; min-width: 0; text-align: left; font: inherit; color: var(--text);
+  background: var(--bg3); border: 2px solid var(--tz-linie); border-radius: 12px; padding: 5px 8px 5px 5px; cursor: pointer; }
+.tz-karte:hover { border-color: var(--tz-rand); }
+.tz-bild { position: relative; flex: none; width: 36px; }
+.tz-gesicht { display: block; width: 36px; height: 44px; overflow: hidden; border-radius: 9px; background: var(--bg4); position: relative; flex: none; }
+.tz-gesicht svg { position: absolute; width: 104%; height: auto; left: -2%; top: -6%; }
+.tz-ovr { position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); min-width: 26px; text-align: center; font: 800 12px/1.35 var(--font-zahl, system-ui);
+  border-radius: 7px; padding: 0 4px; box-shadow: 0 0 0 2px var(--bg3); }
+.tz-wer { display: flex; flex-direction: column; min-width: 0; flex: 1; line-height: 1.25; gap: 1px; }
+.tz-wer > b { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tz-wer > small { font-size: 11px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tz-fakten { display: flex; flex-wrap: wrap; gap: 0 7px; font-size: 11px; color: var(--text3); font-variant-numeric: tabular-nums; }
+.tz-fakten .tz-letztes { color: var(--k-mittel-fg, #7a5800); font-weight: 800; }
+.tz-schild { display: inline-flex; align-items: center; gap: 3px; font-size: 10.5px; font-weight: 700; color: var(--text2); line-height: 1.3; }
+.tz-schild i { font-size: 12px; }
+.tz-schild.teuer { color: var(--tz-gold); } .tz-schild.auge { color: var(--tz-ich); } .tz-schild.zu { color: var(--k-schlecht-fg, #a52a1e); }
+.tz-weg { position: absolute; top: -7px; right: -7px; width: 20px; height: 20px; border-radius: 50%; background: var(--tz-rot); color: #fff; font-size: 12px;
+  display: grid; place-items: center; box-shadow: 0 0 0 2px var(--bg2); }
+
+/* Pick-Ticket */
+.tz-ticket { position: relative; display: flex; gap: 7px; align-items: center; width: 100%; min-width: 0; text-align: left; font: inherit; color: var(--text);
+  background: var(--bg3); border: 2px dashed var(--tz-gold); border-radius: 12px; padding: 5px 8px; cursor: pointer; }
+.tz-ticket .tz-wer > b { font-size: 12.5px; }
+.tz-ticket .tz-wer > small i { font-size: 12px; color: var(--tz-gold); margin-right: 3px; vertical-align: -1px; }
+.tz-tw { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; font: 800 14px/1.05 var(--font-zahl, system-ui); color: var(--tz-gold); flex: none; }
+.tz-tw small { font-size: 9.5px; font-weight: 700; color: var(--text3); }
+
+/* ── Urteil: Trade-O-Meter + Cap-Balken ─────────────────────────────────────── */
+.tz-urteil { margin-top: 0; gap: 7px; }
+.tz-achse { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; font-weight: 700; color: var(--text3); margin-top: -2px; }
+.tz-grund { font-size: 13px; }
+.tz-caps { display: flex; flex-direction: column; gap: 9px; margin-top: 2px; }
+.tz-cap { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.tz-cap-bahn { position: relative; height: 16px; border-radius: 999px; background: var(--bg3); border: 2px solid var(--tz-linie); }
+.tz-cap-nach { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; background: var(--tz-ich-balken); transition: width .3s ease; }
+.tz-cap.er .tz-cap-nach { background: var(--tz-er-balken); }
+.tz-cap.zu .tz-cap-nach { background: var(--tz-rot); }
+.tz-cap-vor { position: absolute; top: -5px; bottom: -5px; width: 3px; margin-left: -1.5px; border-radius: 2px; background: var(--text2); opacity: .6; }
+.tz-cap-grenze { position: absolute; top: -7px; bottom: -7px; width: 4px; margin-left: -2px; border-radius: 2px; background: var(--text); }
+.tz-cap-zahl { display: flex; flex-direction: column; align-items: flex-end; font-variant-numeric: tabular-nums; line-height: 1.1; min-width: 76px; }
+.tz-cap-zahl b { font: 800 14px/1.1 var(--font-zahl, system-ui); }
+.tz-cap.zu .tz-cap-zahl b { color: var(--k-schlecht-fg, #a52a1e); }
+.tz-cap-zahl small { font-size: 10.5px; color: var(--text3); white-space: nowrap; }
+
+/* ── Vertrag vorab (D86) ──────────────────────────────────────────────────── */
+.tz-vorab { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 10px; align-items: center; border-radius: 14px; padding: 9px 10px;
+  background: var(--k-info-bg, #dcebf7); border: 3px solid var(--k-blau-knopf, #2c7cb5); color: var(--text); }
+.tz-vorab > i { font-size: 24px; color: var(--k-info-fg, #1f5f8f); }
+.tz-vorab-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.tz-vorab-text b { font-size: 13px; }
+.tz-vorab-text small { font-size: 12px; color: var(--text2); }
+.tz-vorab-text small.gut { color: var(--k-gut-fg, #2f6b1f); font-weight: 700; } .tz-vorab-text small.schlecht { color: var(--k-schlecht-fg, #a52a1e); font-weight: 700; }
+.tz-vorab-knoepfe { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; }
+.tz-vorab-knoepfe .app-knopf { flex: 1 1 40%; min-height: 40px; }
+.tz-vorab.an { background: var(--k-gut-bg, #e3f1d8); border-color: var(--k-gruen-tief, #4d8236); }
+.tz-vorab.an > i { color: var(--k-gut-fg, #2f6b1f); }
+.tz-vorab.zu, .tz-vorab.nein { background: var(--k-schlecht-bg, #f9dcd5); border-color: var(--k-schlecht-fg, #a52a1e); }
+.tz-vorab.zu > i, .tz-vorab.nein > i { color: var(--k-schlecht-fg, #a52a1e); }
+
+/* ── Vorrat ────────────────────────────────────────────────────────────────── */
+.tz-vorrat { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.tz-vorrat-teil { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.tz-vorrat h5 { margin: 4px 0 0; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 11.5px; font-weight: 800;
+  letter-spacing: .06em; text-transform: uppercase; color: var(--text3); }
+.tz-vorrat-teil.ich h5:first-child { color: var(--tz-ich); } .tz-vorrat-teil.er h5:first-child { color: var(--tz-er); }
+.tz-vorrat h5 small { font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--text3); }
+.tz-leiste { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px 8px; scrollbar-width: thin; overscroll-behavior-x: contain; }
+.tz-mini { position: relative; flex: none; width: 62px; display: flex; flex-direction: column; align-items: center; gap: 2px; font: inherit; color: var(--text);
+  background: var(--bg2); border: 2px solid var(--tz-linie); border-radius: 12px; padding: 4px 2px 3px; cursor: pointer; text-align: center; }
+.tz-mini .tz-gesicht { width: 40px; height: 46px; }
+.tz-mini-ovr { display: flex; align-items: center; gap: 3px; font: 800 13px/1.1 var(--font-zahl, system-ui); }
+.tz-mini-ovr .pos-badge-sm { font-size: 9px; padding: 1px 4px; margin: 0; line-height: 1.2; }
+.tz-mini-name { font-size: 10.5px; line-height: 1.15; max-width: 58px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text2); }
+.tz-mini.pk { width: 66px; justify-content: center; border-style: dashed; border-color: var(--tz-gold); background: var(--bg3); min-height: 86px; }
+.tz-mini.pk > .ti-ticket { font-size: 20px; color: var(--tz-gold); }
+.tz-mini.pk b { font: 800 13px/1.1 var(--font-zahl, system-ui); }
+.tz-mini.pk span { font-size: 10.5px; color: var(--text2); }
+.tz-mini.pk small { font-size: 10px; color: var(--text3); }
+.tz-mini.drin { border-color: var(--k-gruen-tief, #4d8236); background: var(--k-gut-bg, #e3f1d8); }
+.tz-vorrat-teil.er .tz-mini.drin { border-color: var(--k-blau-knopf, #2c7cb5); background: var(--k-info-bg, #dcebf7); }
+.tz-mini.zu { opacity: .55; cursor: not-allowed; }
+.tz-mini.zu.drin { opacity: 1; }
+.tz-ecke { position: absolute; top: 2px; right: 2px; font-size: 11px; font-weight: 800; line-height: 1; padding: 2px 3px; border-radius: 6px; background: var(--bg3); color: var(--text2); }
+.tz-ecke i { font-size: 12px; }
+.tz-ecke.zu { color: var(--k-schlecht-fg, #a52a1e); } .tz-ecke.teuer { color: var(--tz-gold); } .tz-ecke.auge { color: var(--tz-ich); }
+.tz-haken { display: none; position: absolute; top: -6px; left: -6px; width: 20px; height: 20px; border-radius: 50%; place-items: center; color: #fff; font-size: 12px;
+  background: var(--k-gruen-tief, #4d8236); box-shadow: 0 0 0 2px var(--bg2); }
+.tz-vorrat-teil.er .tz-haken { background: var(--k-blau-knopf, #2c7cb5); }
+.tz-mini.drin .tz-haken { display: grid; }
+
+/* ── Knöpfe, Meldung ───────────────────────────────────────────────────────── */
+.tz-knoepfe { display: flex; flex-wrap: wrap; gap: 8px; }
+.tz-knoepfe .app-knopf { flex: 1 1 40%; font-size: 13px; }
+.tz-knoepfe .app-knopf.haupt { flex-basis: 100%; min-height: 52px; }
+.tz-knoepfe .app-knopf[disabled], .tz-vorab .app-knopf[disabled] { opacity: .5; cursor: not-allowed; box-shadow: none; }
+.tz-meldung { font-weight: 700; font-size: 13px; padding: 7px 10px; border-radius: 12px; background: var(--bg3); border: 2px solid var(--tz-linie); }
+.tz .dfl-tr-log { margin-top: 0; border: 2px solid var(--tz-linie); border-radius: 14px; }      /* Letzte Trades: Kenney-Rand statt 1 px */
+.tz #tz-block .dfl-tr-block { margin-top: 0; }
+
+.tz-karte:focus-visible, .tz-ticket:focus-visible, .tz-mini:focus-visible { outline: 3px solid var(--tz-gold); outline-offset: 2px; }
+
+/* PC: Vorrat nebeneinander und umbrechend statt Wischleiste */
+@media (min-width: 820px) {
+  .tz-vorrat { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .tz-leiste { flex-wrap: wrap; overflow: visible; }
+  .tz-knoepfe .app-knopf { flex: 0 1 auto; }
+  .tz-knoepfe .app-knopf.haupt { flex: 1 1 260px; }
+}
+@media (prefers-reduced-motion: reduce) { .tz-cap-nach { transition: none; } }
+
+/* ── Cap und Kosten je Seite (Dead Cap = Handgeld-Rest, sofort bezahlt) ─────── */
+.tz-kosten { display: flex; flex-direction: column; gap: 6px; padding-top: 8px; border-top: 2px dashed var(--tz-linie); }
+.tz-kosten-zeile { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; align-items: center; }
+.tz-kosten-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.tz-kosten-text b { font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.tz-kosten-text small { font-size: 11.5px; color: var(--text2); }
+.tz-kosten-zeile.zu .tz-kosten-text b { color: var(--k-schlecht-fg, #a52a1e); }
+.app-blatt-box .tz-kosten, .anf-dialog .tz-kosten { margin: 12px 0 4px; padding: 10px 12px; border-radius: 14px; background: var(--bg3); border: 2px solid var(--tz-linie); }
+
+/* „Tausch abschließen“ ohne Scrollen: feste Leiste über der App-Leiste, sobald etwas im Tausch liegt (Handy; sticky geht
+   nicht – #tr-sub-trades scrollt waagrecht). Die Knöpfe „Woche weiter“ und „bis …“ machen so lange Platz. */
+body.dfl-shell .tz-unten.fest { position: fixed; left: 0; right: 0; z-index: 8990; bottom: calc(var(--app-leiste, 62px) + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column; gap: 6px; padding: 8px 16px; background: var(--bg2); border-top: 2px solid var(--tz-linie);
+  box-shadow: 0 -6px 14px rgb(0 0 0 / .18); }
+body.dfl-shell .tz-unten.fest .tz-meldung { padding: 4px 8px; font-size: 12px; }
+body.dfl-shell .tz-unten.fest .tz-knoepfe { flex-wrap: nowrap; }
+body.dfl-shell .tz-unten.fest .tz-knoepfe .app-knopf:not(.haupt) { flex: none; width: 52px; min-height: 52px; padding: 0; justify-content: center; }
+body.dfl-shell .tz-unten.fest .tz-knoepfe .app-knopf.haupt { flex: 1 1 auto; order: -1; }
+body.dfl-shell .tz-unten.fest .tz-k-text { display: none; }
+body.dfl-shell:has(.app-view.active .tz-unten.fest) #app-cta.zeigen,
+body.dfl-shell:has(.app-view.active .tz-unten.fest) #dfl-sim-knopf.zeigen { display: none; }
+/* Blatt „Trade-Anfrage“ / „Angebot“: Knöpfe als feste Leiste am Blattende */
+.app-blatt-box .anf-knoepfe { position: sticky; bottom: calc(-18px - env(safe-area-inset-bottom, 0px)); z-index: 2; background: var(--bg2);
+  margin: 12px -16px calc(-18px - env(safe-area-inset-bottom, 0px)); padding: 10px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  border-top: 2px solid var(--tz-linie); }
+
+/* ── Vertragsblatt im Tausch-Modus: Schritte (Trade → Vertrag → beides bestätigen) ── */
+.sw-schritte { display: flex; gap: 6px; flex-wrap: wrap; }
+.sw-schritte span { display: inline-flex; gap: 6px; align-items: center; border-radius: 999px; padding: 3px 10px 3px 4px; font-size: 12px; font-weight: 700;
+  background: var(--bg3); color: var(--text2); border: 2px solid var(--tz-linie); }
+.sw-schritte span b { width: 20px; height: 20px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 11px; background: var(--bg4); color: var(--text); }
+.sw-schritte span.fertig b { background: var(--k-gruen-tief, #4d8236); color: #fff; }
+.sw-schritte span.jetzt { background: var(--k-info-bg, #dcebf7); color: var(--k-info-fg, #1f5f8f); border-color: var(--k-blau-knopf, #2c7cb5); }
+.sw-schritte span.jetzt b { background: var(--k-blau-knopf, #2c7cb5); color: #fff; }

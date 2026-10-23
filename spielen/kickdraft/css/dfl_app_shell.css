@@ -1,0 +1,516 @@
+/* =====================================================================
+   DFL – App-Oberfläche (dfl_app_shell.js), Handy zuerst, Stil „Freundlich dunkel“
+   Leiste unten, Haupt-Button, Blätter von unten, Front Office, Office-Kopf,
+   dazu (auch am PC) Gesichter und Fitness auf dem Taktikfeld und ganze Porträts.
+   Farben kommen aus den Tokens des Themes (--bg, --bg2, --bg3, --border, --text*, --accent).
+   ===================================================================== */
+:root {
+  --app-leiste: 62px;
+  --app-gut: #3fcf7a; --app-mittel: #f0c05a; --app-schlecht: #f07462;
+  --app-glas: color-mix(in oklab, var(--bg2, #191918) 88%, transparent);
+}
+
+/* ── Nur am Handy: alte Leiste weg, neue Leiste/Blätter/Knopf an ──────── */
+#app-nav, #app-cta, #app-sheet, #app-blatt, #app-hinweis { display: none; }
+body.dfl-shell #mob-nav, body.dfl-shell #mob-sheet { display: none !important; }
+body.dfl-shell { padding-bottom: calc(var(--app-leiste) + 86px + env(safe-area-inset-bottom, 0px)) !important; }
+body.dfl-shell.app-gesperrt { overflow: hidden; }
+body.dfl-shell .cal-next { display: none; }            /* „Woche weiter“ übernimmt der Haupt-Button */
+
+body.dfl-shell #app-nav {
+  display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 9000;
+  padding-bottom: env(safe-area-inset-bottom, 0px); background: var(--app-glas);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border-top: 1px solid color-mix(in oklab, var(--border, #3b3a37) 70%, transparent);
+}
+.app-nav-btn {
+  flex: 1 1 0; min-width: 0; height: var(--app-leiste); background: none; border: 0; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  color: var(--text3, #8e8c86); font: 700 10.5px/1.1 var(--font-text, system-ui, sans-serif);
+  position: relative; -webkit-tap-highlight-color: transparent;
+}
+.app-nav-btn i { font-size: 22px; line-height: 1; transition: transform .15s; }
+.app-nav-btn span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.app-nav-btn.an { color: var(--accent-text, var(--accent, #2fb36b)); }
+.app-nav-btn.an i { transform: translateY(-1px); }
+.app-nav-btn.an::before { content: ""; position: absolute; top: 6px; width: 40px; height: 30px; border-radius: 15px;
+  background: color-mix(in oklab, var(--accent, #2fb36b) 16%, transparent); z-index: -1; }
+.app-nav-btn:focus-visible { outline: 2px solid var(--accent, #2fb36b); outline-offset: -4px; border-radius: 12px; }
+
+/* ── Haupt-Button (Daumenzone unten rechts) ─────────────────────────── */
+body.dfl-shell #app-cta.zeigen {
+  display: flex; position: fixed; z-index: 9050; right: 14px;
+  bottom: calc(var(--app-leiste) + 12px + env(safe-area-inset-bottom, 0px));
+  align-items: center; gap: 10px; max-width: calc(100vw - 28px); min-height: 54px; padding: 8px 18px 8px 14px;
+  border: 0; border-radius: 27px; cursor: pointer; text-align: left;
+  background: var(--accent, #2fb36b); color: var(--accent-ink, #0b1a12);
+  font-family: var(--font-text, system-ui, sans-serif);
+  box-shadow: 0 6px 20px rgb(0 0 0 / .45), 0 0 0 1px rgb(255 255 255 / .06) inset;
+  animation: app-cta-rein .22s ease-out;
+}
+#app-cta i { font-size: 22px; }
+#app-cta span { display: flex; flex-direction: column; min-width: 0; }
+#app-cta b { font-size: 15px; font-weight: 800; white-space: nowrap; }
+#app-cta small { font-size: 11px; font-weight: 700; opacity: .78; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 62vw; }
+#app-cta.warn { background: var(--app-mittel); color: #2a1f05; }
+#app-cta:active { transform: scale(.97); }
+#app-cta:focus-visible { outline: 3px solid var(--text, #eeeeec); outline-offset: 3px; }
+@keyframes app-cta-rein { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ── Blätter von unten (Mehr, Spieler) ─────────────────────────────── */
+body.dfl-shell #app-sheet, body.dfl-shell #app-blatt { display: block; position: fixed; inset: 0; z-index: 9500; pointer-events: none; }
+body.dfl-shell #app-sheet.auf, body.dfl-shell #app-blatt.auf { pointer-events: auto; }
+.app-sheet-bg { position: absolute; inset: 0; background: rgb(6 6 5 / .62); opacity: 0; transition: opacity .18s; }
+#app-sheet.auf .app-sheet-bg, #app-blatt.auf .app-sheet-bg { opacity: 1; }
+.app-sheet-box, .app-blatt-box {
+  position: absolute; left: 0; right: 0; bottom: 0; max-height: 86vh; overflow-y: auto; overscroll-behavior: contain;
+  background: var(--bg2, #191918); color: var(--text, #eeeeec); border-radius: 22px 22px 0 0;
+  border-top: 1px solid var(--border, #3b3a37); padding: 6px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  transform: translateY(100%); transition: transform .24s cubic-bezier(.2, .8, .3, 1);
+  font-family: var(--font-text, system-ui, sans-serif);
+}
+#app-sheet.auf .app-sheet-box, #app-blatt.auf .app-blatt-box { transform: none; }
+.app-griff { width: 40px; height: 4px; border-radius: 3px; background: var(--bg4, #3b3a37); margin: 6px auto 12px; }
+.app-sheet-titel { font: 800 12px/1 var(--font-text, system-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--text3, #8e8c86); padding: 0 4px 10px; }
+.app-eintrag, .app-sheet-box .mob-eintrag {
+  width: 100%; display: flex; align-items: center; gap: 14px; min-height: 58px; padding: 10px 8px; border: 0; border-radius: 14px;
+  background: none; color: inherit; text-align: left; cursor: pointer; font: inherit; -webkit-tap-highlight-color: transparent;
+}
+.app-eintrag:active, .app-sheet-box .mob-eintrag:active { background: var(--bg3, #222221); }
+.app-eintrag > i:first-child, .app-sheet-box .mob-eintrag > i:first-child {
+  width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-size: 21px; flex: none;
+  background: color-mix(in oklab, var(--accent, #2fb36b) 14%, var(--bg3, #222221)); color: var(--accent-text, var(--accent, #2fb36b));
+}
+.app-eintrag-txt, .app-sheet-box .mob-eintrag-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.app-eintrag-txt b, .app-sheet-box .mob-eintrag-txt b { font-size: 15px; }
+.app-eintrag-txt small, .app-sheet-box .mob-eintrag-txt small { font-size: 12px; color: var(--text3, #8e8c86); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.app-pfeil, .app-sheet-box .mob-pfeil { color: var(--text3, #8e8c86); }
+
+/* Spieler-Blatt */
+.app-blatt-box { padding-top: 4px; }
+.app-blatt-zu { position: absolute; right: 12px; top: 10px; width: 40px; height: 40px; border-radius: 20px; border: 0; cursor: pointer;
+  background: var(--bg3, #222221); color: var(--text2, #b5b3ad); font-size: 18px; display: grid; place-items: center; }
+.app-blatt-kopf { display: flex; gap: 16px; align-items: flex-end; margin-bottom: 14px; }
+.app-blatt-kopf .dfl-portrait { width: 104px; height: 156px; flex: none; }
+.app-blatt-info { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 6px; padding-bottom: 4px; }
+.app-blatt-name { font: 800 21px/1.15 var(--font-display, var(--font-text, system-ui)); text-wrap: balance; padding-right: 40px; }
+.app-blatt-meta { font-size: 13px; color: var(--text2, #b5b3ad); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.app-blatt-ovr { display: flex; align-items: baseline; gap: 8px; }
+.app-blatt-ovr b { font: 900 40px/1 var(--font-display, system-ui); font-variant-numeric: tabular-nums; }
+.app-blatt-ovr span { font-size: 12px; color: var(--text3, #8e8c86); text-transform: uppercase; letter-spacing: .08em; font-weight: 800; }
+.app-blatt-ovr em { font-style: normal; font-size: 13px; color: var(--gold, #f0c05a); font-weight: 800; }
+.app-rot { color: var(--app-schlecht); font-weight: 800; }
+.app-blatt-werte { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.app-blatt-werte > div { background: var(--bg3, #222221); border-radius: 14px; padding: 10px 12px; display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; min-width: 0; }
+.app-blatt-werte span { font-size: 11px; font-weight: 800; color: var(--text3, #8e8c86); text-transform: uppercase; letter-spacing: .06em; }
+.app-blatt-werte b { font-size: 15px; font-variant-numeric: tabular-nums; }
+.app-blatt-werte b.app-weit { grid-column: 2 / 4; text-align: right; }
+.app-balken { height: 6px; border-radius: 3px; background: var(--bg4, #3b3a37); overflow: hidden; }
+.app-balken i { display: block; height: 100%; border-radius: 3px; }
+.app-blatt-aktionen { display: flex; flex-wrap: wrap; gap: 8px; }
+.app-knopf { flex: 1 1 45%; min-height: 46px; display: flex; align-items: center; justify-content: center; gap: 7px; border-radius: 14px; cursor: pointer;
+  border: 1px solid var(--border, #3b3a37); background: var(--bg3, #222221); color: var(--text, #eeeeec); font: 800 14px/1 var(--font-text, system-ui); }
+.app-knopf i { font-size: 18px; }
+.app-knopf.haupt { background: var(--accent, #2fb36b); border-color: var(--accent, #2fb36b); color: var(--accent-ink, #0b1a12); flex-basis: 100%; }
+.app-knopf.rot { color: var(--red, #f07462); border-color: color-mix(in oklab, var(--red, #f07462) 45%, transparent); }
+.ak-zwei { display: inline-flex; flex-direction: column; align-items: flex-start; line-height: 1.1; }
+.ak-zwei small { font-size: 11px; font-weight: 600; opacity: .85; }
+.app-knopf:focus-visible { outline: 2px solid var(--accent, #2fb36b); outline-offset: 2px; }
+.app-blatt-details:not(:empty) { margin-top: 14px; border-top: 1px solid var(--border, #3b3a37); padding-top: 12px; }
+.app-blatt-details .dfl-pcard-gesicht { display: none; }
+
+/* Hinweis beim Tauschen */
+body.dfl-shell #app-hinweis.auf {
+  display: flex; position: fixed; z-index: 9100; left: 12px; right: 12px; top: calc(10px + env(safe-area-inset-top, 0px));
+  align-items: center; gap: 10px; padding: 10px 10px 10px 16px; border-radius: 16px;
+  background: var(--gold, #f0c05a); color: #2a1f05; font: 800 13px/1.3 var(--font-text, system-ui); box-shadow: 0 6px 20px rgb(0 0 0 / .4);
+}
+#app-hinweis span { flex: 1; }
+#app-hinweis button { border: 0; border-radius: 12px; min-height: 38px; padding: 0 12px; background: rgb(0 0 0 / .14); color: inherit; font: inherit; cursor: pointer; }
+
+/* ── Front Office ─────────────────────────────────────────────────── */
+.fo { padding: 4px 2px 8px; display: flex; flex-direction: column; gap: 14px; font-family: var(--font-text, system-ui); }
+.fo-kopf h2 { margin: 2px 0 0; font: 900 26px/1.1 var(--font-display, system-ui); }
+.fo-ueber { font: 800 11px/1 var(--font-text, system-ui); letter-spacing: .14em; text-transform: uppercase; color: var(--text3, #8e8c86); }
+.fo-karte { background: var(--bg2, #191918); border: 1px solid var(--border, #3b3a37); border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.fo-zeile { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.fo-zeile span { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text3, #8e8c86); }
+.fo-zeile b { font: 900 20px/1 var(--font-display, system-ui); font-variant-numeric: tabular-nums; }
+.fo-zeile small { font: 700 12px/1 var(--font-text, system-ui); color: var(--text3, #8e8c86); }
+.fo-cap { position: relative; height: 14px; border-radius: 7px; background: var(--bg4, #3b3a37); }
+.fo-cap i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 7px; transition: width .4s ease; }
+.fo-cap.gruen i { background: var(--app-gut); } .fo-cap.gold i { background: var(--app-mittel); } .fo-cap.rot i { background: var(--app-schlecht); }
+.fo-cap.rot { animation: fo-puls 1.6s ease-in-out infinite; }
+.fo-cap em { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--text, #eeeeec); opacity: .7; border-radius: 1px; }
+@keyframes fo-puls { 50% { box-shadow: 0 0 0 4px color-mix(in oklab, var(--app-schlecht) 35%, transparent); } }
+.fo-lage { font-size: 13px; color: var(--text2, #b5b3ad); }
+.fo-lage.rot { color: var(--app-schlecht); font-weight: 800; } .fo-lage.gold { color: var(--app-mittel); }
+.fo-zahlen { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.fo-zahlen div { background: var(--bg3, #222221); border-radius: 12px; padding: 8px 4px; text-align: center; min-width: 0; }
+.fo-zahlen b { display: block; font: 900 17px/1.1 var(--font-display, system-ui); font-variant-numeric: tabular-nums; }
+.fo-zahlen span { display: block; font-size: 10px; font-weight: 800; color: var(--text3, #8e8c86); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fo-kacheln { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fo-kachel { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 108px; padding: 14px; border-radius: 18px; cursor: pointer; text-align: left;
+  background: var(--bg2, #191918); border: 1px solid var(--border, #3b3a37); color: var(--text, #eeeeec); font-family: inherit; }
+.fo-kachel i { font-size: 24px; color: var(--accent-text, var(--accent, #2fb36b)); }
+.fo-kachel b { font-size: 15px; }
+.fo-kachel small { font-size: 12px; color: var(--text3, #8e8c86); line-height: 1.3; }
+.fo-kachel:active { transform: scale(.98); }
+.fo-kachel:focus-visible { outline: 2px solid var(--accent, #2fb36b); outline-offset: 2px; }
+
+/* ── App-Kopf (D54): Wappen, Verein, Woche · Platz, „Mehr“ ─────────── */
+#app-kopf { display: none; }
+body.dfl-shell { padding-top: calc(58px + env(safe-area-inset-top, 0px)) !important; }
+body.dfl-shell #app-kopf {
+  display: flex; align-items: center; gap: 8px; position: fixed; top: 0; left: 0; right: 0; z-index: 9000;
+  padding: calc(6px + env(safe-area-inset-top, 0px)) 10px 6px 8px; min-height: 58px;
+  background: var(--k-kopf, var(--bg2, #191918)); color: var(--k-kopf-text, var(--text, #eeeeec));
+  border-bottom: 3px solid var(--k-rand-tief, var(--border, #3b3a37));
+}
+.ak-verein { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; background: none; border: 0; color: inherit; padding: 2px; cursor: pointer; text-align: left; font: inherit; }
+html .ak-verein .ak-wappen.lg-crest { width: 36px !important; height: 38px !important; flex: none; }
+.ak-txt { display: flex; flex-direction: column; min-width: 0; }
+.ak-txt b { font: 700 17px/1.15 var(--font-display, system-ui); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ak-txt small { font: 700 12px/1.2 var(--font-text, system-ui); opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ak-mehr { width: 44px; height: 44px; flex: none; border-radius: 50%; cursor: pointer; display: grid; place-items: center; font-size: 22px;
+  background: var(--bg2, #191918); color: var(--text, #eeeeec); border: 3px solid var(--k-rand, var(--border, #3b3a37)); box-shadow: 0 3px 0 var(--k-rand, transparent); }
+.ak-mehr:active { transform: translateY(2px); box-shadow: none; }
+.ak-mehr:focus-visible, .ak-verein:focus-visible { outline: 3px solid var(--k-gold, #f1c40f); outline-offset: 2px; }
+body.dfl-shell #app-hinweis.auf { top: calc(66px + env(safe-area-inset-top, 0px)); }
+
+/* Stilwahl im Mehr-Blatt */
+.stil-wahl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.stil-kachel { display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 112px; padding: 12px 6px; cursor: pointer; text-align: center;
+  border-radius: 16px; border: 3px solid var(--k-rand, var(--border, #3b3a37)); background: var(--bg3, #222221); color: var(--text, #eeeeec); font: inherit;
+  box-shadow: 0 4px 0 var(--k-rand, transparent); }
+.stil-kachel i { font-size: 28px; color: var(--k-blau, var(--accent, #2fb36b)); }
+.stil-kachel b { font: 700 14px/1.15 var(--font-display, system-ui); }
+.stil-kachel small { font-size: 11px; color: var(--text3, #8e8c86); line-height: 1.25; }
+.stil-kachel[aria-pressed="true"] { background: var(--k-blau-knopf, var(--accent, #2fb36b)); color: #fff; border-color: var(--k-blau-schatten, var(--accent, #2fb36b)); }
+.stil-kachel[aria-pressed="true"] i, .stil-kachel[aria-pressed="true"] small { color: #fff; }
+.stil-hinweis { font-size: 12.5px; color: var(--text3, #8e8c86); margin: 12px 2px 4px; }
+
+/* ── Office: 8 Kacheln unter dem Gelände (D54) ─────────────────────── */
+.ok-kacheln { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.ok-kachel { position: relative; display: flex; flex-direction: column; gap: 4px; min-height: 104px; padding: 12px; cursor: pointer; text-align: left;
+  border-radius: 16px; background: var(--bg2, #191918); color: var(--text, #eeeeec); font: inherit;
+  border: 3px solid var(--k-rand, var(--border, #3b3a37)); box-shadow: 0 5px 0 var(--zustand); -webkit-tap-highlight-color: transparent; }
+.ok-kachel:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--zustand); }
+.ok-kachel:focus-visible { outline: 3px solid var(--k-blau, var(--accent, #2fb36b)); outline-offset: 2px; }
+.ok-oben { display: flex; align-items: center; justify-content: space-between; color: var(--zustand); }
+.ok-oben i { font-size: 22px; }
+.ok-punkt { width: 10px; height: 10px; border-radius: 50%; background: var(--zustand); }
+.ok-gross { font: 700 29px/1 var(--font-zahl, var(--font-display, system-ui)); font-variant-numeric: tabular-nums; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; }
+.ok-gross small { font-size: 14px; color: var(--text3, #8e8c86); font-weight: 700; margin-left: 2px; }
+.ok-unten { font-size: 12.5px; color: var(--text2, #b5b3ad); font-weight: 800; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.ok-unten .ti { font-size: 14px; }
+.ok-barometer { position: relative; display: block; height: 10px; border-radius: 6px; background: var(--bg3, #222221); margin-top: 2px; }
+.ok-barometer i { position: absolute; inset: 0 auto 0 0; border-radius: 6px; }
+.ok-barometer em { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--text, #eeeeec); opacity: .7; }
+.ok-paar { display: inline-flex; align-items: center; gap: 6px; }
+html .ok-paar .ok-wappen.lg-crest { width: 26px !important; height: 28px !important; }
+.ok-form { display: flex; gap: 3px; }
+.ok-form i { font-style: normal; width: 17px; height: 17px; border-radius: 4px; display: grid; place-items: center; font: 800 10px/1 var(--font-text, system-ui); color: #10161f; background: var(--bg4, #3b3a37); }
+.ok-form i.f-W { background: #2ecc71; } .ok-form i.f-L { background: #e74c3c; color: #fff; } .ok-form i.f-D { background: #95a5a6; }
+.ok-fans { margin-bottom: 12px; }
+/* Doppeltes der alten Startseite: Verein, nächstes Spiel, Tabellenplatz, Kasse, Fans/Eigentümer stehen in den Kacheln */
+body.dfl-shell #view-home .home-card.home-club, body.dfl-shell #view-home .home-card.home-match,
+body.dfl-shell #view-home .home-card:has(#hc-position), body.dfl-shell #view-home .home-card:has(#hc-budget),
+body.dfl-shell #view-home .home-card:has(#exp-home-card) { display: none; }
+
+/* ── Office-Kopf ──────────────────────────────────────────────────── */
+#app-office-kopf { display: flex; flex-direction: column; gap: 10px; margin: 2px 0 14px; padding: 6px 12px 0; font-family: var(--font-text, system-ui); }
+.aok-verein { display: flex; align-items: center; gap: 12px; }
+.aok-verein > div { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.aok-verein b { font: 900 20px/1.1 var(--font-display, system-ui); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.aok-verein span { font-size: 13px; color: var(--text2, #b5b3ad); font-variant-numeric: tabular-nums; }
+.aok-verein em { font-style: normal; font-size: 11px; font-weight: 800; color: var(--text3, #8e8c86); text-align: right; }
+html .aok-verein .app-wappen.lg-crest { width: 48px !important; height: 50px !important; flex: none; }
+.aok-spiel { background: var(--bg2, #191918); border: 1px solid var(--border, #3b3a37); border-radius: 18px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.aok-label { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--text3, #8e8c86); }
+.aok-paarung { display: grid; grid-template-columns: auto 1fr auto 1fr auto; align-items: center; gap: 8px; }
+.aok-paarung b { font-size: 14px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.aok-paarung b:last-of-type { text-align: right; }
+.aok-paarung i { font-style: normal; font-size: 12px; font-weight: 900; color: var(--text3, #8e8c86); }
+html .aok-paarung .app-wappen.lg-crest { width: 30px !important; height: 31px !important; }
+.aok-ort { font-size: 12px; color: var(--text3, #8e8c86); }
+
+/* ── Vereinsgelände 2,5D (dfl_gelaende.js) ───────────────────────── */
+.aok-gelaende { margin: 0 -12px; }
+.gel-buehne { position: relative; width: 100%; aspect-ratio: 8 / 5; max-width: 100%;
+  background: radial-gradient(ellipse at 50% 55%, color-mix(in oklab, var(--accent, #2fb36b) 14%, transparent) 0%, transparent 62%); }
+.gel-buehne canvas { width: 100%; height: 100%; display: block; }
+.gel-ziel { position: absolute; background: none; border: 0; padding: 0; cursor: pointer; border-radius: 14px; -webkit-tap-highlight-color: transparent; }
+.gel-ziel:focus-visible { outline: 2px solid var(--accent, #2fb36b); outline-offset: -2px; }
+.gel-ziel:active { background: rgb(255 255 255 / .06); }
+.gel-chip { position: absolute; transform: translate(-50%, -115%); pointer-events: none; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px 3px 6px; border-radius: 10px;
+  background: rgb(17 17 16 / .78); color: #f4f2ec; font: 800 10px/1.2 var(--font-text, system-ui); box-shadow: 0 2px 6px rgb(0 0 0 / .3); }
+.gel-chip i { font-size: 12px; color: var(--accent-text, var(--accent, #2fb36b)); }
+
+/* ── Taktikfeld: Gesicht, Position, Fitness (auch am PC) ──────────── */
+.p-token.mit-gesicht { width: 46px; height: 46px; padding: 0; position: relative; overflow: visible; border: 2px solid #fff;
+  background: radial-gradient(circle at 50% 35%, color-mix(in oklab, var(--accent, #2fb36b) 55%, #ffffff), var(--accent, #2fb36b)); }
+.tk-gesicht { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; }
+.tk-gesicht svg { width: 100%; height: 150%; display: block; margin-top: -3%; }
+.tk-pos { position: absolute; left: -9px; bottom: -5px; font: 800 8px/1 var(--font-text, system-ui); color: #fff; background: rgb(17 17 16 / .88);
+  border-radius: 6px; padding: 2px 4px; letter-spacing: .02em; }
+.tk-fit { width: 38px; height: 5px; border-radius: 3px; background: rgb(0 0 0 / .45); margin-top: 4px; overflow: hidden; box-shadow: 0 0 0 1px rgb(255 255 255 / .25); }
+.tk-fit i { display: block; height: 100%; border-radius: 3px; }
+.tk-legende { display: flex; gap: 12px; align-items: center; font-size: 11px; color: var(--text2, #b5b3ad); padding: 6px 2px 0; flex-wrap: wrap; }
+.tk-legende i { display: inline-block; width: 18px; height: 5px; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
+
+/* ── Ganze Porträts ───────────────────────────────────────────────── */
+.dfl-portrait { display: block; width: 136px; height: 204px; border-radius: 18px; overflow: hidden; position: relative; flex: none;
+  background: linear-gradient(165deg, color-mix(in oklab, var(--accent, #2fb36b) 60%, var(--bg3, #222221)) 0%, var(--bg3, #222221) 75%);
+  box-shadow: 0 0 0 3px var(--accent, #2fb36b), var(--schatten, 0 6px 18px rgb(0 0 0 / .25)); }
+.dfl-portrait svg { width: 100%; height: auto; display: block; }
+.dfl-pcard-gesicht .dfl-portrait { margin: 0 auto; }
+.dfl-portrait.klein { width: 30px; height: 36px; border-radius: 9px; box-shadow: none; margin-right: 2px; }
+.dfl-portrait.klein svg { margin-top: -6%; }
+.sqo-row .dfl-portrait.klein { margin: 0 2px 0 0; }
+.sqo-val.ist-cap { font-variant-numeric: tabular-nums; }
+@media (max-width: 819px) {
+  /* Kaderliste Ebene 1: Position, Porträt, Name, Stärke, Cap Hit – Alter, Punkte und Flagge stehen im Spieler-Blatt */
+  .sqo-row .sqo-val.ist-cap { display: inline; font-size: 11px; color: var(--text2, #b5b3ad); min-width: 46px; text-align: right; }
+  .sqo-row .sqo-age, .sqo-row .squad-dots { display: none; }
+}
+
+/* ── Form −2…+2 (D54) ────────────────────────────────────────────── */
+.form-chip { display: inline-grid; place-items: center; min-width: 28px; height: 22px; padding: 0 4px; border-radius: 7px;
+  font: 800 11.5px/1 var(--font-zahl, var(--font-display, system-ui)); font-variant-numeric: tabular-nums; color: #10161f; vertical-align: middle; }
+.form-chip.p2 { background: #178a45; color: #fff; } .form-chip.p1 { background: #8fd16a; } .form-chip.n0 { background: var(--bg3, #2c2f40); color: var(--text2, #a4b0be); }
+.form-chip.m1 { background: #f5a04a; } .form-chip.m2 { background: #c0392b; color: #fff; }
+.form-legende { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 5px; margin: 2px 2px 10px; font-size: 11.5px; font-weight: 800; color: var(--text3, #8e8c86); }
+.form-legende > span:last-child { flex-basis: 100%; font-weight: 700; }
+
+/* Kaderliste (Ebene 1, D54): Pos · Gesicht · Name · Stärke · Form/Fitness · Cap Hit + Restvertrag */
+.sqo-formfit { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; flex: none; }
+.sqo-fit { display: block; width: 28px; height: 4px; border-radius: 2px; background: var(--bg4, #3b3a37); overflow: hidden; }
+.sqo-fit i { display: block; height: 100%; }
+.sqo-row.sqo-d54 .sqo-val { display: inline-flex; flex-direction: column; align-items: flex-end; line-height: 1.15; font-size: 11px; color: var(--text2, #b5b3ad); min-width: 44px; }
+.sqo-row.sqo-d54 .sqo-val b { font: 700 13px/1.1 var(--font-zahl, var(--font-display, system-ui)); color: var(--text, #eeeeec); }
+body.dfl-shell .sqo-row.sqo-d54 { min-height: 58px; gap: 8px; padding: 6px 10px; align-items: center; }
+body.dfl-shell .sqo-row.sqo-d54 .squad-ovr { font-size: 19px; min-width: 30px; text-align: right; }
+body.dfl-shell .sqo-row.sqo-d54 .sqo-name { flex: 1; min-width: 0; }
+.sqo-row.sqo-d54 .sqo-val { order: 9; }
+.sqo-row.sqo-d54 .sqo-formfit { order: 8; }
+
+/* ── Spieler-Blatt Ebene 2: FUT-Karte mit Neigung + Radar (D54) ─────── */
+.fut-kopf { padding-right: 52px; margin: 2px 0 6px; display: flex; flex-direction: column; gap: 5px; }
+.fut-kopf .app-blatt-name { padding-right: 0; }
+.fut-pot { color: var(--gold, #f0c05a); font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
+.fut-buehne { perspective: 800px; display: grid; place-items: center; padding: 6px 0 2px; }
+.fut { width: 220px; aspect-ratio: 5 / 7; border-radius: 18px; position: relative; transform-style: preserve-3d; transition: transform .12s ease-out; overflow: hidden;
+  background: linear-gradient(150deg, #f8e7a0 0%, #d6a93a 38%, #f4d77a 62%, #b7861f 100%); color: #2a1c02;
+  box-shadow: 0 16px 30px rgb(0 0 0 / .4), 0 0 0 3px var(--k-rand, rgb(0 0 0 / .3)); }
+/* Stufen (Nutzer 2026-10-09): Bronze < 70 · Silber 70–79 · Gold 80–89 · Elite 90–98 · Legende 99 */
+.fut.bronze { background: linear-gradient(150deg, #f3cba8 0%, #b97a48 40%, #e8b68c 64%, #8a5530 100%); color: #2b1608; }
+.fut.silber { background: linear-gradient(150deg, #f1f3f6, #aab3bf 40%, #e9edf2 64%, #8d97a4); color: #18202c; }
+.fut.elite { background: radial-gradient(120% 90% at 50% 0%, #2b3c72 0%, #131c3a 55%, #070b1a 100%); color: #f7d774;
+  box-shadow: 0 16px 34px rgb(0 0 0 / .5), 0 0 0 3px #d4a72c, 0 0 20px rgb(244 208 63 / .45); }
+.fut.legende { background: linear-gradient(125deg, #ff9a9e, #fad0c4, #a1c4fd, #c2e9fb, #d4fc79, #fbc2eb, #ff9a9e); background-size: 300% 300%;
+  animation: fut-holo 7s linear infinite; color: #1a1033; box-shadow: 0 16px 34px rgb(0 0 0 / .5), 0 0 0 3px #ffffff, 0 0 26px rgb(255 255 255 / .7); }
+@keyframes fut-holo { to { background-position: 300% 0; } }
+.fut::after { content: ''; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: soft-light;
+  background: radial-gradient(circle at var(--gx, 30%) var(--gy, 20%), rgb(255 255 255 / .55), transparent 45%); }
+.fut-wert { position: absolute; left: 14px; top: 12px; z-index: 1; font: 800 40px/.9 var(--font-zahl, var(--font-display, system-ui)); }
+.fut-pos { position: absolute; left: 16px; top: 54px; z-index: 1; font: 800 15px var(--font-zahl, var(--font-display, system-ui)); letter-spacing: .04em; }
+.fut-marke { position: absolute; right: 10px; top: 12px; z-index: 1; display: inline-flex; align-items: center; gap: 3px; padding: 4px 7px; border-radius: 8px;
+  font: 800 10px/1 var(--font-text, system-ui); letter-spacing: .06em; text-transform: uppercase; }
+.fut.elite .fut-marke { background: #d4a72c; color: #131c3a; }
+.fut.legende .fut-marke { background: #1a1033; color: #ffffff; }
+/* Gesicht ganz (facesjs 2 : 3) und mittig */
+.fut-gesicht { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); width: 104px; height: 156px; }
+.fut-gesicht svg { width: 100%; height: 100%; display: block; }
+.fut-name { position: absolute; left: 12px; right: 12px; top: 172px; text-align: center; font: 800 16px/1 var(--font-display, system-ui);
+  border-bottom: 1px solid rgb(0 0 0 / .25); padding-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fut.elite .fut-name { border-bottom-color: rgb(244 208 63 / .45); }
+/* Alle 6 Werte: 3 × 2, Zahl groß, Kürzel klein */
+.fut-werte { position: absolute; left: 12px; right: 12px; bottom: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px 6px;
+  font: 700 14px var(--font-zahl, var(--font-display, system-ui)); font-variant-numeric: tabular-nums; }
+.fut-werte span { display: flex; flex-direction: column; align-items: center; line-height: 1.05; }
+.fut-werte b { font-size: 18px; font-weight: 800; }
+.fut-werte em { font-style: normal; font-size: 10px; letter-spacing: .05em; opacity: .75; }
+/* ▲▼ zum Vorjahr (D68) */
+.fut-d { font-size: 9px; font-weight: 800; margin-left: 1px; vertical-align: 6px; letter-spacing: 0; }
+.fut-d.auf { color: #17803d; } .fut-d.ab { color: #b8322a; }
+.fut.elite .fut-d.auf, .fut.legende .fut-d.auf { color: #6fe39a; } .fut.elite .fut-d.ab, .fut.legende .fut-d.ab { color: #ff8f80; }
+@media (prefers-reduced-motion: reduce) { .fut.legende { animation: none; } }
+.app-radar { display: block; width: 100%; max-width: 270px; margin: 14px auto 8px; }
+.app-radar .rd-netz { fill: none; stroke: var(--k-linie, var(--border, #3b3a37)); stroke-width: 1; }
+.app-radar .rd-form { fill: color-mix(in oklab, var(--k-blau, var(--accent, #2fb36b)) 32%, transparent); stroke: var(--k-blau, var(--accent, #2fb36b)); stroke-width: 2.5; }
+.app-radar text { fill: var(--text2, #b5b3ad); font: 800 11px var(--font-zahl, var(--font-text, system-ui)); }
+.app-statistik { margin-top: 12px; padding: 12px; border-radius: 14px; background: var(--bg3, #222221); border: 2px solid var(--k-linie, transparent); }
+.app-stat-kopf { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 22px; }
+.app-stat-kopf b { font: 700 15px var(--font-display, system-ui); }
+.app-stat-kopf small { font-size: 12px; color: var(--text3, #8e8c86); }
+.app-noten { display: flex; gap: 6px; align-items: flex-end; height: 70px; }
+.app-noten i { flex: 1; border-radius: 5px 5px 2px 2px; background: var(--k-blau, var(--accent, #2fb36b)); position: relative; }
+.app-noten i b { position: absolute; top: -17px; left: 0; right: 0; text-align: center; font: 700 10.5px var(--font-zahl, system-ui); color: var(--text2, #b5b3ad); }
+@media (prefers-reduced-motion: reduce) { .fut { transition: none; } }
+
+/* ── Ticketpreise vor der Saison (dfl_tickets_patch.js) ──────────── */
+.tk-kopf { display: flex; flex-direction: column; gap: 2px; padding-right: 52px; margin: 2px 0 10px; }
+.tk-kopf b { font: 700 20px/1.15 var(--font-display, system-ui); }
+.tk-kopf small { font-size: 12.5px; color: var(--text3, #8e8c86); font-weight: 700; }
+.tk-sperre { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 800; color: var(--text2, #b5b3ad); margin-top: 6px; }
+.tk-sperre.gross { display: flex; padding: 10px 12px; border-radius: 12px; background: var(--bg3, #222221); border: 2px solid var(--k-linie, transparent); margin: 0 0 10px; }
+.tk-titel { margin: 10px 2px 6px; font: 800 11.5px var(--font-text, system-ui); letter-spacing: .07em; text-transform: uppercase; color: var(--text3, #8e8c86); }
+.tk-kacheln { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.tk-wahl { display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 140px; padding: 8px 3px; cursor: pointer; font: inherit; color: var(--text, #eeeeec);
+  border-radius: 13px; border: 3px solid var(--k-rand, var(--border, #3b3a37)); background: var(--bg3, #222221); }
+.tk-dauer .tk-wahl { min-height: 116px; }
+.tk-wahl[aria-pressed="true"] { background: color-mix(in oklab, var(--k-blau, var(--accent, #2fb36b)) 16%, var(--bg3, #222221)); box-shadow: 0 0 0 2px var(--k-blau, var(--accent, #2fb36b)) inset; }
+.tk-wahl[disabled] { cursor: default; opacity: .5; }
+.tk-wahl[disabled][aria-pressed="true"] { opacity: 1; }
+.tk-wahl small { font-size: 10.5px; color: var(--text2, #b5b3ad); text-align: center; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.tk-wahl small b { color: var(--text, #eeeeec); }
+.tk-wahl .tk-best, .tk-wahl .tk-best b { color: var(--k-gut-fg, #7ff0a8); }
+.tk-preis { font: 700 18px var(--font-zahl, var(--font-display, system-ui)); white-space: nowrap; }
+.tk-preis.klein { font-size: 14.5px; }
+.tk-fuellung { width: 18px; height: 48px; border-radius: 5px; background: var(--bg2, #191918); position: relative; overflow: hidden; }
+.tk-fuellung i { position: absolute; left: 0; right: 0; bottom: 0; }
+.tk-summe { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 12px; padding: 12px 14px; border-radius: 16px;
+  background: var(--bg2, #191918); border: 3px solid var(--k-rand, var(--border, #3b3a37)); box-shadow: 0 4px 0 var(--k-rand, transparent); }
+.tk-summe span { display: flex; flex-direction: column; min-width: 0; }
+.tk-summe small { font-size: 12px; color: var(--text3, #8e8c86); }
+.tk-summe strong { font: 700 22px var(--font-zahl, var(--font-display, system-ui)); white-space: nowrap; }
+.tk-hinweis { font-size: 12.5px; color: var(--text3, #8e8c86); margin: 10px 2px 12px; }
+
+/* ── Kaderschnitt-Blatt (vor Spieltag 1) ─────────────────────────────── */
+.ks-kopf { display: flex; flex-direction: column; gap: 2px; padding-right: 48px; margin: 4px 0 12px; }
+.ks-kopf b { font: 800 21px/1.15 var(--font-display, var(--font-text, system-ui)); }
+.ks-kopf small, .ks-hinweis { font-size: 13px; color: var(--text2, #b5b3ad); }
+.ks-ziele { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.ks-ziel { display: flex; gap: 10px; align-items: center; padding: 9px 12px; border-radius: 14px; background: var(--bg3, #222221);
+  border: 1px solid transparent; }
+.ks-ziel i { font-size: 20px; flex: none; }
+.ks-ziel.ok i { color: #3fcf7a; }            /* Status: festes Grün, nicht die Vereinsfarbe (Bayern = rot) */
+.ks-ziel.rot { border-color: color-mix(in oklab, var(--red, #f07462) 55%, transparent); }
+.ks-ziel.rot i { color: var(--red, #f07462); }
+.ks-ziel span { display: flex; flex-direction: column; min-width: 0; }
+.ks-ziel b { font-size: 14px; }
+.ks-ziel small { font-size: 12.5px; color: var(--text2, #b5b3ad); font-variant-numeric: tabular-nums; }
+.ks-titel { font-size: 11px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--text3, #8e8c86); margin: 4px 2px 8px; }
+.ks-liste { display: flex; flex-direction: column; gap: 6px; }
+.ks-zeile { display: flex; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 14px; background: var(--bg3, #222221); }
+.ks-zeile .dfl-portrait.klein { flex: none; }
+.ks-wer { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.ks-wer b { font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ks-wer small { font-size: 12px; color: var(--text2, #b5b3ad); font-variant-numeric: tabular-nums; }
+.ks-geld em { font-style: normal; font-weight: 800; color: #3fcf7a; }
+.ks-tun { display: flex; gap: 6px; flex: none; }
+.ks-knopf { min-height: 40px; min-width: 44px; padding: 0 10px; display: inline-flex; align-items: center; gap: 5px; border-radius: 12px; cursor: pointer;
+  font: 700 13px var(--font-text, system-ui); background: var(--bg2, #191918); color: var(--text, #eeeeec); border: 1px solid var(--border, #3b3a37); }
+.ks-knopf.rot { color: var(--red, #f07462); border-color: color-mix(in oklab, var(--red, #f07462) 45%, transparent); }
+.ks-knopf i { font-size: 16px; }
+.ks-knopf.gruen { color: #3fcf7a; border-color: color-mix(in oklab, #3fcf7a 45%, transparent); }
+.ks-fehlt { font-style: normal; font-weight: 800; color: var(--gold, #f0c05a); }
+.ks-mehr { margin-top: 8px; width: 100%; }
+.ks-hinweis { margin-top: 12px; text-align: center; }
+.ks-link { background: none; border: 0; color: var(--accent, #2fb36b); font: inherit; font-weight: 800; cursor: pointer; padding: 6px 4px; }
+.ks-fertig { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 0 16px; text-align: center; }
+.ks-fertig i { font-size: 40px; color: #3fcf7a; }
+.ks-fertig + .app-knopf { width: 100%; }
+.ks-fertig b { font-size: 18px; }
+.ks-fertig small { color: var(--text2, #b5b3ad); }
+
+/* ── Spielbericht: Weiter-Knopf bleibt unten im Daumenbereich ────────── */
+body.dfl-shell #pm-dialog { padding-bottom: 0; max-height: calc(100dvh - 24px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); }
+body.dfl-shell #pm-footer { position: sticky; bottom: 0; z-index: 2; padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+  background: var(--bg2, #191918); border-top: 1px solid var(--border, #3b3a37); }
+body.dfl-shell #pm-continue-btn { min-height: 52px; border-radius: 14px; font-size: 15px; color: var(--accent-ink, #0b1a12);
+  display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+/* Toasts am Handy oben unter dem App-Kopf – unten liegen Leiste, Haupt-Button und die Knöpfe der Blätter */
+body.dfl-shell .toast-host { top: calc(66px + env(safe-area-inset-top, 0px)); bottom: auto; }
+
+/* ── Trade-Anfragen (D50) ─────────────────────────────────────────────── */
+.anf-ico { display: grid; place-items: center; font-size: 17px; color: var(--text2, #b5b3ad); background: var(--bg2, #191918); border-radius: 10px; }
+.anf-dialog { max-width: 460px; width: 100%; max-height: 88vh; overflow-y: auto; }
+.anf-dialog .app-blatt-aktionen { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* ── D51: Wettquoten und Draft-Noten (dfl_analysten_patch.js) ───── */
+.qn-dialog { position: relative; max-width: 560px; width: 100%; max-height: 88vh; overflow-y: auto; }
+.qn-dialog .ks-liste { display: flex; flex-direction: column; gap: 6px; }
+.qn-staende { display: flex; flex-wrap: wrap; gap: 6px; margin: -4px 0 10px; }
+.ks-zeile.ich { outline: 2px solid var(--accent, #2fb36b); outline-offset: -2px; }
+.qn-platz { flex: none; width: 22px; text-align: center; font-weight: 800; color: var(--text3, #8e8c86); font-variant-numeric: tabular-nums; }
+.qn-quote { flex: none; min-width: 70px; text-align: right; white-space: nowrap; font: 800 17px/1 var(--font-display, var(--font-text, system-ui)); font-variant-numeric: tabular-nums; }
+.qn-trend { font-size: 11px; margin-left: 4px; vertical-align: 2px; }
+.qn-trend.auf { color: #3fcf7a; }
+.qn-trend.ab { color: #f07462; }
+html.freundlich:not(.dark) .qn-trend.auf { color: #17803f; }
+html.freundlich:not(.dark) .qn-trend.ab { color: #b8342a; }
+.qn-note { flex: none; width: 40px; padding: 7px 0; border-radius: 10px; text-align: center; font: 900 16px/1 var(--font-display, var(--font-text, system-ui));
+  color: #0f2a19; background: #3fcf7a; }
+.qn-note.n-b { background: #a6d96a; color: #1d2a0c; }
+.qn-note.n-c { background: #f0c05a; color: #2e2200; }
+.qn-note.n-d, .qn-note.n-f { background: #f07462; color: #2e0c07; }
+
+@media (prefers-reduced-motion: reduce) {
+  #app-cta, .app-sheet-box, .app-blatt-box, .fo-cap i, .app-nav-btn i { animation: none !important; transition: none !important; }
+  .fo-cap.rot { animation: none; }
+}
+
+/* ── Aufstellung: „Beste Elf“ statt Schiebe-Hinweis (2026-10-09) ───────────────── */
+#sub-lineup .formation-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+body.dfl-taktik #sub-lineup .swap-hint { display: none; }
+#sub-lineup .formation-row .beste-elf { flex: 0 0 auto; margin-left: auto; width: auto; min-height: 40px; padding: 8px 14px; font-size: 14px; }
+
+/* ── Werbe-Bonus (D56): Zeile im Front Office + Platzhalter-Spot ────────────────── */
+.wb-zeile { display: flex; align-items: center; gap: 8px; width: 100%; margin-top: 10px; padding: 10px 12px; border-radius: 12px; cursor: pointer;
+  border: 2px dashed var(--k-blau, #38bdf8); background: color-mix(in oklab, var(--k-blau, #38bdf8) 10%, transparent); color: var(--text, #eee);
+  font: 700 14px var(--font-text, system-ui); text-align: left; }
+.wb-zeile i { font-size: 18px; color: var(--k-blau, #38bdf8); }
+.wb-zeile span { flex: 1; }
+.wb-zeile b { font: 800 14px var(--font-zahl, system-ui); }
+.wb-zeile.an { cursor: default; border-style: solid; border-color: var(--app-gut, #2ecc71); background: color-mix(in oklab, var(--app-gut, #2ecc71) 12%, transparent); }
+.wb-zeile.an i { color: var(--app-gut, #2ecc71); }
+#dfl-werbung-ov { position: fixed; inset: 0; z-index: 9000; display: grid; place-items: center; background: rgb(0 0 0 / .82); }
+.wb-karte { width: min(320px, 88vw); padding: 22px 18px; border-radius: 18px; background: var(--bg2, #1e2230); border: var(--k-rahmen, 3px solid #000);
+  display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; color: var(--text, #fff); position: relative; }
+.wb-karte > i { font-size: 54px; color: var(--k-blau, #38bdf8); }
+.wb-marke { position: absolute; top: 10px; left: 10px; font: 800 10px var(--font-text, system-ui); text-transform: uppercase; letter-spacing: .06em;
+  padding: 3px 7px; border-radius: 7px; background: var(--app-mittel, #f1c40f); color: #1b1300; }
+.wb-uhr { font: 800 34px var(--font-zahl, system-ui); }
+.wb-abbruch { flex: 0 0 auto; width: auto; padding: 8px 16px; }
+/* Handy: die PC-Seitenleiste von Kader & Taktik (Gesamtstärke, Mannschaftswerte, „Aktuelle Taktik“) hing unter jeder
+   Unterseite – Stärke steht im Office, Spielerkarte kommt als Blatt */
+body.dfl-shell #view-squad .sidebar { display: none; }
+
+/* Verletzt/gesperrt in Kaderliste und Aufstellung: abgeblendet, Name rot durchgestrichen, Marke mit Wochen/Spielen (2026-10-10) */
+#sub-squadlist .sqo-row.unavailable, #squad-list .squad-row.unavailable { opacity: .62; }
+#sub-squadlist .sqo-row.unavailable .sqo-name, #squad-list .squad-row.unavailable .squad-name {
+  text-decoration: line-through; text-decoration-color: #d64545; text-decoration-thickness: 2px; }
+.sqo-aus { flex: none; display: inline-flex; align-items: center; gap: 2px; margin: 0 4px; padding: 1px 6px; border-radius: 999px; font-size: 11px;
+  font-weight: 800; line-height: 1.3; color: #fff; background: #d64545; vertical-align: 1px; }
+.sqo-aus.gesperrt { background: #8a5a12; }
+.sqo-aus.weg { background: #6b4fa3; }   /* will getradet werden */
+.sqo-aus .ti { font-size: 12px; }
+
+/* Spielplan: eigene Ligaergebnisse in Farbe (dfl_laufband_patch.js merkt sie, 2026-10-10) */
+.fixture-res.erg-sieg { color: var(--green, #2fa36b); }
+.fixture-res.erg-remis { color: var(--text2, #8a8a86); }
+.fixture-res.erg-niederlage { color: var(--red, #d8573f); }
+/* Blätter mit Titel: Platz für den Schließen-Knopf (im Fans-Blatt lag er über „Eigentümer 58 %“, Prüfung 2026-10-10) */
+#app-blatt .app-blatt-box > .app-sheet-titel { min-height: 40px; padding-right: 52px; box-sizing: border-box; }
+/* Ausfall auf dem Feld (2026-10-13): abgeblendet, Marke oben rechts am Gesicht */
+.tk-ausfall .tk-gesicht { filter: grayscale(.85); opacity: .7; }
+.tk-aus { position: absolute; top: -8px; right: -12px; z-index: 2; display: inline-flex; align-items: center; gap: 1px; padding: 1px 5px;
+  border-radius: 999px; font-size: 10px; font-weight: 700; color: #fff; background: #c8463c; border: 2px solid #fff; line-height: 1.2; }
+.tk-aus.gesperrt { background: #8a5a12; }
+.tk-aus i { font-size: 11px; }
+/* Rückmeldung 17.10. (10): Seed-Kachel mit Rand in der Farbe der Playoff-Lage */
+.ok-kachel.ok-rand { border-color: var(--zustand); }
+.ok-seed { font-weight: 700; }
+/* Rückmeldung 17.10. (16): Angebote im Spieler-Blatt */
+.app-angebote { margin-top: 12px; padding: 12px; border-radius: 14px; background: var(--bg3, #222221); border: 2px solid var(--k-linie, transparent); display: flex; flex-direction: column; gap: 8px; }
+.app-angebote .app-stat-kopf { margin-bottom: 2px; }
+.aa-zeile { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 12px; background: var(--bg2, #191918); }
+.aa-zeile .tz-wappen { width: 30px; height: 32px; flex: none; }
+.aa-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; align-items: flex-start; }
+.aa-text small { color: var(--text2, #b5b3ad); font-size: 12px; line-height: 1.3; }
+.aa-zeile .app-knopf { flex: none; width: auto; padding: 8px 12px; }
+.aa-leer { margin: 0; color: var(--text2, #b5b3ad); font-size: 13px; }

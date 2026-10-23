@@ -1,0 +1,3 @@
+Teile aus „UI Pack“ von Kenney (www.kenney.nl), Lizenz CC0 1.0
+(http://creativecommons.org/publicdomain/zero/1.0/), Farbe Yellow:
+stern.png = star.png, stern_leer.png = star_outline.png, regler_griff.png = slide_hangle.png.

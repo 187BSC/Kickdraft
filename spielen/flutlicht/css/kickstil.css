@@ -1,0 +1,204 @@
+/* ═══════════════════════════════════════════════════════════
+   Kickstil · Anpassungen  (lädt als letztes Stylesheet)
+   ───────────────────────────────────────────────────────────
+   Kleine Brücken zwischen unserem Spiel und den aus Kickdraft
+   übernommenen Stilen (theme_dfl_kenney.css, dfl_textspiel.css).
+   Nur Tokens – Tag und Nacht.
+   ═══════════════════════════════════════════════════════════ */
+
+/* Entscheidungs-Dialoge (Trainingslager, Vereinsleben) liegen mit z-index 10000
+   über allem. Kommen sie, während der Ticker ein Spiel erzählt, warten sie, bis er
+   zu ist – sonst verdeckt z. B. die Sommer-Vorbereitung das laufende Spiel. */
+body.ts-offen .exp-overlay { display: none !important; }
+
+/* Vereinswahl beim Karrierestart: Hintergrund var(--bg1, #0d1117) – --bg1 gibt es im Kenney-Stil nicht, der Grund blieb
+   dunkel, die Schrift im Tag-Stil aber auch (Titel unlesbar). Kenney-Grund mit Punkteraster wie der Rest der App. */
+#onboarding-overlay { background: var(--bg) !important; color: var(--text); }
+html.kenney.tag #onboarding-overlay { background-image: radial-gradient(color-mix(in oklab, var(--k-rand, #8b5a2b) 18%, transparent) 1px, transparent 1.4px) !important;
+  background-size: 18px 18px !important; }
+/* Gewählte Liga war blau (rgba(56,139,253,.15) fest im Inline-Stil) */
+#onboarding-overlay button[style*="56,139,253"] { background: color-mix(in oklab, var(--accent) 18%, var(--bg2)) !important; }
+#onboarding-overlay button[onclick^="window._obTeam"] { gap: 7px; }
+#onboarding-overlay button[onclick^="window._obTeam"] > span:nth-of-type(2) { flex: 1; }
+.ks-ob-wappen { width: 22px; height: 24px; flex: none; display: inline-block; }
+.ks-ob-wappen svg { width: 100%; height: 100%; display: block; }
+
+/* PC-Übersicht: das Raster hat bis zu 6 Spalten – steht die Vereinskarte allein (spielfreie Woche),
+   bekam sie nur eine und brach „1. FC Lokomotive Leipzig“ in drei Zeilen um. */
+@media (min-width: 820px) { #view-home .home-grid > .home-card.home-club { grid-column: span 2; } }
+
+/* Spieltag mit Engine v3 (body.ks-v3, js/kickstil_anbindung.js): Anpfiff rechnet das ganze Spiel, der Ticker erzählt.
+   Momentum, Torchance/Min, Trainer-Eingriffe, die Live-Taktikspalte und der zweite Knopf „Spiel simulieren“ gehörten
+   zur alten Minuten-Engine („Spiel als Text: Aus“ ersetzt das Sofort-Simulieren). Statistik und Karten bleiben. */
+body.ks-v3 #view-match #sim-btn,
+body.ks-v3 #view-match .sidebar .sb-sec:has(#mom-fill-home),
+body.ks-v3 #view-match .sidebar .sb-sec:has(#decision-log),
+body.ks-v3 #view-match #tactics-col { display: none !important; }
+
+/* Laufband (js/kickstil_laufband.js): „…“ zwischen Tabellenspitze und eigenem Platz */
+#dfl-band .db-luecke { color: var(--text3); font-weight: 800; }
+#dfl-band .db-seed small { margin-left: 2px; }
+
+/* Vereinsgelände am PC (kickstil_app_shell.js officeKopf): Streifen statt 8:5-Bild (das wäre bei 1280 px 790 px hoch);
+   die Ansicht passt das Gelände in die Höhe ein, Vollbild-Knopf für Zoom bleibt */
+#app-office-kopf.ks-pc-kopf { margin-bottom: 14px; }
+#app-office-kopf.ks-pc-kopf .aok-gelaende { margin: 0; }
+#app-office-kopf.ks-pc-kopf .gel-buehne { aspect-ratio: auto !important; height: clamp(260px, 34vw, 400px); border-radius: 18px; overflow: hidden;
+  border: 3px solid var(--k-rand, var(--border)); box-shadow: 0 4px 0 var(--k-rand, var(--border)); }
+
+/* „Simulieren bis …“ (js/kickstil_simulieren.js): Auf-/Abstiegszonen statt Playoff-Seeds */
+.sim-seed.ks-ab { background: var(--app-schlecht, #d0402f); color: #fff; }
+.sim-tab tr.ks-linie-auf td { border-bottom: 3px dashed var(--app-gut, #3fcf7a); }
+.sim-k-linie.ks-auf { stroke: var(--app-gut, #3fcf7a); }
+#dfl-sim .sim-halt .ks-angebot { margin: 8px 0; }
+
+/* ── Deadline-Day (js/kickstil_deadline_day.js) – Aufbau wie der Draft-Tag (dfl_spiel.css) ───────────────────── */
+#ks-dl .dl-wappen { width: 30px; height: 32px; display: inline-block; flex: none; }
+#ks-dl .dfl-prospekt { display: grid !important; grid-template-columns: auto auto minmax(0, 1fr) auto !important; align-items: center; gap: 8px; }
+#ks-dl .dfl-prospekt .dfl-pr-name small { white-space: normal; }
+#ks-dl .dl-st { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 700; color: var(--text2); margin-top: 2px; }
+#ks-dl .dl-st.gut { color: var(--k-gut-fg, var(--app-gut, #2e9e5b)); }
+#ks-dl .dl-zeit { display: flex; gap: 6px; margin: 8px 0 4px; flex-wrap: wrap; }
+#ks-dl .dl-zeit .dfl-draft-btn { flex: 1; }
+#ks-dl .dl-zusage { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; margin: 8px 0;
+  border-color: var(--app-gut, #3fcf7a) !important; }
+#ks-dl .dl-zusage span { display: flex; flex-direction: column; } #ks-dl .dl-zusage small { color: var(--text2); }
+#ks-dl .dl-block-titel { display: flex; align-items: center; gap: 6px; margin: 14px 2px 6px; font-size: 13px; font-weight: 800; }
+#ks-dl .dl-angebot-zeile { display: grid; grid-template-columns: auto 1fr auto auto; gap: 6px; align-items: center; padding: 6px 2px;
+  border-bottom: 2px dashed var(--k-linie, var(--border)); }
+#ks-dl .dl-angebot-zeile span { display: flex; flex-direction: column; min-width: 0; } #ks-dl .dl-angebot-zeile small { color: var(--text2); font-size: 11.5px; }
+#ks-dl .dl-ticker-kopf { display: flex; align-items: center; gap: 6px; margin: 14px 2px 6px; font-size: 13px; }
+#ks-dl .dl-live { margin-left: auto; background: var(--app-schlecht, #e74c3c); color: #fff; font-weight: 800; font-size: 10px; padding: 2px 7px;
+  border-radius: 99px; letter-spacing: .06em; animation: ks-dl-blink 1.2s infinite; }
+@keyframes ks-dl-blink { 50% { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) { #ks-dl .dl-live { animation: none; } }
+#ks-dl .dl-ticker { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+#ks-dl .dl-ticker li { display: grid; grid-template-columns: 44px 18px 1fr; gap: 6px; align-items: start; font-size: 13px; padding: 7px 9px; border-radius: 12px;
+  background: var(--bg2); border: 2px solid var(--k-linie, var(--border)); }
+#ks-dl .dl-ticker li.eigen { border-color: var(--k-rand, var(--border)); background: var(--bg3); }
+#ks-dl .dl-ticker li b { font-variant-numeric: tabular-nums; color: var(--text2); }
+#ks-dl .dl-ticker li.gut i { color: var(--app-gut, #2e9e5b); } #ks-dl .dl-ticker li.schlecht i { color: var(--app-schlecht, #d0402f); }
+#ks-dl .dl-ticker li.warn i { color: var(--app-mittel, #c99a2e); }
+#ks-dl .dl-fuss { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; } #ks-dl .dl-fuss .dfl-draft-btn { flex: 1; }
+#ks-dl .dl-anruf .ks-angebot { margin: 6px 0; }
+#ks-dl .dl-note { display: flex; gap: 10px; align-items: center; text-align: left; margin: 6px 0 10px; padding: 10px; border-radius: 12px; background: var(--bg2);
+  border: 2px solid var(--k-linie, var(--border)); }
+#ks-dl .dl-note span:last-child { display: flex; flex-direction: column; gap: 2px; } #ks-dl .dl-note small { color: var(--text2); }
+#ks-dl .dl-bilanz-titel { text-align: left; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); margin: 10px 2px 4px; }
+#ks-dl .dl-bilanz-zeile { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; text-align: left; padding: 6px 2px;
+  border-bottom: 2px dashed var(--k-linie, var(--border)); }
+#ks-dl .dl-bilanz-zeile span { display: flex; flex-direction: column; } #ks-dl .dl-bilanz-zeile small { color: var(--text2); font-size: 11.5px; }
+#ks-dl .dl-summen { margin: 12px 0 4px; }
+#ks-dl .dl-summen b { font-size: 16px; }
+.ks-dl-pc { margin: 0 8px 0 0; }
+
+/* ── Transfers mit Bildern (js/kickstil_transfer_karten.js) ─────────────────── */
+.ks-angebot { display: flex; flex-direction: column; gap: 8px; padding: 10px 11px; border-radius: 14px;
+  background: var(--bg2); border: 3px solid var(--k-rand, var(--border)); box-shadow: 0 3px 0 var(--k-rand, var(--border));
+  color: var(--text); font-family: var(--font-text, system-ui); text-align: left; }
+.ks-ang-seiten { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
+.ks-ang-seite { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.ks-ang-seite > small { display: flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 700; color: var(--text2);
+  text-transform: uppercase; letter-spacing: .04em; min-width: 0; }
+.ks-ang-seite > small span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: none; letter-spacing: 0; font-size: 12px; color: var(--text); }
+.ks-ang-seite.sie { align-items: flex-end; text-align: right; }
+.ks-ang-sp { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ks-ang-gesicht { width: 44px; height: 52px; flex: none; border-radius: 10px; overflow: hidden; background: var(--bg3);
+  border: 2px solid var(--k-linie, var(--border)); }
+.ks-angebot.gross .ks-ang-gesicht { width: 58px; height: 68px; }
+.ks-ang-gesicht svg { width: 100%; height: auto; display: block; }
+.ks-ang-wer { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ks-ang-wer > span { display: flex; align-items: center; gap: 5px; min-width: 0; }
+.ks-ang-wer b { font-size: 13.5px; overflow-wrap: anywhere; line-height: 1.15; }
+.ks-ang-wer > span { flex-wrap: wrap; }
+.ks-ang-wer small { font-size: 11px; color: var(--text2); }
+.ks-ang-pfeil { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  background: var(--bg3); border: 2px solid var(--k-linie, var(--border)); color: var(--text2); font-size: 16px; }
+.ks-ang-summe { font: 800 22px/1.05 var(--font-display, system-ui); font-variant-numeric: tabular-nums; color: var(--text); }
+.ks-angebot.gross .ks-ang-summe { font-size: 26px; }
+.ks-ang-mw { font-size: 11px; color: var(--text2); }
+.ks-ang-wappen { width: 22px; height: 24px; flex: none; display: inline-block; }
+.ks-pf-wappen { width: 30px; height: 32px; display: inline-block; }
+.ks-ang-fuss { display: flex; flex-wrap: wrap; gap: 6px; }
+.bk-chip.gold { background: color-mix(in oklab, var(--gold, #f2c14e) 22%, var(--bg2)); color: var(--text);
+  border-color: color-mix(in oklab, var(--gold, #f2c14e) 55%, transparent); }
+
+/* Waage: Summe gegen Marktwert/Forderung, Skala 50–150 %, Strich bei 100 % */
+.ks-waage { display: flex; flex-direction: column; gap: 4px; }
+.ks-waage-bahn { position: relative; height: 12px; border-radius: 99px; background: var(--bg3); border: 2px solid var(--k-linie, var(--border)); overflow: hidden; }
+.ks-waage-bahn i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 99px; }
+.ks-waage-bahn em { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 2px; background: var(--text); opacity: .65; }
+.ks-waage.gut .ks-waage-bahn i { background: var(--app-gut, #3fcf7a); }
+.ks-waage.mittel .ks-waage-bahn i { background: var(--app-mittel, #f0c05a); }
+.ks-waage.schlecht .ks-waage-bahn i { background: var(--app-schlecht, #f07462); }
+.ks-waage-text { display: flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; color: var(--text2); }
+.ks-waage.gut .ks-waage-text { color: var(--k-gut-fg, var(--app-gut)); }
+.ks-waage.schlecht .ks-waage-text { color: var(--k-schlecht-fg, var(--app-schlecht)); }
+
+.ks-angebot-zeile { display: flex; flex-direction: column; gap: 7px; margin-bottom: 12px; }
+.ks-ang-knoepfe { display: flex; gap: 6px; flex-wrap: wrap; }
+.ks-ang-knoepfe .mkt-btn { flex: 1; min-width: 90px; }
+.ks-nego-karte { margin: 10px 0 6px; display: flex; flex-direction: column; gap: 8px; }
+.ks-ang-forderung { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; color: var(--text2); padding: 0 2px; }
+.ks-ang-forderung b { font: 800 18px var(--font-display, system-ui); color: var(--text); font-variant-numeric: tabular-nums; }
+/* Postfach: Karte über die volle Breite, Knöpfe darunter nebeneinander */
+.pf-item:has(.ks-angebot) { flex-wrap: wrap; }
+.pf-item:has(.ks-angebot) .pf-body { flex: 1 1 calc(100% - 60px); }
+.pf-item:has(.ks-angebot) .pf-text { margin-left: -51px; width: calc(100% + 51px); }
+.pf-item:has(.ks-angebot) .pf-actions { flex: 1 1 100%; flex-direction: row; align-self: stretch; }
+.pf-item:has(.ks-angebot) .pf-actions .pf-btn { flex: 1; }
+.pf-item .pf-text .ks-angebot { margin-top: 8px; }
+/* Transfermarkt: Porträt vor dem Namen */
+.market-row { align-items: center; }
+.market-row .ks-mkt-gesicht { margin-right: 8px; }
+@media (max-width: 420px) {
+  .ks-ang-summe { font-size: 19px; }
+  .ks-ang-gesicht { width: 38px; height: 46px; }
+}
+
+/* Saison-Plus (kickstil_saisonplus.js, 2026-10-15): „72 (+1)“ – schlicht in Klammern, gedeckt grün/rot, ohne Pfeil und Pille
+   (Nutzer: auf der Karte „dunkler, weniger grell“) */
+.season-gain.ks-plus { display: inline; padding: 0; margin-left: 3px; border: 0; border-radius: 0; background: none; box-shadow: none;
+  color: #2f7a4c; font-weight: 700; font-size: .72em; vertical-align: .12em; white-space: nowrap; }
+.season-gain.ks-plus::before { content: none; display: none; }
+.season-gain.ks-plus.season-loss { color: #a8463c; }
+html.dark .season-gain.ks-plus, .dark .season-gain.ks-plus { color: #79b893; }
+html.dark .season-gain.ks-plus.season-loss, .dark .season-gain.ks-plus.season-loss { color: #d08a82; }
+html .fut .fut-wert .season-gain.ks-plus { font-size: 15px; font-weight: 700; vertical-align: .9em; margin-left: 2px; text-shadow: none; color: #33563f; opacity: .9; }
+html .fut .fut-wert .season-gain.ks-plus.season-loss { color: #6e2f29; }
+html .pitch-wrap .p-ovr .season-gain.ks-plus, html .mini-pitch .p-ovr .season-gain.ks-plus { color: #9fcfae; font-size: .85em; margin-left: 2px; vertical-align: 0; }
+html .pitch-wrap .p-ovr .season-gain.ks-plus.season-loss, html .mini-pitch .p-ovr .season-gain.ks-plus.season-loss { color: #e3a9a2; }
+
+/* Rückmeldung 18.10.: Liga-Reiter in einer Zeile (wischbar) wie Kickdraft */
+body.dfl-shell #view-liga .lg-wrap > .subtabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; justify-content: flex-start; }
+body.dfl-shell #view-liga .lg-wrap > .subtabs::-webkit-scrollbar { display: none; }
+body.dfl-shell #view-liga .lg-wrap > .subtabs .subtab { flex: none; }
+.eu-nicht-dabei { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 12px; background: var(--bg3, #efe2c8); color: var(--text2, #6b5a42); font-size: 13px; font-weight: 600; }
+.eu-nicht-dabei .ti { font-size: 18px; }
+
+/* Taktik wie Kickdraft (kickstil_taktik.js): alte Regler, Repertoire und Eingespieltheit aus */
+body.ks-taktik #sub-tactics > :not(#dfl-stil-box) { display: none !important; }
+.ks-stil-wappen { width: 34px; height: 38px; flex: none; } .ks-stil-wappen svg { width: 100%; height: 100%; display: block; }
+
+/* Optionen-Blatt (Einstellungen) wie Kickdraft – Stile aus kickdraft/spiel/css/dfl_ebenen.css (2026-10-18, kickstil_mehr_neu.js) */
+.eb-seg, .einst-seg { display: flex; background: var(--bg3); border: 3px solid var(--k-rand, var(--border)); border-radius: 14px; padding: 3px; gap: 3px; }
+.eb-seg button, .einst-seg button { flex: 1; min-height: 38px; border: 0; border-radius: 10px; background: none; color: var(--text2); font: 800 13px var(--font-text, system-ui); cursor: pointer; }
+.eb-seg button[aria-pressed="true"], .einst-seg button[aria-pressed="true"] { background: var(--k-blau-knopf, #2c7cb5); color: #fff; box-shadow: 0 3px 0 var(--k-blau-schatten, #1d5a85); }
+.einst-seg button:disabled { opacity: .45; cursor: default; }
+.einst-gruppe { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.einst-gruppe h4 { margin: 0; display: flex; align-items: center; gap: 6px; font: 700 15px var(--font-display, system-ui); color: var(--text); }
+.einst-zeile { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: 800; font-size: 14px; }
+.einst-zeile .einst-seg { flex: 0 0 160px; }
+.einst-schalter { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 52px; padding: 8px 12px; cursor: pointer; text-align: left;
+  border-radius: 14px; border: 3px solid var(--k-rand, var(--border)); background: var(--bg2); color: var(--text); font: 700 14px var(--font-text, system-ui); }
+.einst-schalter span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.einst-schalter small { font-size: 12px; font-weight: 600; color: var(--text3); }
+.einst-bahn { position: relative; flex: none; width: 46px; height: 26px; border-radius: 13px; background: var(--bg4, var(--bg3)); border: 2px solid var(--k-rand, var(--border)); transition: background .15s; }
+.einst-bahn::after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg2); box-shadow: 0 2px 0 rgba(0, 0, 0, .25); transition: left .15s; }
+.einst-schalter[aria-checked="true"] .einst-bahn { background: var(--app-gut); }
+.einst-schalter[aria-checked="true"] .einst-bahn::after { left: 22px; }
+@media (prefers-reduced-motion: reduce) { .einst-bahn, .einst-bahn::after { transition: none; } }
+
+
+/* Positionen mit Seite (2026-10-18): Abzugsmarke bleibt in der Stärke-Zeile auf dem Feld */
+html .pitch-wrap .p-ovr { white-space: nowrap; }

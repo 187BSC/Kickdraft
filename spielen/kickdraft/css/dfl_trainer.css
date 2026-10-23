@@ -1,0 +1,77 @@
+/* DFL · Trainerteam (D118, dfl_trainerteam_patch.js) – nur Tokens (Kenney Tag/Nacht), Handy zuerst */
+
+.tt-sterne { display: inline-flex; gap: 1px; color: var(--gold, #a86b12); font-size: 15px; white-space: nowrap; flex: none; }
+.tt-sterne .ti-star { opacity: .55; }
+
+.tt-summe { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.tt-plaetze, .tt-liste { display: flex; flex-direction: column; gap: 8px; padding-bottom: 6px; }
+.tt-platz, .tt-kopf { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 10px; align-items: center; width: 100%; min-height: 60px;
+  padding: 8px 10px; border: 2px solid var(--k-rand, var(--border, #30363d)); border-bottom-width: 4px; border-radius: 12px;
+  background: var(--bg2, #1e2230); color: var(--text, #f5f6fa); font: inherit; text-align: left; cursor: pointer; box-sizing: border-box; }
+.tt-platz.leer { border-style: dashed; border-bottom-width: 2px; }
+.tt-platz:focus-visible, .tt-kopf:focus-visible, .tt-chip:focus-visible, .tt-zurueck:focus-visible { outline: 2px solid var(--k-blau, #3498db); outline-offset: 2px; }
+.tt-bild { position: relative; width: 44px; height: 44px; border-radius: 10px; overflow: hidden; display: grid; place-items: center; background: var(--bg3, #262a3a); flex: none; }
+.tt-bild svg { position: absolute; width: 100%; height: auto; left: 0; top: -4%; }
+.tt-kuerzel, .tt-icon { font-weight: 800; color: var(--text2, #a4b0be); }
+.tt-icon i { font-size: 22px; }
+.tt-name { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+.tt-name b { font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tt-name small { font-size: 12px; color: var(--text3, #8a95a6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tt-suchen { font-weight: 800; font-size: 13px; padding: 6px 10px; border-radius: 8px; background: var(--bg3, #262a3a); color: var(--text, #f5f6fa); }
+
+.tt-zurueck { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 0 4px; border: 0; background: none; color: var(--text2, #a4b0be);
+  font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.tt-unter { font-size: 12px; color: var(--text3, #8a95a6); margin: 10px 2px 6px; }
+.tt-kand { display: flex; flex-direction: column; gap: 8px; }
+.tt-kand.offen { padding: 0 0 10px; border-bottom: 2px solid var(--k-rand, var(--border, #30363d)); }
+.tt-kand.aktuell .tt-kopf { border-color: var(--gold, #a86b12); }
+.tt-wirkung { font-size: 13px; font-weight: 700; color: var(--text, #f5f6fa); padding: 0 4px; }
+.tt-knoepfe { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.tt-kand .app-knopf { min-height: 44px; width: 100%; }
+.tt-kand .app-knopf[disabled] { opacity: .5; cursor: not-allowed; }
+.tt-jahre { display: flex; gap: 6px; flex-wrap: wrap; }
+.tt-chip { min-height: 36px; padding: 0 12px; border-radius: 18px; border: 2px solid var(--k-rand, var(--border, #30363d)); background: var(--bg2, #1e2230);
+  color: var(--text, #f5f6fa); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.tt-chip.an { background: var(--text, #f5f6fa); color: var(--bg, #111113); border-color: var(--text, #f5f6fa); }
+.tt-grund { font-size: 12.5px; font-weight: 800; color: var(--k-schlecht-fg, var(--app-schlecht, #d0402f)); padding: 0 4px; }
+
+/* ── Chefscout (D120, dfl_chefscout_patch.js) ─────────────────────────────── */
+.cs-kopf { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 10px; align-items: center; width: 100%; min-height: 60px; padding: 8px 10px;
+  border: 2px solid var(--k-rand, var(--border, #30363d)); border-bottom-width: 4px; border-radius: 12px; background: var(--bg2, #1e2230);
+  color: var(--text, #f5f6fa); font: inherit; text-align: left; cursor: pointer; box-sizing: border-box; }
+.cs-kopf.leer { border-style: dashed; border-bottom-width: 2px; }
+.cs-kopf:focus-visible { outline: 2px solid var(--k-blau, #3498db); outline-offset: 2px; }
+.cs-note { display: inline-grid; place-items: center; min-width: 38px; height: 30px; padding: 0 4px; border-radius: 8px; font: 800 16px var(--font-zahl, var(--font-display, system-ui));
+  border: 2px solid var(--k-rand, var(--border, #30363d)); background: var(--bg3, #262a3a); color: var(--text, #f5f6fa); box-sizing: border-box; }
+.cs-note.gut { border-color: var(--app-gut, #3d9a2a); color: var(--k-gut-fg, var(--app-gut, #3d9a2a)); }
+.cs-note.mittel { border-color: var(--app-mittel, #d29a0c); color: var(--k-mittel-fg, var(--app-mittel, #d29a0c)); }
+.cs-note.schlecht { border-color: var(--app-schlecht, #d0402f); color: var(--k-schlecht-fg, var(--app-schlecht, #d0402f)); }
+.cs-note.offen, .cs-note.leise { color: var(--text3, #8a95a6); }
+.cs-steal { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 800; padding: 1px 6px; border-radius: 999px;
+  border: 2px solid var(--gold, #a86b12); color: var(--gold, #a86b12); }
+.cs-satz { font-size: 13px; line-height: 1.35; padding: 8px 10px; border: 2px dashed var(--k-rand, var(--border, #30363d)); border-radius: 10px; color: var(--text, #f5f6fa); }
+.cs-satz b { margin-right: 4px; }
+
+.cs-urteil { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 12px; border: 2px solid var(--k-rand, var(--border, #30363d)); background: var(--bg2, #1e2230); }
+.cs-urteil-kopf { display: flex; align-items: center; gap: 8px; font-size: 17px; }
+.cs-urteil-kopf i { font-size: 22px; }
+.cs-urteil.top, .cs-urteil.gut { border-color: var(--app-gut, #3d9a2a); }
+.cs-urteil.top .cs-urteil-kopf, .cs-urteil.gut .cs-urteil-kopf { color: var(--k-gut-fg, var(--app-gut, #3d9a2a)); }
+.cs-urteil.okay { border-color: var(--app-mittel, #d29a0c); }
+.cs-urteil.okay .cs-urteil-kopf { color: var(--k-mittel-fg, var(--app-mittel, #d29a0c)); }
+.cs-urteil.schlecht, .cs-urteil.weg { border-color: var(--app-schlecht, #d0402f); }
+.cs-urteil.schlecht .cs-urteil-kopf, .cs-urteil.weg .cs-urteil-kopf { color: var(--k-schlecht-fg, var(--app-schlecht, #d0402f)); }
+.cs-urteil-satz { font-size: 13.5px; color: var(--text, #f5f6fa); }
+.cs-urteil-satz span { font-weight: 800; }
+.cs-skala { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3px; font-size: 10.5px; font-weight: 700; text-align: center; color: var(--text3, #8a95a6); }
+.cs-skala span { display: grid; place-items: center; padding: 4px 1px; border-radius: 6px; background: var(--bg3, #262a3a); line-height: 1.1; hyphens: manual; }
+.cs-skala span.an { color: var(--bg, #111113); background: var(--text, #f5f6fa); }
+.cs-skala span.an.top, .cs-skala span.an.gut { background: var(--app-gut, #3d9a2a); color: #fff; }
+.cs-skala span.an.okay { background: var(--app-mittel, #d29a0c); color: #1d1606; }
+.cs-skala span.an.schlecht, .cs-skala span.an.weg { background: var(--app-schlecht, #d0402f); color: #fff; }
+.cs-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-size: 12.5px; font-weight: 800;
+  border: 2px solid var(--k-rand, var(--border, #30363d)); background: var(--bg2, #1e2230); color: var(--text, #f5f6fa); white-space: nowrap; }
+.cs-chip.top, .cs-chip.gut { border-color: var(--app-gut, #3d9a2a); color: var(--k-gut-fg, var(--app-gut, #3d9a2a)); }
+.cs-chip.okay { border-color: var(--app-mittel, #d29a0c); color: var(--k-mittel-fg, var(--app-mittel, #d29a0c)); }
+.cs-chip.schlecht, .cs-chip.weg { border-color: var(--app-schlecht, #d0402f); color: var(--k-schlecht-fg, var(--app-schlecht, #d0402f)); }
+.cs-urteil { margin: 8px 0; }

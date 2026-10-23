@@ -1,0 +1,195 @@
+/* DFL · Drei Ebenen und Stil-Eignung (D111/D112, dfl_ebenen_patch.js) – nur Tokens (Kenney Tag/Nacht) */
+
+/* Ebene 3: aufgeklappt nur auf Tipp (Inhalte mit eigenem display brauchen das !important) */
+[data-eb-ziel][hidden], .eb-ebene3[hidden] { display: none !important; }
+
+/* ── D112 Stil-Zeichen (Ebene 1) ───────────────────────────────────────── */
+.stil-z { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 7px; background: var(--sf); color: #1d1d1f;
+  font-size: 14px; vertical-align: middle; margin-left: 6px; box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .22); flex: none; position: relative; }
+.stil-z i { line-height: 1; }
+.stil-z.ok::after { content: ''; position: absolute; right: -5px; bottom: -5px; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--app-gut, #3d9a2a) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 6.2l2 2 4-4.4' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat;
+  border: 2px solid var(--bg2, #fffdf9); }
+.stil-z.klein { width: 18px; height: 18px; font-size: 12px; border-radius: 6px; margin-left: 5px; }
+.stil-z.klein.ok::after { width: 10px; height: 10px; right: -4px; bottom: -4px; }
+.stil-leer { width: 22px; height: 22px; border-radius: 7px; border: 2px dashed var(--k-linie, var(--bg4)); display: inline-block; }
+
+/* Filter „passt zu meinem Stil“ (jede Liste) */
+.eb-filter { display: inline-flex; align-items: center; gap: 6px; font: 800 12px var(--font-text, system-ui); min-height: 32px; padding: 4px 11px 4px 6px;
+  border-radius: 999px; cursor: pointer; border: 2px solid var(--k-rand, var(--border)); background: var(--bg2); color: var(--text2); white-space: nowrap; vertical-align: middle; }
+.eb-filter .stil-z { margin-left: 0; }
+.eb-filter b { color: var(--text); }
+.eb-filter[aria-pressed="true"] { background: var(--k-blau-knopf, #2c7cb5); border-color: var(--k-blau-schatten, #1d5a85); color: #fff; }
+.eb-filter[aria-pressed="true"] b { color: #fff; }
+.eb-filter:focus-visible, .eb-filterknopf:focus-visible, .eb-tiefer:focus-visible, .blick-auf:focus-visible { outline: 2px solid var(--k-blau, #3498db); outline-offset: 2px; }
+
+/* ── Karten im Blatt (Ebene 2): Stil, Entwicklung ──────────────────────── */
+.eb-karte { margin: 10px 0 4px; padding: 12px; border-radius: 16px; background: var(--bg2); border: 3px solid var(--k-rand, var(--border));
+  display: flex; flex-direction: column; gap: 4px; }
+.eb-kopf { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; }
+.eb-kopf b { display: inline-flex; align-items: center; gap: 6px; font: 700 15px var(--font-display, system-ui); }
+.eb-kopf span { font-size: 12.5px; font-weight: 800; color: var(--text2); }
+.eb-reihe { display: grid; grid-template-columns: 26px 92px minmax(0, 1fr) 46px; align-items: center; gap: 8px; padding: 4px 0; }
+.eb-reihe.mein { background: var(--bg3); border-radius: 10px; padding: 4px 6px; margin: 0 -6px; }
+.eb-reihe.aus { opacity: .55; }
+.eb-ic { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; background: var(--sf); color: #1d1d1f; font-size: 15px; box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .2); }
+.eb-nm { font-weight: 800; font-size: 14px; display: flex; flex-direction: column; line-height: 1.1; min-width: 0; }
+.eb-nm small { font-size: 10.5px; color: var(--k-gut-fg, var(--app-gut)); font-weight: 800; }
+/* D156: Torwart-Typ je Stil („Mitspieler“) unter dem Stil */
+.eb-nm .eb-tw { font-style: normal; font-size: 10.5px; font-weight: 700; color: var(--text2); overflow-wrap: anywhere; }
+.eb-reihe b { text-align: right; font: 700 15px var(--font-zahl, var(--font-display, system-ui)); font-variant-numeric: tabular-nums; }
+.eb-leer { grid-column: 3 / 5; font-size: 12px; color: var(--text3); font-weight: 700; }
+.eb-bahn { height: 12px; border: 2px solid var(--k-rand, var(--border)); border-radius: 6px; background: var(--bg4); overflow: hidden; }
+.eb-bahn i { display: block; height: 100%; }
+.eb-bahn i.gut { background: var(--app-gut); } .eb-bahn i.mittel { background: var(--app-mittel); } .eb-bahn i.schlecht { background: var(--app-schlecht); }
+.eb-typ { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.eb-typ .stil-z { margin-left: 0; }
+.eb-typ b { font-size: 15px; }
+.eb-typ small { flex-basis: 100%; display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 700; color: var(--text2); }
+
+/* Ebene 3: „Wie gerechnet?“ / „Kurve“ */
+.eb-tiefer { margin-top: 8px; width: 100%; display: flex; justify-content: center; align-items: center; gap: 4px; padding: 7px 10px; border-radius: 10px; cursor: pointer;
+  border: 2px dashed var(--k-rand, var(--border)); background: transparent; color: var(--text2); font: 800 13px var(--font-text, system-ui); }
+.eb-tiefer.klein { width: auto; margin: 0; padding: 4px 10px; flex: none; }
+.eb-tiefer.auf i { transform: rotate(180deg); }
+.eb-ebene3 { margin-top: 8px; padding: 10px; border-radius: 12px; background: var(--bg3); font-size: 13px; display: flex; flex-direction: column; gap: 6px; }
+.eb-ebene3 p { margin: 0; }
+.eb-ebene3 .bk-svg { display: block; width: 100%; }
+.eb-formel { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: var(--text2); }
+.eb-klein { font-size: 11.5px; color: var(--text3); }
+.eb-klein b { color: var(--text); }
+.eb-teil { display: grid; grid-template-columns: 92px 30px minmax(0, 1fr) 40px; align-items: center; gap: 6px; font-weight: 700; }
+.eb-spur { position: relative; height: 12px; border-radius: 6px; background: var(--bg4); border: 2px solid var(--k-rand, var(--border)); overflow: hidden; }
+.eb-spur i { position: absolute; top: 0; bottom: 0; }
+.eb-spur i.plus { background: var(--app-gut); } .eb-spur i.minus { background: var(--app-schlecht); }
+.eb-teil em { font-style: normal; text-align: right; } .eb-teil em.plus { color: var(--k-gut-fg, var(--app-gut)); } .eb-teil em.minus { color: var(--k-schlecht-fg, var(--app-schlecht)); }
+
+/* D111 Entwicklung als Pfeil (5 Stufen) */
+.bk-satz { display: flex; align-items: center; gap: 10px; margin: 2px 0 4px; }
+.eb-pfeil { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; font-size: 26px; flex: none; color: #fff;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .2); }
+.eb-pfeil.p2 { background: var(--k-gruen-tief, var(--app-gut)); }
+.eb-pfeil.p1 { background: var(--app-gut); }
+.eb-pfeil.n0 { background: var(--bg4); color: var(--text); }
+.eb-pfeil.m1 { background: var(--app-mittel); color: #1b1408; }
+.eb-pfeil.m2 { background: var(--app-schlecht); }
+.eb-pfeil-text { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.15; }
+.eb-pfeil-text b { font: 700 16px var(--font-display, system-ui); }
+.eb-pfeil-text small { font-size: 12px; color: var(--text3); font-weight: 700; }
+
+/* ── Kaderliste (Ebene 1 am Handy) ─────────────────────────────────────── */
+body.dfl-shell #sub-squadlist.eb-kader .sq-sortrow, body.dfl-shell #sub-squadlist.eb-kader .blick-filter, body.dfl-shell #sub-squadlist.eb-kader .sqo-count,
+body.dfl-shell #sub-squadlist.eb-kader .form-legende, body.dfl-shell #sub-squadlist.eb-kader .med-einsatz { display: none !important; }
+body.dfl-shell #sub-squadlist.eb-kader .sqo-row .squad-dots, body.dfl-shell #sub-squadlist.eb-kader .sqo-row .sqo-val,
+body.dfl-shell #sub-squadlist.eb-kader .sqo-row .kpm-t.neben { display: none !important; }
+body.dfl-shell #sub-squadlist.eb-kader .sqo-row .sqo-name { min-width: 0; flex: 1 1 auto; }
+/* Name kürzt mit „…“, das Stil-Zeichen steht daneben; Polster unten/rechts, damit der Haken (ragt 5 px heraus) nicht abgeschnitten wird */
+#sub-squadlist.eb-kader .sqo-row .sqo-name { padding-bottom: 5px; margin-bottom: -5px; }
+.eb-nmzeile { display: flex; align-items: center; min-width: 0; max-width: 100%; }
+.eb-nmzeile .sqo-nm { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.eb-nmzeile .stil-z { margin-right: 5px; }
+body.dfl-shell #sub-squadlist.eb-kader .pos-filter-row:not(.sq-sortrow) { align-items: center; }
+.eb-filterknopf { display: none; }
+body.dfl-shell .eb-filterknopf { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; min-height: 36px; padding: 4px 10px; border-radius: 999px; cursor: pointer;
+  border: 3px solid var(--k-rand, var(--border)); background: var(--bg2); color: var(--text); font: 800 14px var(--font-text, system-ui); }
+body.dfl-shell .eb-filterknopf i { font-size: 18px; }
+body.dfl-shell .eb-filterknopf.an { background: var(--k-blau-knopf, #2c7cb5); border-color: var(--k-blau-schatten, #1d5a85); color: #fff; }
+.eb-filterknopf b { min-width: 20px; height: 20px; border-radius: 10px; background: var(--k-rot, var(--app-schlecht)); color: #fff; font-size: 12px; display: inline-grid; place-items: center; padding: 0 5px; }
+.eb-leiste { display: none; }
+body.dfl-shell .eb-leiste { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 2px 2px 8px; font-size: 12.5px; font-weight: 700; color: var(--text2); }
+.eb-legende { display: inline-flex; align-items: center; gap: 4px; }
+.eb-legende .stil-z { margin: 0 2px 0 0; }
+.eb-aktiv { display: inline-flex; align-items: center; gap: 4px; font: 800 12px var(--font-text, system-ui); min-height: 30px; padding: 3px 10px; border-radius: 999px; cursor: pointer;
+  border: 2px solid var(--k-blau-schatten, #1d5a85); background: var(--k-blau-knopf, #2c7cb5); color: #fff; }
+
+/* Filter-Blatt (Ebene 2) */
+.eb-einsatz { margin-bottom: 12px; }
+.eb-gruppe { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.eb-gruppe > small { font: 800 11.5px var(--font-text, system-ui); letter-spacing: .06em; text-transform: uppercase; color: var(--text3); }
+.eb-seg, .einst-seg { display: flex; background: var(--bg3); border: 3px solid var(--k-rand, var(--border)); border-radius: 14px; padding: 3px; gap: 3px; }
+.eb-seg button, .einst-seg button { flex: 1; min-height: 38px; border: 0; border-radius: 10px; background: none; color: var(--text2); font: 800 13px var(--font-text, system-ui); cursor: pointer; }
+.eb-seg button[aria-pressed="true"], .einst-seg button[aria-pressed="true"] { background: var(--k-blau-knopf, #2c7cb5); color: #fff; box-shadow: 0 3px 0 var(--k-blau-schatten, #1d5a85); }
+.einst-seg button:disabled { opacity: .45; cursor: default; }
+.eb-chips .stil-z { margin: 0 4px 0 0; }
+.app-sheet-titel .info-btn { margin-left: 4px; vertical-align: -2px; }
+[data-eb-fertig] { width: 100%; }
+/* ⓘ in Bannern und Karten bleibt ein kleines Zeichen (Kenney macht sonst aus jedem Knopf einen Druckknopf) */
+.season-banner .info-btn, .fc-name .info-btn, .sc .info-btn, .news-header .info-btn, .bk-feld .info-btn {
+  background: none !important; border: 0 !important; box-shadow: none !important; min-height: 0 !important; width: auto !important;
+  padding: 0 3px !important; margin: 0 0 0 2px !important; color: var(--text3) !important; font-size: 15px; vertical-align: -2px; transform: none !important; }
+
+/* Entlassen-Blatt */
+.eb-entl-kopf { display: flex; flex-direction: column; gap: 2px; margin: 0 4px 10px; }
+.eb-entl-kopf b { font: 700 18px var(--font-display, system-ui); }
+.eb-entl-kopf small { font-size: 12.5px; color: var(--text2); }
+.eb-entl-knoepfe { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.eb-entl-knoepfe .app-knopf { flex: 1 1 45%; }
+.eb-entl-knoepfe p { flex-basis: 100%; margin: 0; display: flex; gap: 6px; align-items: center; }
+.sw-link { border: 0; background: none; padding: 0 2px; font: 800 13px var(--font-text, system-ui); color: var(--k-blau, #2c7cb5); text-decoration: underline; cursor: pointer; }
+
+/* ── Free Agency (Ebene 1 am Handy): Zeilen ohne Knöpfe, Tipp → Blatt ── */
+.fa-pfeil { display: none; }
+body.dfl-shell #tr-sub-frei .market-row[data-welt] { position: relative; cursor: pointer; padding-right: 34px !important; min-height: 0 !important; }
+body.dfl-shell #tr-sub-frei .market-btns, body.dfl-shell #tr-sub-frei .loan-tag, body.dfl-shell #tr-sub-frei .fa-zuletzt,
+body.dfl-shell #tr-sub-frei .kpm-t.neben { display: none !important; }
+body.dfl-shell #tr-sub-frei .market-name { white-space: nowrap; }
+body.dfl-shell #tr-sub-frei .fa-pfeil { display: block; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 18px; }
+.fa-kopf { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.fa-leer { font-size: 13px; color: var(--text3); padding: 12px; text-align: center; }
+
+/* ── Draft-Jahrgang: sechs Spalten passen aufs Handy; Zeile → Talent-Blatt ── */
+.dfl-draft-filter { margin: 8px 0; }
+.eb-draft tbody tr[data-sc] { cursor: pointer; }
+.eb-draft td b { white-space: nowrap; }
+body.dfl-shell .eb-draft { overflow-x: visible; }
+body.dfl-shell .eb-draft table { width: 100%; min-width: 0 !important; table-layout: auto; font-size: 13px; }
+body.dfl-shell .eb-draft td, body.dfl-shell .eb-draft th { padding: 7px 3px; }
+body.dfl-shell .eb-draft td.num { white-space: nowrap; font-size: 12.5px; }
+.dfl-pr-name b .stil-z { vertical-align: -3px; }
+
+/* ── Blatt fremder Spieler (D111 „wie bei eigenen“), Talent-Blatt ───────── */
+.sc-fut-kopf { padding-right: 52px; }
+.fut-wert.fut-stufe { font-size: 30px; }
+.sc-typ { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; white-space: nowrap; }
+.sc-typ .stil-z { margin-left: 0; }
+.sc-talent { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 4px 0 6px; }
+.sc-talent > span { display: flex; flex-direction: column; gap: 2px; background: var(--bg3); border-radius: 12px; padding: 8px 10px; min-width: 0; }
+.sc-talent small { font-size: 11px; font-weight: 800; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; }
+.sc-talent b { font: 700 16px var(--font-zahl, var(--font-display, system-ui)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.eb-entw .bk-satz { margin-top: 0; }
+
+/* ── Trade-Zentrale, Wertliste ──────────────────────────────────────────── */
+.tz-mini { position: relative; }
+.tz-mini-stil { position: absolute; left: 4px; top: 4px; line-height: 0; pointer-events: none; }
+.tz-mini-stil .stil-z { margin: 0; }
+.tz-vorrat-filter, .tz-werte-filter { margin: 4px 0 8px; }
+.tz-zh-filter .eb-filter { min-height: 30px; }
+
+/* ── Einstellungen (Mehr → Einstellungen) ───────────────────────────────── */
+.einst-gruppe { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.einst-gruppe h4 { margin: 0; display: flex; align-items: center; gap: 6px; font: 700 15px var(--font-display, system-ui); color: var(--text); }
+.einst-zeile { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: 800; font-size: 14px; }
+.einst-zeile .einst-seg { flex: 0 0 160px; }
+.einst-schalter { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 52px; padding: 8px 12px; cursor: pointer; text-align: left;
+  border-radius: 14px; border: 3px solid var(--k-rand, var(--border)); background: var(--bg2); color: var(--text); font: 700 14px var(--font-text, system-ui); }
+.einst-schalter span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.einst-schalter small { font-size: 12px; font-weight: 600; color: var(--text3); }
+.einst-bahn { position: relative; flex: none; width: 46px; height: 26px; border-radius: 13px; background: var(--bg4); border: 2px solid var(--k-rand, var(--border)); transition: background .15s; }
+.einst-bahn::after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg2); box-shadow: 0 2px 0 rgba(0, 0, 0, .25); transition: left .15s; }
+.einst-schalter[aria-checked="true"] .einst-bahn { background: var(--app-gut); }
+.einst-schalter[aria-checked="true"] .einst-bahn::after { left: 22px; }
+@media (prefers-reduced-motion: reduce) { .einst-bahn, .einst-bahn::after { transition: none; } }
+
+/* ── Office: Hinweis zum Gelände hinter ⓘ ───────────────────────────────── */
+.gel-info { position: absolute; left: 8px; top: 8px; z-index: 2; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; padding: 0; cursor: pointer;
+  background: color-mix(in oklab, var(--bg2) 88%, transparent); border: 2px solid var(--k-rand, var(--border)); color: var(--text); font-size: 17px; }
+
+/* ── Front Office: „Wohin der Cap geht“ und „Größte Posten“ eingeklappt ─── */
+.blick-auf { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 40px; padding: 4px 2px; cursor: pointer; text-align: left;
+  border: 0; background: none; color: var(--text); font: 700 14px var(--font-text, system-ui); }
+.blick-auf > span { flex: 1; display: inline-flex; align-items: center; gap: 6px; }
+.blick-auf b { font-variant-numeric: tabular-nums; }
+.blick-auf > i:last-child { color: var(--text3); transition: transform .15s; }
+.blick-auf.auf > i:last-child { transform: rotate(180deg); }
+.blick-auf + .blick-auf, .blick-teil + .blick-auf, .blick-posten + .blick-auf { border-top: 2px solid var(--k-linie, var(--bg3)); }
+.blick-teil { display: flex; flex-direction: column; gap: 8px; }

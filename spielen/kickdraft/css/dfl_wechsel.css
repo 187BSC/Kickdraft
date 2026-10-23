@@ -1,0 +1,95 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   DFL · Wechselwünsche und Abgaben  ·  v1   (D99, 2026-10-11; lädt nach dfl_scouting.css)
+   ─────────────────────────────────────────────────────────────────────────
+   Marken der Gründe (Scout-Bericht, Trade-Zentrale), Blatt „Angebot“ (Postfach), Block „Zu haben in der Liga“ in der
+   Trade-Zentrale, Schilder „will weg“/„Abgabe“. Nur Tokens (Kenney Tag/Nacht), 2-px-Ränder, Kenney-Balken (k-bahn).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Marken (Gründe, Lücke, Cap, Preis) ───────────────────────────────────────── */
+.d99-chip { display: inline-flex; align-items: center; gap: 3px; font: 700 11px/1.35 var(--font-text, system-ui); border-radius: 999px; padding: 1px 7px;
+  background: var(--k-neutral-bg, var(--bg3)); color: var(--text2); border: 2px solid var(--k-linie, var(--border)); white-space: nowrap; }
+.d99-chip i { font-size: 12px; }
+.d99-chip.gut { background: var(--k-gut-bg, var(--bg3)); color: var(--k-gut-fg, var(--text)); border-color: color-mix(in oklab, var(--k-gut-fg, #2f6b1f) 30%, transparent); }
+.d99-chip.mittel { background: var(--k-mittel-bg, var(--bg3)); color: var(--k-mittel-fg, var(--text)); border-color: color-mix(in oklab, var(--k-mittel-fg, #7a5800) 30%, transparent); }
+.d99-chip.schlecht { background: var(--k-schlecht-bg, var(--bg3)); color: var(--k-schlecht-fg, var(--text)); border-color: color-mix(in oklab, var(--k-schlecht-fg, #a52a1e) 30%, transparent); }
+.d99-chip.info { background: var(--k-info-bg, var(--bg3)); color: var(--k-info-fg, var(--text)); border-color: color-mix(in oklab, var(--k-info-fg, #1f5f8f) 30%, transparent); }
+.d99-chip.warn { background: var(--k-mittel-bg, var(--bg3)); color: var(--k-mittel-fg, var(--text)); border-color: color-mix(in oklab, var(--k-mittel-fg, #7a5800) 30%, transparent); }
+.d99-chip.preis { color: var(--k-gut-fg, var(--text)); font-variant-numeric: tabular-nums; }
+/* in den Zeilen des Scout-Berichts (sc-zeile, schmale Spalte) kleiner */
+.sc-zeile .d99-chip { font-size: 10.5px; padding: 0 5px; }
+.sc-zeile .d99-chip i { font-size: 11px; }
+
+/* ── Blatt „Angebot“ ───────────────────────────────────────────────────────── */
+.d99-angebot { display: flex; flex-direction: column; gap: 10px; }
+.d99-wer { display: flex; gap: 10px; align-items: center; }
+.d99-wer-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.d99-wer-text > b { font: 800 18px/1.15 var(--font-display, var(--font-text, system-ui)); }
+.d99-zeile { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+.d99-zeile small { color: var(--text2); font-size: 12px; font-variant-numeric: tabular-nums; }
+.d99-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.d99-gesicht { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: var(--bg4, var(--bg3)); border: 2px solid var(--k-linie, var(--border)); flex: none; display: block; }
+.d99-gesicht svg { width: 100%; height: 125%; display: block; margin-top: -1px; }
+.d99-gesicht.gross { width: 60px; height: 60px; }
+.d99-warum { margin: 0; font-size: 13px; color: var(--text2); }
+.d99-tausch { display: grid; grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr); gap: 6px; align-items: start; }
+.d99-seite { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.d99-seite > small { font: 800 11px var(--font-text, system-ui); letter-spacing: .06em; text-transform: uppercase; color: var(--text3); }
+.d99-teil { display: flex; gap: 8px; align-items: center; background: var(--bg3); border: 2px solid var(--k-linie, var(--border)); border-radius: 12px; padding: 5px 8px; min-width: 0; }
+.d99-teil .d99-gesicht { width: 32px; height: 32px; }
+.d99-teil > span:last-child { display: flex; flex-direction: column; min-width: 0; }
+.d99-teil b { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.d99-teil small { font-size: 11.5px; color: var(--text2); font-variant-numeric: tabular-nums; }
+.d99-teil.pick { border-style: dashed; border-color: var(--k-rand, var(--border)); }
+.d99-teil.pick > i { font-size: 20px; color: var(--k-info-fg, var(--text2)); flex: none; }
+.d99-pfeil { align-self: center; justify-self: center; font-size: 20px; color: var(--text3); }
+.d99-meter { display: flex; flex-direction: column; gap: 5px; background: var(--bg3); border: 2px solid var(--k-linie, var(--border)); border-radius: 14px; padding: 8px 10px; }
+.d99-meter > small { font-size: 12px; color: var(--text2); }
+.d99-meter-zeile { display: grid; grid-template-columns: 82px minmax(0, 1fr) 36px; gap: 8px; align-items: center; font-size: 12.5px; color: var(--text2); }
+.d99-meter-zeile b { color: var(--text); text-align: right; font-variant-numeric: tabular-nums; }
+.d99-bahn { display: block; height: 12px; border: 2px solid var(--k-rand, var(--border)); border-radius: 6px; background: var(--bg4, var(--bg2)); overflow: hidden; box-sizing: border-box; }
+.d99-fuell { display: block; height: 100%; }
+.d99-fuell.preis { background: var(--app-mittel, #d29a0c); }
+.d99-fuell.paket { background: var(--k-blau-knopf, #2c7cb5); }
+.d99-weg { color: var(--k-schlecht-fg, var(--text2)); }
+.d99-knoepfe { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.d99-knoepfe .app-knopf { min-width: 0; padding-inline: 6px; }
+@media (max-width: 380px) { .d99-knoepfe { grid-template-columns: 1fr 1fr; } .d99-knoepfe .app-knopf.haupt { grid-column: 1 / -1; } }
+
+/* ── Trade-Zentrale: „Zu haben in der Liga“ ───────────────────────────────── */
+.tz-zh { display: flex; flex-direction: column; gap: 8px; margin: 10px 0 12px; padding: 10px; background: var(--bg2); border: 3px solid var(--k-rand, var(--border));
+  border-radius: 16px; box-shadow: 0 4px 0 var(--k-rand, transparent); }
+.tz-zh-kopf { display: flex; flex-direction: column; gap: 1px; }
+.tz-zh-kopf b { display: flex; align-items: center; gap: 6px; font: 800 15px/1.2 var(--font-text, system-ui); color: var(--text); }
+.tz-zh-kopf b i { font-size: 18px; color: var(--k-schlecht-fg, var(--text2)); }
+.tz-zh-kopf small { font-size: 12px; color: var(--text2); }
+.tz-zh-filter { display: flex; flex-wrap: wrap; gap: 6px; }
+.tz-zh-chip { font: 800 12px var(--font-text, system-ui); border-radius: 999px; padding: 4px 10px; min-height: 32px; border: 2px solid var(--k-rand, var(--border));
+  background: var(--bg2); color: var(--text2); cursor: pointer; }
+.tz-zh-chip b { font-variant-numeric: tabular-nums; }
+.tz-zh-chip[aria-pressed="true"] { background: var(--k-blau-knopf, #2c7cb5); border-color: var(--k-blau-schatten, #1d5a85); color: #fff; }
+.tz-zh-liste { display: flex; flex-direction: column; gap: 6px; }
+.tz-zh-zeile { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: center; width: 100%; text-align: left; font: inherit; color: var(--text);
+  background: var(--bg3); border: 2px solid var(--k-linie, var(--border)); border-radius: 12px; padding: 6px 8px; cursor: pointer; min-height: 48px; }
+.tz-zh-zeile:hover { border-color: var(--k-rand, var(--border)); }
+.tz-zh-zeile.drin { border-color: var(--k-blau-knopf, #2c7cb5); background: var(--k-info-bg, var(--bg3)); }
+.tz-zh-zeile .tz-wappen { width: 22px; height: 24px; }
+.tz-zh-wer { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tz-zh-wer b { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tz-zh-wer small { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font-size: 12px; color: var(--text2); }
+.tz-zh-gruende { display: flex; flex-wrap: wrap; gap: 4px; }
+.tz-zh-grund { font: 700 10.5px/1.4 var(--font-text, system-ui); border-radius: 999px; padding: 0 6px; border: 2px solid var(--k-linie, var(--border));
+  background: var(--k-neutral-bg, var(--bg2)); color: var(--text2); white-space: nowrap; }
+.tz-zh-grund.weg, .tz-zh-grund.cap { background: var(--k-schlecht-bg, var(--bg2)); color: var(--k-schlecht-fg, var(--text)); border-color: color-mix(in oklab, var(--k-schlecht-fg, #a52a1e) 30%, transparent); }
+.tz-zh-grund.neuaufbau { background: var(--k-mittel-bg, var(--bg2)); color: var(--k-mittel-fg, var(--text)); border-color: color-mix(in oklab, var(--k-mittel-fg, #7a5800) 30%, transparent); }
+.tz-zh-grund.stil { background: var(--k-info-bg, var(--bg2)); color: var(--k-info-fg, var(--text)); border-color: color-mix(in oklab, var(--k-info-fg, #1f5f8f) 30%, transparent); }
+.tz-zh-werte { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.tz-zh-werte small { font: 800 11px var(--font-text, system-ui); color: var(--k-gut-fg, var(--text2)); font-variant-numeric: tabular-nums; }
+.tz-zh-mehr { align-self: center; display: inline-flex; align-items: center; gap: 4px; font: 800 13px var(--font-text, system-ui); background: none; border: 0;
+  color: var(--text); cursor: pointer; padding: 6px 10px; min-height: 36px; }
+.tz-zh-hinweis { display: flex; align-items: center; gap: 4px; color: var(--k-gut-fg, var(--text2)); }
+.tz-schild.weg, .tz-schild.ab { white-space: nowrap; }
+.tz-schild.weg { color: var(--k-schlecht-fg, #a52a1e); } .tz-schild.ab { color: var(--k-mittel-fg, #7a5800); }
+.tz-ecke.weg { color: var(--k-schlecht-fg, #a52a1e); } .tz-ecke.ab { color: var(--k-mittel-fg, #7a5800); }
+/* Unterzeile der Listen im Scout-Bericht: Verein + weitere Gründe, zu lang → „…“ statt abgeschnitten */
+.sc-name small .d99-sub { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.d99-knoepfe .app-knopf.haupt:first-child:not(:only-child) { grid-column: 1 / -1; }   /* Annehmen über die ganze Breite (Nutzer 2026-10-14) */

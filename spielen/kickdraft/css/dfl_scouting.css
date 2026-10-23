@@ -1,0 +1,189 @@
+/* DFL · Scouting nach Positionen (D78, js/dfl_scouting_patch.js) – Flächen nur mit Tokens (Kenney Tag/Nacht).
+   Feste (helle) Farben nur in den Stufen-Marken Bronze/Silber/Gold wie die FUT-Karten; Elite über Tokens. */
+
+.sc { display: flex; flex-direction: column; gap: 10px; margin: 12px 0 18px; }
+.sc-titel { display: flex; align-items: center; gap: 6px; }
+.sc-frei { margin-left: auto; font: 800 12px/1 var(--font-zahl, system-ui); color: var(--text2); background: var(--bg3); border-radius: 999px; padding: 5px 10px; white-space: nowrap; }
+.sc-reiter { display: flex; }
+.sc-reiter .subtab { flex: 1 1 0; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+.sc-zaehler { display: inline-grid; place-items: center; min-width: 18px; height: 18px; border-radius: 9px; padding: 0 5px; font: 800 11px/1 var(--font-zahl, system-ui);
+  background: var(--k-gold, #f1c40f); color: var(--k-gold-text, #2a1f05); }
+.sc-inhalt { display: flex; flex-direction: column; gap: 9px; }
+.sc .leise, .sc-blatt .leise, .sc-dialog .leise { color: var(--text3); }
+.sc .klein, .sc-blatt .klein { font-size: 12px; }
+
+/* Karten (Aufträge, Bericht) */
+.sc-karte { background: var(--bg2); border: 3px solid var(--k-rand, var(--border)); border-radius: 16px; padding: 10px 12px; display: flex; flex-direction: column; gap: 7px;
+  box-shadow: 0 4px 0 var(--k-rand, transparent); }
+.sc-karte.leise-karte { border-width: 2px; border-color: var(--k-linie, var(--border)); box-shadow: none; }
+.sc-karte.gewaehlt { border-color: var(--k-blau, #3498db); }
+.sc-karte h4 { margin: 0; display: flex; align-items: center; gap: 8px; font: 800 15px/1.2 var(--font-display, system-ui); color: var(--text); }
+.sc-karte h4 .ti { font-size: 18px; color: var(--text2); }
+.sc-karte p { margin: 0; font-size: 13px; color: var(--text2); line-height: 1.4; }
+.sc-tag { margin-left: auto; font: 800 11px/1 var(--font-text, system-ui); padding: 5px 8px; border-radius: 999px; background: var(--bg3); color: var(--text2); white-space: nowrap; }
+.sc-tag.blau { background: var(--k-info-bg, var(--bg3)); color: var(--k-info-fg, var(--text)); }
+.sc-balken { height: 12px; border-radius: 7px; background: var(--bg3); border: 2px solid var(--k-linie, var(--border)); overflow: hidden; }
+.sc-balken i { display: block; height: 100%; background: var(--k-blau, #3498db); }
+.sc-scouts { display: flex; flex-wrap: wrap; gap: 6px; }
+.sc-scout { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 3px 4px 3px 3px; border-radius: 999px; background: var(--bg3);
+  border: 2px solid var(--k-linie, var(--border)); color: var(--text2); min-height: 32px; }
+.sc-scout.frei { padding-right: 10px; }
+.sc-scout i { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 11px; background: var(--k-blau-knopf, #2c7cb5); color: #fff;
+  font: 800 11px/1 var(--font-zahl, system-ui); font-style: normal; }
+.sc-scout.frei i { background: var(--bg4); color: var(--text3); }
+.sc-scout b { color: var(--text); max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sc-x { border: 0; background: none; color: var(--text3); cursor: pointer; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 14px; font-size: 14px; }
+.sc-x:hover { background: var(--bg4); color: var(--text); }
+.sc-knoepfe { display: flex; flex-wrap: wrap; gap: 8px; }
+.sc-knoepfe .app-knopf { flex: 1 1 45%; }
+.sc-neu-auftrag { width: 100%; }
+.sc-ueber { display: flex; align-items: center; gap: 6px; margin: 6px 2px 0; font: 800 12px/1.2 var(--font-text, system-ui); letter-spacing: .06em; text-transform: uppercase; color: var(--text3); }
+.sc-ueber small { text-transform: none; letter-spacing: 0; font-weight: 600; }
+
+/* Kandidaten: Kopf, Filter */
+.sc-kopf2 { display: flex; flex-direction: column; gap: 7px; }
+.sc-kopf2 .sc-z1 { font-size: 14px; color: var(--text); }
+.sc-kopf2 small { font-size: 12px; line-height: 1.35; }
+.sc-chips-reihe { display: flex; flex-wrap: wrap; gap: 6px; }
+.sc-chip { font: 800 12px var(--font-text, system-ui); min-height: 34px; padding: 4px 11px; border-radius: 999px; cursor: pointer;
+  border: 2px solid var(--k-rand, var(--border)); background: var(--bg2); color: var(--text2); }
+.sc-chip b { color: var(--text); margin-left: 2px; }
+.sc-chip[aria-pressed="true"] { background: var(--k-blau-knopf, #2c7cb5); border-color: var(--k-blau-schatten, #1d5a85); color: #fff; }
+.sc-chip[aria-pressed="true"] b { color: #fff; }
+
+/* Zeilen (Kandidaten, Berichte, Listen von D99) */
+.sc-liste { display: flex; flex-direction: column; gap: 6px; }
+.sc-zeile { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto auto; gap: 8px; align-items: center; padding: 6px 8px; min-height: 54px;
+  background: var(--bg2); border: 2px solid var(--k-linie, var(--border)); border-radius: 14px; cursor: pointer; color: var(--text); text-align: left; }
+.sc-zeile:hover { border-color: var(--k-rand, var(--border)); }
+.sc-zeile:focus-visible { outline: 2px solid var(--k-blau, #3498db); outline-offset: 2px; }
+.sc-zeile.fertig { border-color: color-mix(in oklab, var(--k-blau, #3498db) 55%, var(--k-linie, var(--border))); }
+.sc-zeile.sc-neu { animation: sc-auf 1s ease-out 2; }
+@keyframes sc-auf { 0% { box-shadow: 0 0 0 0 var(--k-blau, #3498db); } 45% { box-shadow: 0 0 0 6px color-mix(in oklab, var(--k-blau, #3498db) 45%, transparent); } 100% { box-shadow: 0 0 0 0 transparent; } }
+.sc-gesicht { display: block; width: 36px; height: 42px; border-radius: 9px; overflow: hidden; position: relative; background: var(--bg3); flex: none; }
+.sc-gesicht svg { position: absolute; width: 104%; height: auto; left: -2%; top: -6%; }
+.sc-gesicht.gross { width: 72px; height: 86px; border-radius: 14px; }
+.sc-name { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; gap: 2px; }
+.sc-z1 { display: flex; align-items: center; gap: 5px; min-width: 0; }
+.sc-name b { font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.sc-name small { font-size: 11.5px; color: var(--text3); display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; }
+.sc-name small .pos-badge-sm { font-size: 9.5px; padding: 1px 4px; margin: 0; flex: none; }
+.sc-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+.sc-wappen { display: inline-block; width: 14px; height: 15px; flex: none; }
+.sc-werte { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-size: 11px; min-width: 52px; }
+.sc-pot { color: var(--text2); white-space: nowrap; }
+.sc-pot .dfl-sterne { margin-left: 0; gap: 1px; }
+.sc-pot .dfl-sterne i { width: 11px; height: 10px; }
+.sc-pot .dfl-sterne b { background-size: 11px 10px; }
+.sc-status { display: flex; justify-content: flex-end; align-items: center; min-width: 50px; }
+
+/* Stufe (öffentlich), genaue Zahl, unbekannt */
+.sc-stufe { display: inline-block; font: 800 11px/1 var(--font-zahl, system-ui); padding: 3px 6px; border-radius: 6px; white-space: nowrap; border: 1.5px solid rgb(0 0 0 / .2); }
+.sc-stufe.bronze { background: #e3b48a; color: #2b1608; }
+.sc-stufe.silber { background: #d7dde5; color: #18202c; }
+.sc-stufe.gold { background: #f0cd57; color: #2a1c02; }
+.sc-stufe.elite { background: var(--k-info-bg, #dcebf7); color: var(--k-info-fg, #1f5f8f); border-color: var(--k-gold-tief, #b7950b); }   /* Token: im Tag-Stil keine dunkle Fläche */
+.sc-zahl { font: 800 16px/1 var(--font-zahl, system-ui); color: var(--text); font-variant-numeric: tabular-nums; }
+.sc-zahl.leise { font-size: 12px; color: var(--text2); }
+.sc-unbekannt { display: inline-grid; place-items: center; min-width: 20px; height: 18px; border-radius: 6px; background: var(--bg4); color: var(--text2); font: 800 11px/1 var(--font-zahl, system-ui); }
+
+/* Passung, Ring (Scout unterwegs), Knöpfe */
+.sc-passung { display: inline-flex; align-items: center; gap: 4px; font: 800 12px/1 var(--font-zahl, system-ui); padding: 5px 7px; border-radius: 999px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sc-passung i { width: 8px; height: 8px; border-radius: 4px; display: inline-block; }
+.sc-passung.gut { background: var(--k-gut-bg, var(--bg3)); color: var(--k-gut-fg, var(--text)); } .sc-passung.gut i { background: var(--app-gut, #3d9a2a); }
+.sc-passung.mittel { background: var(--k-mittel-bg, var(--bg3)); color: var(--k-mittel-fg, var(--text)); } .sc-passung.mittel i { background: var(--app-mittel, #d29a0c); }
+.sc-passung.schlecht { background: var(--k-schlecht-bg, var(--bg3)); color: var(--k-schlecht-fg, var(--text)); } .sc-passung.schlecht i { background: var(--app-schlecht, #d0402f); }
+.sc-passung.neutral { background: var(--bg3); color: var(--text3); }
+.sc-ring { position: relative; width: 38px; height: 38px; display: inline-block; flex: none; }
+.sc-ring svg { width: 38px; height: 38px; transform: rotate(-90deg); }
+.sc-ring circle { fill: none; stroke-width: 4; }
+.sc-ring-bahn { stroke: var(--bg4); }
+.sc-ring-fuell { stroke: var(--k-blau, #3498db); stroke-linecap: round; }
+.sc-ring span { position: absolute; inset: 0; display: grid; place-items: center; font: 800 9.5px/1 var(--font-zahl, system-ui); color: var(--text2); }
+.sc-mini { font: 800 12px/1 var(--font-text, system-ui); padding: 8px 9px; min-height: 34px; border-radius: 10px; border: 0; cursor: pointer;
+  background: var(--k-blau-knopf, #2c7cb5); color: #fff; box-shadow: 0 3px 0 var(--k-blau-schatten, #1d5a85); }
+.sc-mini:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--k-blau-schatten, #1d5a85); }
+.sc-schloss { color: var(--k-schlecht-fg, #a52a1e); font-size: 18px; display: grid; place-items: center; width: 34px; height: 34px; }
+.sc-teuer { flex: none; font: 800 10px/1 var(--font-zahl, system-ui); padding: 2px 4px; border-radius: 5px; background: var(--k-mittel-bg, var(--bg3)); color: var(--k-mittel-fg, var(--text)); }
+.sc-knopf { display: inline-flex; align-items: center; justify-content: center; gap: 4px; font: 800 12px/1 var(--font-text, system-ui); padding: 7px 9px; min-height: 34px;
+  border-radius: 10px; border: 2px solid var(--k-rand, var(--border)); background: var(--bg3); color: var(--text); box-shadow: 0 3px 0 var(--k-rand, transparent);
+  cursor: pointer; white-space: nowrap; }
+.sc-knopf .ti { font-size: 15px; }
+.sc-knopf:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--k-rand, transparent); }
+.sc-knopf.bericht { background: var(--k-info-bg, var(--bg3)); color: var(--k-info-fg, var(--text)); }
+.sc-knopf.unterwegs { color: var(--text2); }
+
+/* Bericht */
+.sc-bericht { display: flex; flex-direction: column; gap: 9px; }
+.sc-bericht-kopf { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 12px; align-items: center; }
+.sc-bericht-kopf h4 { margin: 0; font: 800 18px/1.15 var(--font-display, system-ui); }
+.sc-meta { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; font-size: 12px; color: var(--text2); margin-top: 4px; }
+.sc-kacheln { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 2px; }
+.sc-kachel { display: flex; flex-direction: column; gap: 4px; padding: 8px; border-radius: 12px; background: var(--bg3); min-width: 0; }
+.sc-kachel small { font: 800 10.5px/1.1 var(--font-text, system-ui); color: var(--text3); letter-spacing: .05em; text-transform: uppercase; }
+.sc-kachel b { font: 800 18px/1.1 var(--font-zahl, system-ui); color: var(--text); }
+.sc-kachel > span { font-size: 11px; color: var(--text2); min-height: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.sc-kachel .dfl-sterne { margin-left: 0; }
+.sc-kachel .sc-twtyp { flex-basis: 100%; font-weight: 800; color: var(--text2); overflow-wrap: anywhere; }   /* D156: Torwart-Typ */
+.sc-teil { display: grid; grid-template-columns: 96px minmax(0, 1fr) 34px; gap: 8px; align-items: center; font-size: 12.5px; color: var(--text2); }
+.sc-spur { position: relative; height: 10px; border-radius: 5px; background: var(--bg3); }
+.sc-spur::after { content: ''; position: absolute; left: calc(50% - 1px); top: -2px; bottom: -2px; width: 2px; background: var(--k-linie, var(--border)); }
+.sc-spur i { position: absolute; top: 0; bottom: 0; border-radius: 5px; }
+.sc-spur i.plus { background: var(--app-gut, #3d9a2a); }
+.sc-spur i.minus { background: var(--app-schlecht, #d0402f); }
+.sc-teil b { text-align: right; font-variant-numeric: tabular-nums; color: var(--text2); }
+.sc-teil b.plus { color: var(--k-gut-fg, var(--text)); }
+.sc-teil b.minus { color: var(--k-schlecht-fg, var(--text)); }
+.sc-details { display: flex; flex-wrap: wrap; gap: 6px; }
+.sc-detail { font-size: 12px; padding: 4px 9px; border-radius: 999px; background: var(--bg3); color: var(--text2); }
+.sc-detail b { color: var(--text); }
+.sc-eig { display: flex; flex-wrap: wrap; gap: 4px; }
+.sc-zurueck { align-self: flex-start; display: inline-flex; align-items: center; gap: 4px; border: 0; background: none; color: var(--k-info-fg, var(--text)); font: 800 13px var(--font-text, system-ui);
+  cursor: pointer; padding: 6px 2px; min-height: 36px; }
+.sc-leer { display: flex; gap: 8px; align-items: center; padding: 14px; border-radius: 14px; background: var(--bg2); border: 2px dashed var(--k-linie, var(--border)); color: var(--text2); font-size: 13px; line-height: 1.4; }
+.sc-leer .ti { font-size: 22px; color: var(--text3); flex: none; }
+.sc-leer.klein { padding: 10px; font-size: 12.5px; }
+.sc-fuss { font-size: 12px; color: var(--text2); padding: 8px 12px; border-radius: 12px; background: var(--bg2); border: 2px solid var(--k-linie, var(--border)); }
+.sc-fuss b { color: var(--text); }
+
+/* Blatt (Handy) und Fenster (PC) für fremde Spieler */
+.sc-blatt { padding: 0 0 10px; }
+#app-blatt .app-blatt-box > .sc-blatt-titel { min-height: 40px; padding-right: 52px; box-sizing: border-box; display: flex; align-items: center; }
+.sc-dialog > .sc-blatt-titel { padding-right: 52px; min-height: 36px; display: flex; align-items: center; }
+.sc-dialog { position: relative; max-width: 540px; }
+.sc-dialog .sc-ov-zu { position: absolute; right: 12px; top: 12px; z-index: 2; }
+
+/* Trade-Zentrale: Berichte zum Tausch */
+.sc-tausch { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; border-radius: 12px; background: var(--bg3); border: 2px dashed var(--k-linie, var(--border)); margin: 8px 0 2px; }
+.sc-tausch-zeile { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12.5px; }
+.sc-tausch-name { display: flex; align-items: center; gap: 6px; min-width: 0; flex-wrap: wrap; color: var(--text2); }
+.sc-tausch-name b { color: var(--text); }
+
+/* Wertliste: Name fremder Spieler antippbar (Bericht bzw. „Scouten“) */
+.sc-namelink { border: 0; background: none; padding: 0; font: inherit; font-weight: 800; color: var(--text); cursor: pointer; text-align: left;
+  text-decoration: underline dotted; text-underline-offset: 3px; }
+
+/* Free Agency (transfermarkt_balance.js): Knopf neben „Verpflichten“ */
+.market-btns .sc-knopf { margin-bottom: 4px; }
+.market-meta .sc-stufe { vertical-align: 1px; }
+
+@media (prefers-reduced-motion: reduce) { .sc-zeile.sc-neu { animation: none; } .sc-mini:active, .sc-knopf:active { transform: none; } }
+
+/* D120: Scouting mit Chefscout – Segment, Positions-Chips, Dein Pick, aufklappbare Zeile mit Satz */
+#dfl-scouting .cs-kopf { margin-bottom: 10px; }
+.sc-seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0 0 10px; border: 2px solid var(--k-rand, var(--border)); border-radius: 12px; overflow: hidden; }
+.sc-seg button { min-height: 40px; border: 0; background: var(--bg2); color: var(--text); font: 800 14px var(--font-text, system-ui); cursor: pointer; }
+.sc-seg button + button { border-left: 2px solid var(--k-rand, var(--border)); }
+.sc-seg button.an { background: var(--k-blau-knopf, #2c7cb5); color: #fff; }
+.sc-seg button:focus-visible { outline: 2px solid var(--k-blau, #3498db); outline-offset: -4px; }
+.sc-pos { margin-bottom: 6px; }
+.sc-pos .sc-chip { min-width: 44px; justify-content: center; }
+.sc-chip i { margin-right: 3px; }
+.sc-chip-steal { border-color: var(--gold, #a86b12); }
+.sc-pick { display: flex; align-items: center; gap: 6px; margin: 10px 2px 6px; font-size: 13px; color: var(--text2); }
+.sc-pick b { color: var(--text); font-size: 15px; }
+.sc-eintrag { display: flex; flex-direction: column; gap: 6px; }
+.sc-eintrag.offen { padding-bottom: 8px; border-bottom: 2px solid var(--k-rand, var(--border)); }
+.sc-eintrag .sc-knoepfe { display: flex; flex-wrap: wrap; gap: 6px; }
+.sc-eintrag .sc-knoepfe .app-knopf { flex: 1 1 auto; min-height: 40px; }
+

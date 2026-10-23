@@ -1,0 +1,239 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   DFL · Bilder statt Text  ·  v1   (D76, freigegeben 2026-10-10; js/dfl_bilder_patch.js)
+   ─────────────────────────────────────────────────────────────────────────
+   Karten im Postfach (Spieltag, Aufstellung, Stimmung, Saisonplan, Tausch, KI-Trade, Verlorenes Jahr), Eigentümer-Ampel,
+   Cap-Untergrenze als 4-Saisons-Balken, Ringe der Trainingsgruppe. Nur Tokens (Tag und Nacht); Finanzfarben als eigene
+   Tokens in beiden Stilen (wie in der Vorschau spiel/dfl_bilder_vorschau.html).
+   ═══════════════════════════════════════════════════════════════════════════ */
+html.freundlich.kenney.tag { --bk-tv: #2c7cb5; --bk-tickets: #e0a00c; --bk-merch: #4d8236; --bk-spons: #8e5cc2; --bk-kader: #c0392b; --bk-betrieb: #8b5a2b; --bk-anlagen: #6d6a63; }
+html.freundlich.kenney.dark { --bk-tv: #3f8ccc; --bk-tickets: #e9b42a; --bk-merch: #3fae5c; --bk-spons: #a77be0; --bk-kader: #e2574a; --bk-betrieb: #a87543; --bk-anlagen: #8a8f9c; }
+
+/* ── Postfach: Karte im Text der Meldung ───────────────────────────────── */
+.pfk { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; min-width: 0; }
+/* Karten-Meldung: Zeichen + Titel (+ Knopf) oben, die Karte darunter über die ganze Breite */
+.pf-item:has(.pfk) { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "ico titel akt" "karte karte karte" "meta meta meta";
+  column-gap: 10px; row-gap: 2px; align-items: center; }
+.pf-item:has(.pfk) .pf-ico { grid-area: ico; }
+.pf-item:has(.pfk) .pf-body { display: contents; }
+.pf-item:has(.pfk) .pf-title { grid-area: titel; min-width: 0; }
+.pf-item:has(.pfk) .pf-text { grid-area: karte; overflow: visible; display: block; -webkit-line-clamp: unset; margin-top: 2px; }
+.pf-item:has(.pfk) .pf-meta { grid-area: meta; }
+.pf-item:has(.pfk) .pf-actions { grid-area: akt; align-self: center; }
+.pf-title .info-btn { vertical-align: -2px; }
+.bk-erg-marke b { font: 800 16px/1 var(--font-display, inherit); }
+.bk-chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 999px; background: var(--bg3); border: 2px solid var(--k-linie, var(--border));
+  font: 700 11.5px/1.3 var(--font-text, inherit); color: var(--text2); white-space: nowrap; }
+.bk-chip .ti { font-size: 13px; }
+.bk-chip.gut { background: var(--k-gut-bg); color: var(--k-gut-fg); border-color: color-mix(in oklab, var(--k-gut-fg) 30%, transparent); }
+.bk-chip.mittel { background: var(--k-mittel-bg); color: var(--k-mittel-fg); border-color: color-mix(in oklab, var(--k-mittel-fg) 30%, transparent); }
+.bk-chip.schlecht { background: var(--k-schlecht-bg); color: var(--k-schlecht-fg); border-color: color-mix(in oklab, var(--k-schlecht-fg) 30%, transparent); }
+.bk-fazit { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 2px 8px; padding: 7px 10px; border-radius: 12px; font: 700 12.5px/1.3 var(--font-text, inherit); }
+.bk-fazit .ti { font-size: 17px; }
+.bk-fazit small { grid-column: 2; font-weight: 600; opacity: .9; }
+.bk-fazit.gut { background: var(--k-gut-bg); color: var(--k-gut-fg); }
+.bk-fazit.schlecht { background: var(--k-schlecht-bg); color: var(--k-schlecht-fg); }
+.bk-legende { display: flex; flex-wrap: wrap; gap: 3px 12px; font-size: 11.5px; color: var(--text2); }
+.bk-legende span { display: inline-flex; align-items: center; gap: 5px; }
+.bk-legende i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; }
+.bk-legende b { color: var(--text); font-variant-numeric: tabular-nums; }
+.bk-mio { margin-left: auto; color: var(--text3); }
+
+/* Ring (Zuschauer, Eigentümer, Trainingsgruppe) */
+.bk-ring { width: 34px; height: 34px; flex: none; }
+.bk-ring circle { fill: none; stroke-width: 4; }
+.bk-ring .bk-ring-grund { stroke: var(--bg4); }
+.bk-ring .bk-ring-wert { stroke: var(--k-blau-knopf); stroke-linecap: round; }
+.bk-ring.gut .bk-ring-wert { stroke: var(--app-gut); } .bk-ring.mittel .bk-ring-wert { stroke: var(--app-mittel); }
+.bk-ring.schlecht .bk-ring-wert { stroke: var(--app-schlecht); } .bk-ring.info .bk-ring-wert { stroke: var(--k-blau); }
+.bk-ring text { fill: var(--text); font: 800 9px var(--font-zahl, sans-serif); }
+.bk-ring.w15 .bk-ring-wert { stroke-width: 3; } .bk-ring.w20 .bk-ring-wert { stroke-width: 3.4; } .bk-ring.w25 .bk-ring-wert { stroke-width: 3.8; }
+.bk-ring.w40 .bk-ring-wert { stroke-width: 4.8; } .bk-ring.w60 .bk-ring-wert { stroke-width: 6.2; }
+
+/* 1 · Spieltag */
+.bk-erg { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; }
+.bk-team { display: flex; align-items: center; gap: 7px; min-width: 0; font: 800 15px/1.1 var(--font-display, inherit); color: var(--text); }
+.bk-team.rechts { justify-content: flex-end; }
+html .bk-team .bk-wappen.lg-crest { width: 28px !important; height: 30px !important; font-size: 0 !important; flex: none; }
+.bk-stand { display: inline-flex; align-items: center; gap: 2px; padding: 3px 12px; border-radius: 12px; background: var(--bg3); border: 3px solid var(--k-rand, var(--border));
+  font: 800 24px/1 var(--font-zahl, inherit); color: var(--text); font-variant-numeric: tabular-nums; }
+.bk-stand i { font-style: normal; color: var(--text3); padding: 0 1px; }
+.bk-kacheln { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.bk-kacheln.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+/* fünf Kacheln (Heimspiel mit Platz und Moral): Stadion oben in drei, Tabelle und Moral unten in zwei breiten Kacheln */
+.bk-kacheln.n5 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.bk-kacheln.n5 > :nth-child(-n+3) { grid-column: span 2; }
+.bk-kacheln.n5 > :nth-child(n+4) { grid-column: span 3; flex-direction: row; justify-content: center; gap: 7px; padding: 5px 6px; }
+.bk-kacheln.n5 > :nth-child(n+4) > .ti { font-size: 18px; height: auto; line-height: 1; }
+.bk-kachel { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 7px 3px; border-radius: 12px; background: var(--bg3); border: 2px solid var(--k-linie, var(--border));
+  text-align: center; min-width: 0; }
+.bk-kachel > .ti { font-size: 22px; height: 26px; line-height: 26px; color: var(--text2); }
+.bk-kachel .bk-ring { width: 26px; height: 26px; }
+.bk-kachel b { font: 800 15px/1.1 var(--font-zahl, inherit); color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bk-kachel small { font-size: 10.5px; line-height: 1.15; color: var(--text3); }
+.bk-kachel.gut b, .bk-kachel.gut > .ti { color: var(--k-gut-fg); }
+.bk-kachel.schlecht b, .bk-kachel.schlecht > .ti { color: var(--k-schlecht-fg); }
+.bk-kachel.mittel b, .bk-kachel.mittel > .ti { color: var(--k-mittel-fg); }
+
+/* 2 · Aufstellung angepasst */
+.bk-wechsel { display: grid; grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr); align-items: center; gap: 4px; }
+.bk-sp { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 4px; border-radius: 12px; background: var(--bg3); border: 2px solid var(--k-linie, var(--border));
+  text-align: center; min-width: 0; }
+.bk-sp b { font-size: 13px; font-weight: 800; color: var(--text); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bk-sp small { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; color: var(--text3); }
+.bk-sp small .ti { font-size: 13px; }
+.bk-sp-st { font: 800 19px/1 var(--font-zahl, inherit); color: var(--text); }
+.bk-sp.leer { color: var(--text3); justify-content: center; min-height: 80px; }
+.bk-sp.leer .ti { font-size: 26px; }
+.bk-pfeil { color: var(--text3); font-size: 20px; text-align: center; }
+.ko-gesicht.bk-gesicht { width: 42px; height: 42px; }
+.ko-gesicht.bk-gesicht.klein { width: 32px; height: 32px; }
+.bk-fuss { display: flex; flex-wrap: wrap; gap: 6px; }
+.bk-sammel { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; padding: 7px 10px; border-radius: 12px; background: var(--k-mittel-bg); color: var(--k-mittel-fg);
+  font: 700 12.5px/1.3 var(--font-text, inherit); }
+.bk-sammel > .ti { font-size: 17px; }
+.bk-sammel-ico { display: inline-flex; flex-wrap: wrap; gap: 1px; font-size: 15px; }
+.bk-sammel small { flex-basis: 100%; font-weight: 600; }
+
+/* 3 · Stimmung im Kader */
+.bk-st-skala { position: relative; padding: 26px 4px 30px; }
+.bk-st-zonen { display: flex; height: 14px; border-radius: 999px; overflow: hidden; border: 2px solid var(--k-rand, var(--border)); }
+.bk-st-zonen i { display: block; height: 100%; }
+.bk-z-streik { background: var(--app-schlecht); } .bk-z-wunsch { background: var(--bk-tickets, #e0a00c); } .bk-z-unz { background: color-mix(in oklab, var(--app-mittel) 55%, var(--bg2)); }
+.bk-z-ok { background: var(--app-gut); }
+.bk-st-marke { position: absolute; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; }
+.bk-st-marke.oben { top: 0; }
+.bk-st-marke.unten { top: 34px; }
+.bk-st-marke b { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; font: 800 10px/1 var(--font-text, inherit); background: var(--bg2); color: var(--text);
+  border: 2px solid var(--k-rand, var(--border)); box-sizing: border-box; }
+.bk-st-marke.k-strike b { border-color: var(--app-schlecht); } .bk-st-marke.k-wants_out b { border-color: var(--bk-tickets, #e0a00c); } .bk-st-marke.k-unhappy b { border-color: var(--app-mittel); }
+.bk-st-achse { position: relative; height: 12px; margin-top: 4px; font-size: 10px; color: var(--text3); font-variant-numeric: tabular-nums; }
+.bk-st-achse span { position: absolute; transform: translateX(-50%); }
+.bk-st-achse span:first-child { transform: none; } .bk-st-achse span:last-child { transform: translateX(-100%); }
+.bk-st-liste { display: flex; flex-direction: column; gap: 6px; }
+.bk-st-zeile { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 4px 8px; padding: 7px 8px; border-radius: 12px; background: var(--bg3);
+  border: 2px solid var(--k-linie, var(--border)); }
+.bk-st-zeile.k-strike { border-color: var(--app-schlecht); } .bk-st-zeile.k-wants_out { border-color: var(--bk-tickets, #e0a00c); }
+.bk-st-mitte { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.bk-st-mitte > b { font-size: 13.5px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bk-st-unter { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 7px; font-size: 11.5px; color: var(--text2); }
+.bk-st-ovr { font: 800 13px/1 var(--font-zahl, inherit); color: var(--text); }
+.bk-st-stufe { display: inline-flex; align-items: center; gap: 3px; font-weight: 800; }
+.bk-st-wert { color: var(--text3); }
+.bk-st-zeile .pf-btn { display: inline-flex; align-items: center; gap: 4px; }
+@media (max-width: 420px) { .bk-st-zeile { grid-template-columns: auto minmax(0, 1fr); } .bk-st-zeile > .pf-btn { grid-column: 2; justify-self: start; } }
+
+/* 8 · Saisonplan */
+.bk-plan { display: flex; flex-direction: column; gap: 8px; }
+.bk-pl-zeile { display: grid; grid-template-columns: 72px minmax(0, 1fr) 46px; align-items: center; gap: 8px; font-size: 12px; }
+.bk-pl-zeile > span:first-child { font-weight: 800; color: var(--text2); }
+.bk-pl-zeile > b { text-align: right; font: 800 14px/1 var(--font-zahl, inherit); color: var(--text); }
+.bk-pl-bahn { display: flex; height: 26px; border-radius: 9px; overflow: hidden; background: var(--bg4); border: 2px solid var(--k-rand, var(--border)); box-sizing: border-box; }
+.bk-pl-bahn i { display: grid; place-items: center; height: 100%; font-style: normal; font: 800 10px/1 var(--font-text, inherit); color: #fff; white-space: nowrap; overflow: hidden; }
+.bk-pl-bahn i + i { box-shadow: inset 2px 0 0 var(--bg2); }
+.f-tv { background: var(--bk-tv); } .f-tickets { background: var(--bk-tickets); } .f-merch { background: var(--bk-merch); } .f-spons { background: var(--bk-spons); }
+.f-kader { background: var(--bk-kader); } .f-betrieb { background: var(--bk-betrieb); } .f-anlagen { background: var(--bk-anlagen); }
+/* Überschuss, Prognose, Lücke: helle Fläche mit gestricheltem Rand (keine Verläufe, D104) */
+.bk-pl-bahn .bk-pl-luecke { background: var(--k-gut-bg); color: var(--k-gut-fg); outline: 2px dashed var(--app-gut); outline-offset: -2px; }
+.bk-legende .f-tickets, .bk-pl-bahn .f-tickets { color: #2a1f05; }
+
+/* 14 · Verlorenes Jahr / Potenzial */
+.bk-jahr { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+.bk-jahr-mitte { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.bk-jahr-zeile { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 3px 6px; font-size: 12px; color: var(--text2); }
+.bk-jahr-zeile.mit-bahn > span:first-child { grid-column: 1 / -1; font-weight: 700; }
+.bk-jahr-zeile:not(.mit-bahn) { justify-content: start; }
+.bk-jahr-zeile b { font: 800 14px/1 var(--font-zahl, inherit); color: var(--text); }
+.bk-jahr-zeile b small { font-size: 10px; color: var(--text3); }
+.bk-jahr-bahn .k-fuell { background: var(--app-mittel); }
+.bk-jahr-pot { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 8px; border-radius: 12px; text-align: center; max-width: 104px; }
+.bk-jahr-pot .ti { font-size: 18px; }
+.bk-jahr-pot b { font: 800 13px/1.1 var(--font-zahl, inherit); }
+.bk-jahr-pot small { font-size: 10px; }
+.bk-jahr-pot.ab { background: var(--k-schlecht-bg); color: var(--k-schlecht-fg); } .bk-jahr-pot.auf { background: var(--k-gut-bg); color: var(--k-gut-fg); }
+
+/* Verletzung und Rückkehr (D102) */
+.bk-vl-kopf { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; min-width: 0; }
+.bk-vl-unter { display: inline-flex; align-items: center; gap: 4px; font: 700 12.5px/1.2 var(--font-text, inherit); color: var(--text2); min-width: 0; }
+.bk-vl-unter .ti { font-size: 15px; color: var(--k-schlecht-fg); }
+.pfk-rueckkehr .bk-vl-unter .ti { color: var(--k-gut-fg); }
+.bk-fuss .pf-btn { display: inline-flex; align-items: center; gap: 4px; }
+.bk-fuss .info-btn { align-self: center; }
+
+/* 10 · Tausch-Karte (Postfach und Anfrage-Blatt) */
+.bk-tausch { display: flex; flex-direction: column; gap: 8px; }
+.bk-tk-seiten { display: grid; grid-template-columns: minmax(0, 1fr) 22px minmax(0, 1fr); align-items: start; gap: 4px; }
+.bk-tk-seite { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 6px; border-radius: 12px; background: var(--bg3); border: 2px solid var(--k-linie, var(--border)); }
+.bk-tk-seite > small { display: flex; align-items: center; gap: 4px; font: 800 10.5px/1.2 var(--font-text, inherit); letter-spacing: .05em; text-transform: uppercase; color: var(--text3); }
+html .bk-tk-seite .bk-wappen.klein.lg-crest { width: 16px !important; height: 17px !important; font-size: 0 !important; }
+.bk-tk-sp { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 5px; min-width: 0; }
+.bk-tk-sp.pick > .ti { font-size: 18px; color: var(--text2); width: 32px; text-align: center; }
+.bk-tk-wer { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
+.bk-tk-wer b { font-size: 12.5px; font-weight: 800; color: var(--text); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bk-tk-wer .kpm { height: 16px; min-width: 24px; font-size: 9px; padding: 0 4px; }
+.bk-tk-wer small { font-size: 10.5px; color: var(--text3); }
+.bk-tk-sp em { font-style: normal; font: 800 14px/1 var(--font-zahl, inherit); color: var(--text); }
+.bk-tk-sp em .sc-stufe { font-size: 10px; padding: 2px 4px; }     /* D78: Spieler der KI ohne Scout-Bericht als Stufe */
+.bk-tk-pfeil { align-self: center; color: var(--text3); font-size: 18px; text-align: center; }
+.bk-tk-leer { font-size: 11.5px; color: var(--text3); }
+.bk-tausch.gross .bk-tk-wer b { font-size: 14px; }
+.bk-tausch.gross .ko-gesicht.bk-gesicht { width: 38px; height: 38px; }
+.bk-waage { display: flex; height: 22px; border-radius: 9px; overflow: hidden; border: 2px solid var(--k-rand, var(--border)); background: var(--bg4); box-sizing: border-box; }
+.bk-waage span { display: grid; place-items: center; height: 100%; font: 800 11px/1 var(--font-zahl, inherit); color: #fff; min-width: 26px; }
+.bk-wg-gibt { background: var(--app-schlecht); } .bk-wg-bek { background: var(--app-gut); box-shadow: inset 2px 0 0 var(--bg2); }
+.bk-tk-fuss { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* ── 6 · Eigentümer ─────────────────────────────────────────────────────── */
+.bk-eigner, .bk-untergrenze { display: flex; flex-direction: column; gap: 10px; }
+.bk-eigner .exp-section-title, .bk-untergrenze .exp-section-title { display: flex; align-items: center; gap: 6px; }
+.bk-eg-kopf { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.bk-eg-name { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; min-width: 0; }
+.bk-eg-name b { font-size: 15px; color: var(--text); }
+.bk-eg-wert { display: flex; align-items: baseline; gap: 5px; }
+.bk-eg-wert b { font: 800 26px/1 var(--font-zahl, inherit); color: var(--text); }
+.bk-eg-wert small { font: 800 12px/1 var(--font-text, inherit); }
+.bk-eg-wert.gut small { color: var(--k-gut-fg); } .bk-eg-wert.mittel small { color: var(--k-mittel-fg); } .bk-eg-wert.schlecht small { color: var(--k-schlecht-fg); }
+.bk-ampel { position: relative; display: flex; height: 22px; border-radius: 9px; overflow: visible; border: 2px solid var(--k-rand, var(--border)); box-sizing: border-box; }
+.bk-ampel i { display: grid; place-items: center; height: 100%; font: 800 10.5px/1 var(--font-text, inherit); font-style: normal; }
+.bk-a-k { background: var(--app-schlecht); color: #fff; border-radius: 7px 0 0 7px; } .bk-a-n { background: var(--bg4); } .bk-a-z { background: var(--app-gut); color: #fff; border-radius: 0 7px 7px 0; }
+.bk-zeiger { position: absolute; top: -7px; bottom: -7px; width: 4px; margin-left: -2px; border-radius: 2px; background: var(--text); }
+.bk-eg-ringe { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; text-align: center; }
+.bk-eg-ring { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11.5px; color: var(--text2); }
+.bk-eg-ring .bk-ring { width: 54px; height: 54px; }
+.bk-eg-ring b { font-size: 12.5px; color: var(--text); }
+.bk-eg-erg { display: grid; grid-template-columns: 66px minmax(0, 1fr) 46px; align-items: center; gap: 8px; font-size: 12px; }
+.bk-eg-erg > span:first-child { font-weight: 800; color: var(--text2); }
+.bk-eg-erg > b { text-align: right; font: 800 14px/1 var(--font-zahl, inherit); color: var(--text); }
+.bk-eg-bahn { position: relative; height: 14px; border-radius: 7px; background: var(--bg4); border: 2px solid var(--k-rand, var(--border)); box-sizing: border-box; }
+.bk-eg-bahn i { position: absolute; top: 0; bottom: 0; }
+.bk-eg-bahn i.gut { background: var(--app-gut); } .bk-eg-bahn i.schlecht { background: var(--app-mittel); }
+.bk-eg-bahn em { position: absolute; top: -6px; bottom: -6px; width: 3px; margin-left: -1.5px; background: var(--text); border-radius: 2px; }
+.bk-eg-fuss { display: flex; flex-direction: column; gap: 2px; font-size: 12.5px; font-weight: 700; color: var(--text); }
+.bk-eg-fuss .ti { margin-right: 4px; color: var(--k-mittel-fg); }
+.bk-eg-fuss small { font-size: 11px; font-weight: 600; color: var(--text3); }
+.bk-eg-hist { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.bk-eg-hist > small { font-size: 11px; color: var(--text3); }
+
+/* ── 7 · Cap-Untergrenze ────────────────────────────────────────────────── */
+.bk-ug-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; font-size: 11px; text-align: center; }
+.bk-ug-tabs span { padding: 4px 0; border-radius: 8px; background: var(--bg3); color: var(--text3); border: 2px solid var(--k-linie, var(--border)); }
+.bk-ug-tabs span.fertig { color: var(--text2); }
+.bk-ug-tabs span.jetzt { background: var(--k-blau-knopf); color: #fff; border-color: var(--k-blau-schatten); font-weight: 800; }
+.bk-ug-bahn { position: relative; display: flex; height: 28px; border-radius: 9px; background: var(--bg4); border: 2px solid var(--k-rand, var(--border)); overflow: visible; box-sizing: border-box; }
+.bk-ug-bahn i { display: grid; place-items: center; height: 100%; font-style: normal; font: 800 10.5px/1 var(--font-zahl, inherit); color: #fff; white-space: nowrap; overflow: hidden; }
+.bk-ug-bahn i:first-child { border-radius: 7px 0 0 7px; }
+.bk-ug-fertig { background: var(--app-gut); }
+.bk-ug-jetzt { background: color-mix(in oklab, var(--app-gut) 65%, var(--bg2)); color: var(--k-gut-fg) !important; }
+.bk-ug-bahn i + i { box-shadow: inset 2px 0 0 var(--bg2); }
+.bk-ug-prog { background: var(--k-gut-bg); color: var(--k-gut-fg) !important; outline: 2px dashed var(--app-gut); outline-offset: -2px; }
+.bk-ug-luecke { background: var(--k-schlecht-bg); outline: 2px dashed var(--app-schlecht); outline-offset: -2px; }
+.bk-ug-soll { position: absolute; top: -7px; bottom: -7px; width: 4px; margin-left: -2px; border-radius: 2px; background: var(--text); }
+.bk-legende .bk-ug-soll-i { width: 4px; height: 12px; border-radius: 2px; background: var(--text); }
+.bk-legende i.bk-ug-prog { outline-width: 1.5px; }
+
+/* ── 9 · Trainingsgruppe: drei Ringe ───────────────────────────────────── */
+.tg-intro.bk-tg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) auto; align-items: start; gap: 6px; margin: 6px 0 10px; }
+.bk-tg-ring { display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center; }
+.bk-tg-ring .bk-ring { width: 54px; height: 54px; }
+.bk-tg-ring .bk-ring text { font-size: 8px; }
+.bk-tg-ring small { font-size: 11px; line-height: 1.2; color: var(--text2); }
+.bk-tg-info { align-self: center; }

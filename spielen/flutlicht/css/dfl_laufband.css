@@ -1,0 +1,30 @@
+/* DFL-Laufband (D72): Ergebnisse des Spieltags + Seeds je Conference, von rechts nach links (dfl_laufband_patch.js).
+   Nur Tokens des Kenney-Stils (Tag und Nacht), Fallbacks für die älteren Stile. */
+#dfl-band { display: flex; align-items: stretch; overflow: hidden; cursor: pointer; user-select: none;
+  background: var(--bg2, #191918); border-bottom: 3px solid var(--k-linie, var(--border, #3b3a37));
+  font-family: var(--font-text, inherit); }
+#dfl-band[hidden] { display: none !important; }
+#dfl-band:focus-visible { outline: 3px solid var(--k-gold, #f1c40f); outline-offset: -3px; }
+#dfl-band .db-fenster { flex: 1; min-width: 0; overflow: hidden; }
+#dfl-band .db-lauf { display: inline-flex; padding: 7px 0; white-space: nowrap; will-change: transform; }
+/* Inhalt doppelt: die zweite Hälfte schließt nahtlos an (Abstand am Ende = Abstand zwischen zwei Durchläufen) */
+#dfl-band .db-teil { display: inline-flex; align-items: center; gap: 18px; padding-right: 36px; }
+#dfl-band .db-marke { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 999px; font-weight: 800; font-size: 12px;
+  background: var(--k-blau-knopf, var(--accent, #2c7cb5)); color: #fff; letter-spacing: 0.02em; }
+#dfl-band .db-marke.db-leise { background: var(--bg3, #262626); color: var(--text2, #b8b8b2); }
+#dfl-band .db-marke.db-gold { background: var(--k-gold, #f1c40f); color: #2a1c02; }
+#dfl-band .db-erg, #dfl-band .db-seed { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: var(--text2, #b8b8b2); }
+#dfl-band .db-erg b { color: var(--text, #eeeeec); font-variant-numeric: tabular-nums; font-weight: 800; }
+#dfl-band .db-erg small, #dfl-band .db-seed small { font-size: 11px; color: var(--text3, #8a8a84); font-variant-numeric: tabular-nums; }
+#dfl-band .db-seed i { font-style: normal; font-weight: 800; font-size: 11px; min-width: 16px; height: 16px; border-radius: 4px; display: inline-flex;
+  align-items: center; justify-content: center; background: var(--bg3, #262626); color: var(--text, #eeeeec); }
+#dfl-band .db-eigen { color: var(--text, #eeeeec); font-weight: 700; background: var(--bg3, #262626); border-radius: 8px; padding: 1px 7px; }
+#dfl-band .db-wappen { width: 14px !important; height: 16px !important; min-width: 14px; font-size: 0 !important; border-radius: 3px 3px 7px 7px; flex: none; }
+/* Kein position: sticky – .app hat overflow: hidden (Scroll-Container, der nie scrollt): das Band rutschte dort um
+   „top“ nach unten über das Gelände. Es steht oben in Office/Liga und scrollt mit (wie die Ergebnisleiste bei ESPN). */
+/* „Bewegung reduzieren“: stehend, zum Wischen */
+@media (prefers-reduced-motion: reduce) {
+  #dfl-band .db-fenster { overflow-x: auto; }
+  #dfl-band .db-lauf { padding-inline: 10px; }
+  #dfl-band .db-teil + .db-teil { display: none; }
+}

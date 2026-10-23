@@ -1,0 +1,236 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   DFL-Theme „Kenney“ · v1  (D54, 2026-10-09; lädt als letztes Stylesheet)
+   ─────────────────────────────────────────────────────────────────────────
+   Zwei Stile nach den Gemini-Entwürfen des Nutzers (docs/quellen/gemini-ui-kenney-*.html):
+     · Kenney Tag   <html class="freundlich kenney tag">   – Beige, Holz, weiße Tafeln
+     · Kenney Nacht <html class="freundlich kenney dark">  – #12141d, dunkle Tafeln
+   Umschalten (nach Uhrzeit 6–19 Uhr Tag, sonst Nacht, oder fest): js/dfl_design_patch.js.
+   Kantige Kacheln: 3 px Rand, Unterkante als „Druckknopf“, Punkteraster im Hintergrund.
+   Schrift: Rubik für Titel, Zahlen und Text (SIL OFL, lokal in vendor/fonts/) – seit 2026-10-09 statt Fredoka + Nunito.
+   Zusätzliche Tokens: --k-rand (Kachelrand), --k-blau / --k-gruen (Bedienung), --k-kopf (App-Kopf),
+   --k-blau-knopf (Fläche unter weißer Schrift, Kontrast ≥ 4,5 : 1).
+   Die Vereinsfarbe bleibt Akzent (--accent, gesetzt von DFLIdentitaet.vereinsTheme); Bedienung blau,
+   Haupt-Button grün – wie in der Vorschau spiel/dfl_bedien_vorschau.html.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Eine Schrift für alles: Rubik (SIL OFL, lokal) – leicht gerundete Ecken wie die Kenney-Kacheln, kräftige Zahlen */
+@font-face { font-family: 'Rubik'; font-weight: 400; font-display: swap;
+  src: url('../vendor/fonts/rubik-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Rubik'; font-weight: 500 600; font-display: swap;
+  src: url('../vendor/fonts/rubik-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Rubik'; font-weight: 700; font-display: swap;
+  src: url('../vendor/fonts/rubik-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Rubik'; font-weight: 800 900; font-display: swap;
+  src: url('../vendor/fonts/rubik-latin-800-normal.woff2') format('woff2'); }
+
+/* ── Tokens Tag ─────────────────────────────────────────────────────────────── */
+html.freundlich.kenney.tag {
+  --bg: #f4e3c1; --bg2: #fffdf9; --bg3: #f6ead2; --bg4: #e8d3ab;
+  --border: #dcc39a; --text: #2c3e50; --text2: #5c4a36; --text3: #846d52;
+  --gold: #a86b12; --red: #c0392b; --blue: #2471a3;
+  --k-rand: #8b5a2b; --k-rand-tief: #5c3a21; --k-linie: #e3c99a; --k-punkt: #e8d2a6;
+  --k-kopf: #8b5a2b; --k-kopf-text: #ffffff;
+  --k-blau: #4aa3df; --k-blau-tief: #2980b9; --k-blau-knopf: #2c7cb5; --k-blau-schatten: #1d5a85; --k-gruen: #78bc61; --k-gruen-tief: #4d8236; --k-gruen-text: #10230a;
+  --k-gold: #f1c40f; --k-rot: #e74c3c; --k-gut-fg: #2f6b1f; --k-mittel-fg: #7a5800; --k-schlecht-fg: #a52a1e;
+  --app-gut: #3d9a2a; --app-mittel: #d29a0c; --app-schlecht: #d0402f;
+  --app-glas: var(--bg2);
+  color-scheme: light;
+}
+/* ── Tokens Nacht ───────────────────────────────────────────────────────────── */
+html.freundlich.kenney.dark {
+  --bg: #12141d; --bg2: #1e2230; --bg3: #262a3a; --bg4: #343a50;
+  --border: #2c2f40; --text: #f5f6fa; --text2: #a4b0be; --text3: #7c8798;
+  --gold: #f1c40f; --red: #ff7a6b; --blue: #5dade2;
+  --k-rand: #0b0d14; --k-rand-tief: #05060a; --k-linie: #2c2f40; --k-punkt: #1b1f2c;
+  --k-kopf: #1e2230; --k-kopf-text: #f5f6fa;
+  --k-blau: #3498db; --k-blau-tief: #2471a3; --k-blau-knopf: #2471a3; --k-blau-schatten: #164a6e; --k-gruen: #2ecc71; --k-gruen-tief: #1e8449; --k-gruen-text: #05210f;
+  --k-gold: #f1c40f; --k-rot: #e74c3c; --k-gut-fg: #7ff0a8; --k-mittel-fg: #ffe27a; --k-schlecht-fg: #ff9aa9;
+  --app-gut: #2ecc71; --app-mittel: #f1c40f; --app-schlecht: #ff6b5b;
+  --app-glas: var(--bg2);
+  --schatten: 0 1px 2px rgb(0 0 0 / .35); --schatten-hoch: 0 2px 6px rgb(0 0 0 / .4);
+  color-scheme: dark;
+}
+html.freundlich.kenney {
+  --font-display: 'Rubik', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-text: 'Rubik', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-zahl: 'Rubik', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --rund: 16px; --rund-klein: 12px;
+  --k-rahmen: 3px solid var(--k-rand); --k-hebung: 0 5px 0 var(--k-rand);
+}
+
+/* ── Grund: Punkteraster ────────────────────────────────────────────────────── */
+html.kenney body, html.kenney .app {
+  background-color: var(--bg);
+  background-image: radial-gradient(var(--k-punkt) 15%, transparent 16%);
+  background-size: 26px 26px;
+}
+html.kenney .app { border-radius: 0; }
+html.kenney body { color: var(--text); }
+
+/* ── Typografie ─────────────────────────────────────────────────────────────── */
+html.kenney .hc-big, html.kenney .hc-club-name, html.kenney .pcard-ovr, html.kenney .pcard-name, html.kenney .squad-ovr,
+html.kenney .hm-name, html.kenney .dfl-titel, html.kenney .fo-kopf h2, html.kenney .fo-zeile b, html.kenney .fo-zahlen b,
+html.kenney .app-blatt-name, html.kenney .app-blatt-ovr b, html.kenney .ks-kopf b, html.kenney .sqo-ovr, html.kenney .tab-title,
+html.kenney .qn-quote, html.kenney .qn-note, html.kenney h1, html.kenney h2, html.kenney h3 {
+  font-family: var(--font-display); letter-spacing: 0;
+}
+html.kenney .hc-label, html.kenney .squad-section-title, html.kenney .ks-titel, html.kenney .app-sheet-titel, html.kenney .fo-ueber {
+  font-family: var(--font-text); font-weight: 800; letter-spacing: .07em; color: var(--text3);
+}
+
+/* ── Tafeln (kantig, mit Unterkante) ────────────────────────────────────────── */
+html.kenney .home-card, html.kenney .dfl-karte, html.kenney .fo-karte, html.kenney .lg-wrap, html.kenney .pcard-box,
+html.kenney .news-item, html.kenney .aok-spiel, html.kenney .facility-card, html.kenney .sponsor-card, html.kenney .calendar-widget,
+html.kenney .exp-panel, html.kenney .club-facilities > .facility-card {
+  background: var(--bg2); border: var(--k-rahmen); border-radius: var(--rund); box-shadow: var(--k-hebung);
+}
+html.kenney .home-card:hover, html.kenney .news-item:hover { border-color: var(--k-rand); box-shadow: var(--k-hebung); }
+html.kenney .home-grid, html.kenney .news-feed { gap: 14px; }
+html.kenney .news-item { margin-bottom: 4px; }
+
+/* Listenzeilen: gleicher Rand, ohne Unterkante (Listen bleiben ruhig) */
+html.kenney .squad-row, html.kenney .sqo-row, html.kenney .market-row, html.kenney .prospect-row, html.kenney .bench-card, html.kenney .ks-zeile,
+html.kenney .ks-ziel {
+  background: var(--bg2); border: var(--k-rahmen); border-radius: 14px; box-shadow: none;
+}
+html.kenney .squad-row.selected, html.kenney .bench-card.selected { border-color: var(--k-blau); box-shadow: 0 0 0 2px var(--k-blau) inset; }
+html.kenney .ks-ziel.rot { border-color: var(--red); }
+
+/* ── Knöpfe als Druckknöpfe ─────────────────────────────────────────────────── */
+html.kenney .hc-action, html.kenney .mkt-btn, html.kenney .mgmt-btn, html.kenney .app-knopf, html.kenney .ks-knopf, html.kenney .fixture-btn,
+html.kenney .sp-sign-btn, html.kenney .exp-offer-btn, html.kenney .fc-upgrade, html.kenney .exp-gameover-btn, html.kenney .pcard-act {
+  border: var(--k-rahmen); border-radius: 12px; box-shadow: 0 4px 0 var(--k-rand); background: var(--bg3); color: var(--text);
+  font-family: var(--font-text); font-weight: 800; transition: transform .08s, box-shadow .08s;
+}
+html.kenney .hc-action:active, html.kenney .mkt-btn:active, html.kenney .mgmt-btn:active, html.kenney .app-knopf:active, html.kenney .ks-knopf:active,
+html.kenney .fixture-btn:active, html.kenney .sp-sign-btn:active, html.kenney .exp-offer-btn:active, html.kenney .fc-upgrade:active, html.kenney .pcard-act:active {
+  transform: translateY(3px); box-shadow: 0 1px 0 var(--k-rand);
+}
+html.kenney .app-knopf.haupt, html.kenney .hc-action, html.kenney .sp-sign-btn, html.kenney .exp-offer-btn {
+  background: var(--k-blau-knopf); color: #fff; border-color: var(--k-blau-schatten); box-shadow: 0 4px 0 var(--k-blau-schatten);
+}
+html.kenney .ks-knopf.rot, html.kenney .app-knopf.rot { color: var(--red); }
+html.kenney .ks-knopf.gruen { color: var(--k-gut-fg); }
+html.kenney .mkt-btn.danger { color: var(--red); }
+
+/* Unterreiter als Segment (aktiv = blauer Druckknopf) */
+html.kenney .subtabs { background: var(--bg2); border: var(--k-rahmen); border-radius: 14px; padding: 4px; gap: 4px; box-shadow: none; }
+html.kenney .subtab { border: 0; border-radius: 10px; min-height: 40px; font-family: var(--font-text); font-weight: 800; color: var(--text2); background: none; }
+html.kenney .subtab.active { background: var(--k-blau-knopf); color: #fff; box-shadow: 0 3px 0 var(--k-blau-schatten); border: 0; }
+html.kenney .pos-filter-btn { border: 2px solid var(--k-linie); border-radius: 999px; font-weight: 800; }
+html.kenney .pos-filter-btn.active { background: var(--k-blau-knopf); color: #fff; border-color: var(--k-blau-schatten); }
+
+/* ── Positionsfarben (D54): TW gold, Abwehr blau, Mittelfeld grün, Sturm rot – D95 auch mit Seite (LV/RV, LM/RM, LF/RF) ─── */
+html.kenney .pos-TW { background: #f1c40f; color: #2a1c02; }
+html.kenney .pos-IV, html.kenney .pos-AV, html.kenney .pos-LV, html.kenney .pos-RV { background: #2563eb; color: #fff; }   /* weiß darauf 5,2 : 1 (vorher #3b82f6: 3,7) */
+html.kenney .pos-ZDM, html.kenney .pos-ZM, html.kenney .pos-OM, html.kenney .pos-ZOM, html.kenney .pos-AM, html.kenney .pos-LM, html.kenney .pos-RM { background: #22c55e; color: #052e14; }
+html.kenney .pos-FL, html.kenney .pos-LF, html.kenney .pos-RF, html.kenney .pos-ST { background: #dc2626; color: #fff; }   /* 4,8 : 1 (vorher #ef4444: 3,8) */
+html.kenney .pos-badge-sm, html.kenney .pos-badge { border-radius: 7px; font-family: var(--font-zahl); font-weight: 700; letter-spacing: .02em; }
+
+/* ── Tabellen ───────────────────────────────────────────────────────────────── */
+html.kenney .lg-table th { font-family: var(--font-text); color: var(--text3); }
+html.kenney .lg-table tr.fcm-row { background: color-mix(in oklab, var(--k-blau) 16%, transparent); }
+html.kenney .lg-table tr.fcm-row td:first-child { box-shadow: inset 4px 0 0 var(--k-blau); }
+html.kenney .lg-table tbody tr:nth-child(even) { background: color-mix(in oklab, var(--bg3) 70%, transparent); }
+
+/* ── App-Oberfläche (Handy) ─────────────────────────────────────────────────── */
+html.kenney body.dfl-shell #app-nav {
+  background: var(--bg2); border-top: var(--k-rahmen); -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+html.kenney .app-nav-btn { font-family: var(--font-text); font-weight: 800; font-size: 11px; color: var(--text3); }
+html.kenney .app-nav-btn.an { color: var(--k-blau); }
+html.kenney.tag .app-nav-btn.an { color: var(--k-blau-tief); }
+html.kenney .app-nav-btn.an::before { background: color-mix(in oklab, var(--k-blau) 18%, transparent); }
+
+html.kenney body.dfl-shell #app-cta.zeigen {
+  background: var(--k-gruen); color: var(--k-gruen-text); border-radius: 18px; font-family: var(--font-display);
+  box-shadow: 0 5px 0 var(--k-gruen-tief), 0 10px 24px rgb(0 0 0 / .3);
+}
+html.kenney #app-cta b { font-family: var(--font-display); font-weight: 700; font-size: 16px; }
+html.kenney #app-cta small { font-family: var(--font-text); }
+html.kenney body.dfl-shell #app-cta.warn { background: var(--k-gold); color: #2a1f05; box-shadow: 0 5px 0 #b7950b, 0 10px 24px rgb(0 0 0 / .3); }
+html.kenney #app-cta:active { transform: translateY(3px); }
+
+html.kenney .app-sheet-box, html.kenney .app-blatt-box { background: var(--bg2); border-top: var(--k-rahmen); border-radius: 26px 26px 0 0; }
+html.kenney .app-griff { background: var(--k-linie); width: 46px; height: 5px; }
+html.kenney .app-blatt-zu { background: var(--bg2); border: var(--k-rahmen); box-shadow: 0 3px 0 var(--k-rand); color: var(--text); width: 44px; height: 44px; border-radius: 22px; }
+html.kenney .app-eintrag > i:first-child { background: var(--bg3); color: var(--k-blau-tief); border: 2px solid var(--k-linie); }
+html.kenney.dark .app-eintrag > i:first-child { color: var(--k-blau); }
+html.kenney .app-blatt-werte > div, html.kenney .fo-zahlen div { background: var(--bg3); border: 2px solid var(--k-linie); }
+
+/* Front Office */
+html.kenney .fo-kachel { background: var(--bg2); border: var(--k-rahmen); border-radius: var(--rund); box-shadow: var(--k-hebung); }
+html.kenney .fo-kachel:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--k-rand); }
+html.kenney .fo-kachel i { color: var(--k-blau); }
+html.kenney.tag .fo-kachel i { color: var(--k-blau-tief); }
+html.kenney .fo-cap { background: var(--bg3); border: 2px solid var(--k-linie); }
+
+/* Gelände-Chips bleiben dunkel (liegen auf dem Bild) */
+html.kenney .gel-chip { font-family: var(--font-text); }
+
+/* Spielbericht unten */
+html.kenney body.dfl-shell #pm-footer { background: var(--bg2); border-top: var(--k-rahmen); }
+
+/* Hinweise / Toasts */
+html.kenney .toast, html.kenney .toast-host > * { font-family: var(--font-text); }
+
+/* ── Spielbericht: Ergebniskopf mit heller Schrift (Grund ist immer farbig) ──── */
+html.kenney #pm-dialog { border: var(--k-rahmen); }
+html.kenney #pm-header { border-bottom: var(--k-rahmen); }
+html.kenney #pm-header #pm-score, html.kenney #pm-header #pm-teams, html.kenney #pm-header #pm-result-label, html.kenney #pm-header #pm-match-type {
+  color: #fff; opacity: 1; }
+html.kenney #pm-header #pm-score { font-family: var(--font-display); text-shadow: 0 2px 0 rgb(0 0 0 / .25); }
+html.kenney #pm-header #pm-result-label { opacity: .9; }
+html.kenney #pm-header #pm-match-type { background: rgb(0 0 0 / .18); }
+html.kenney.tag #pm-header.win { background: linear-gradient(135deg, #4d8236 0%, #78bc61 100%); }
+html.kenney.tag #pm-header.draw { background: linear-gradient(135deg, #9a7d0a 0%, #c9a227 100%); }
+html.kenney.tag #pm-header.loss { background: linear-gradient(135deg, #a93226 0%, #e74c3c 100%); }
+
+/* ── Feste dunkle Flächen des Altspiels im Tag-Stil aufhellen ────────────────── */
+html.kenney.tag .score-box, html.kenney.tag .dfl-scorebug { background: var(--bg3); color: var(--text); }
+html.kenney.tag .p-token { color: #fff; }
+
+@media (prefers-reduced-motion: reduce) {
+  html.kenney .hc-action, html.kenney .app-knopf, html.kenney .fo-kachel { transition: none; }
+}
+
+/* ── Kenney-Spielfeld (2026-10-09, Nutzer: „bei Taktik das Spielfeld mit Kenney-Spielfeld“) ──────────────
+   Rasen in den Farben des Kenney Sports Pack (CC0: #2ecc71 / #31d978, gemähte Streifen quer), weiße Linien,
+   Tore mit Karonetz wie die Kenney-Torteile. Als SVG (680 × 1000 = Seitenverhältnis von .pitch-wrap), keine Bilddatei. */
+html.kenney .pitch-wrap {
+  border: var(--k-rahmen); border-radius: var(--rund, 16px); box-shadow: var(--k-hebung);
+  background-color: #2ecc71;
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 680 1000' preserveAspectRatio='none'><defs><pattern id='netz' width='10' height='10' patternUnits='userSpaceOnUse'><rect width='5' height='5' fill='%23ffffff' fill-opacity='.7'/><rect x='5' y='5' width='5' height='5' fill='%23ffffff' fill-opacity='.7'/></pattern></defs><g fill='none' stroke='%23ffffff' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'><rect x='22' y='44' width='636' height='912' rx='6'/><line x1='22' y1='500.0' x2='658' y2='500.0'/><circle cx='340.0' cy='500.0' r='88'/><circle cx='340.0' cy='500.0' r='5' fill='%23ffffff' stroke='none'/><rect x='140.0' y='44' width='400' height='158'/><rect x='248.0' y='44' width='184' height='54'/><circle cx='340.0' cy='150' r='5' fill='%23ffffff' stroke='none'/><path d='M269.0 202 A88 88 0 0 0 411.0 202'/><rect x='140.0' y='798' width='400' height='158'/><rect x='248.0' y='902' width='184' height='54'/><circle cx='340.0' cy='850' r='5' fill='%23ffffff' stroke='none'/><path d='M269.0 798 A88 88 0 0 1 411.0 798'/><path d='M36 44 A14 14 0 0 1 22 58'/><path d='M644 44 A14 14 0 0 0 658 58'/><path d='M22 942 A14 14 0 0 1 36 956'/><path d='M658 942 A14 14 0 0 0 644 956'/></g><rect x='297.0' y='14' width='86' height='30' rx='7' fill='url(%23netz)' stroke='%23e9e8f6' stroke-width='6'/><rect x='297.0' y='956' width='86' height='30' rx='7' fill='url(%23netz)' stroke='%23e9e8f6' stroke-width='6'/></svg>"),
+    repeating-linear-gradient(180deg, #2ecc71 0 5%, #31d978 5% 10%);
+  background-size: 100% 100%, 100% 100%; }
+html.kenney.dark .pitch-wrap { background-color: #239b56;
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 680 1000' preserveAspectRatio='none'><defs><pattern id='netz' width='10' height='10' patternUnits='userSpaceOnUse'><rect width='5' height='5' fill='%23ffffff' fill-opacity='.7'/><rect x='5' y='5' width='5' height='5' fill='%23ffffff' fill-opacity='.7'/></pattern></defs><g fill='none' stroke='%23ffffff' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'><rect x='22' y='44' width='636' height='912' rx='6'/><line x1='22' y1='500.0' x2='658' y2='500.0'/><circle cx='340.0' cy='500.0' r='88'/><circle cx='340.0' cy='500.0' r='5' fill='%23ffffff' stroke='none'/><rect x='140.0' y='44' width='400' height='158'/><rect x='248.0' y='44' width='184' height='54'/><circle cx='340.0' cy='150' r='5' fill='%23ffffff' stroke='none'/><path d='M269.0 202 A88 88 0 0 0 411.0 202'/><rect x='140.0' y='798' width='400' height='158'/><rect x='248.0' y='902' width='184' height='54'/><circle cx='340.0' cy='850' r='5' fill='%23ffffff' stroke='none'/><path d='M269.0 798 A88 88 0 0 1 411.0 798'/><path d='M36 44 A14 14 0 0 1 22 58'/><path d='M644 44 A14 14 0 0 0 658 58'/><path d='M22 942 A14 14 0 0 1 36 956'/><path d='M658 942 A14 14 0 0 0 644 956'/></g><rect x='297.0' y='14' width='86' height='30' rx='7' fill='url(%23netz)' stroke='%23e9e8f6' stroke-width='6'/><rect x='297.0' y='956' width='86' height='30' rx='7' fill='url(%23netz)' stroke='%23e9e8f6' stroke-width='6'/></svg>"),
+    repeating-linear-gradient(180deg, #239b56 0 5%, #27a85e 5% 10%); }
+html.kenney .pitch-wrap::before, html.kenney .pitch-wrap .pitch-line, html.kenney .pitch-wrap .attack-arrow { display: none; }
+/* Namen als Kenney-Schild (weiß, Unterkante), Stärke als dunkle Marke – lesbar auf hellem Rasen */
+html.kenney .pitch-wrap .p-name { background: rgb(255 255 255 / .94); color: #1d2b20; text-shadow: none; border-radius: 6px;
+  padding: 1px 5px; margin-top: 4px; font: 700 10px/1.25 var(--font-text); box-shadow: 0 2px 0 rgb(0 0 0 / .2); }
+html.kenney .pitch-wrap .p-ovr { background: #2c3e50; color: #fff; text-shadow: none; border-radius: 5px; padding: 0 5px; margin-top: 2px;
+  font: 800 10px/1.4 var(--font-zahl); }
+/* Aufstellung: nur die Marken Rookie und Star (2026-10-10, „Talent raus, Star rein“; Stamm/Rotation/Ergänzung brachen als
+   „ERGÄN-ZUNG“ um) und das Potenzial klein unter der Stärke („das Potenzial mitzeigen“) – in Aufstellung und Kaderliste */
+html.kenney #squad-list .role-badge { display: none; }
+html.kenney #squad-list .role-badge.role-star, html.kenney #squad-list .role-badge.role-rookie,
+.sqo-row .role-badge.role-star, .sqo-row .role-badge.role-rookie { display: inline-block; }
+html.kenney #squad-list .squad-name { min-width: 0; overflow-wrap: anywhere; }
+html.kenney #squad-list .squad-ovr, body.dfl-shell .sqo-row.sqo-d54 .squad-ovr { line-height: 1.05; text-align: right; }
+html.kenney #squad-list .squad-pot, body.dfl-shell .sqo-row.sqo-d54 .squad-pot { display: block; margin: 2px 0 0; color: var(--text2);
+  font: 700 9px/1.2 var(--font-text, system-ui); letter-spacing: 0; white-space: nowrap; }
+html.kenney .role-badge { font: 800 9px/1.45 var(--font-text, system-ui); letter-spacing: .03em; padding: 0 6px; border-radius: 6px;
+  border: 1.5px solid transparent; box-shadow: 0 1.5px 0 rgb(0 0 0 / .18); margin-left: 5px; vertical-align: middle; }
+html.kenney .role-badge.role-star { color: #4a3300; background: #ffd75e; border-color: #c99a1a; }
+html.kenney .role-badge.role-rookie { color: #fff; background: #3a8fd8; border-color: #2a6fae; }
+.sqo-row .sqo-name .sqo-nm { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sqo-row .sqo-name .sqo-marken { display: block; margin-top: 3px; line-height: 1; }
+.sqo-row .sqo-marken .role-badge { margin: 0 4px 0 0; }
+/* Handy: Unterreiter umbrechen statt wischen – die versteckte Wischleiste schnitt „Verträge & Cap“, „Playoffs“ usw. ab,
+   und niemand sah, dass es dort weitergeht */
+@media (max-width: 819px) {
+  html.kenney .subtabs { flex-wrap: wrap; overflow-x: visible; }
+  html.kenney .subtab { flex: 1 1 auto; padding: 0 10px; min-height: 36px; }
+}

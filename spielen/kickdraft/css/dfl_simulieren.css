@@ -1,0 +1,271 @@
+/* DFL · Simulieren bis … (D64) und „DFL auf einen Blick“ (D62 · 1–3) – js/dfl_simulieren_patch.js.
+   Knopf „bis …“ neben dem Haupt-Button, Blatt mit Zielen/Ticker/Halt/Zusammenfassung, Spielvorschau, Konferenz, Tabelle.
+   Nur Tokens des Kenney-Stils (Tag und Nacht), Fallbacks für ältere Stile. Vorlagen: spiel/dfl_simulieren_vorschau.html,
+   spiel/dfl_intuitiv_vorschau.html. */
+
+#dfl-sim, .sim-office, .sim-spieltag-vorschau, .sim-pm-konf, #lg-sub-spieltag, .sim-liga-tabelle {
+  --sim-rand: var(--k-rand, var(--border, #3b3a37)); --sim-linie: var(--k-linie, var(--border, #3b3a37));
+  --sim-blau: var(--k-blau-knopf, #2c7cb5); --sim-blau-tief: var(--k-blau-schatten, #1d5a85);
+  --sim-gruen: var(--k-gruen, #2fb36b); --sim-gruen-tief: var(--k-gruen-tief, #1e8449); --sim-gruen-text: var(--k-gruen-text, #0b1a12);
+  --sim-gut: var(--k-gut-fg, #2f6b1f); --sim-mittel: var(--k-mittel-fg, #7a5800); --sim-schlecht: var(--k-schlecht-fg, #a52a1e);
+  --sim-gut-bg: var(--k-gut-bg, rgb(61 154 42 / .18)); --sim-mittel-bg: var(--k-mittel-bg, rgb(210 154 12 / .2)); --sim-schlecht-bg: var(--k-schlecht-bg, rgb(208 64 47 / .18));
+  --sim-sieg: var(--k-sieg, #3f7a2c); --sim-remis: var(--k-remis, #7d6608); --sim-niederlage: var(--k-niederlage, #a93226);
+  --sim-linie-po: var(--app-schlecht, #d0402f); --sim-gold: var(--k-gold, #f1c40f);
+}
+
+/* ── Knopf „bis …“ rechts neben dem Haupt-Button (Handy) ─────────────────── */
+#dfl-sim-knopf { display: none; }
+body.dfl-shell #dfl-sim-knopf.zeigen {
+  display: flex; position: fixed; z-index: 9050; right: 14px; bottom: calc(var(--app-leiste, 62px) + 12px + env(safe-area-inset-bottom, 0px));
+  width: 62px; min-height: 54px; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 4px; cursor: pointer;
+  border: 0; border-radius: 18px; background: var(--k-blau-knopf, #2c7cb5); color: #fff; font: 800 11px/1.1 var(--font-text, system-ui, sans-serif);
+  box-shadow: 0 5px 0 var(--k-blau-schatten, #1d5a85), 0 10px 24px rgb(0 0 0 / .3); -webkit-tap-highlight-color: transparent;
+}
+body.dfl-shell #dfl-sim-knopf.zeigen i { font-size: 24px; line-height: 1; }
+body.dfl-shell #dfl-sim-knopf.weiter { background: var(--k-gold, #f1c40f); color: #2a1f05; box-shadow: 0 5px 0 #b7950b, 0 10px 24px rgb(0 0 0 / .3); }
+body.dfl-shell #dfl-sim-knopf:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--k-blau-schatten, #1d5a85); }
+body.dfl-shell #dfl-sim-knopf:focus-visible { outline: 3px solid var(--text, #2c3e50); outline-offset: 3px; }
+body.dfl-shell.sim-mit-knopf #app-cta.zeigen { right: calc(14px + 62px + 10px); max-width: calc(100vw - 28px - 72px); }
+body.dfl-shell.sim-mit-knopf #app-cta small { max-width: calc(100vw - 180px); }
+@media (prefers-reduced-motion: no-preference) {
+  body.dfl-shell #dfl-sim-knopf.zeigen { animation: sim-rein .22s ease-out; }
+  @keyframes sim-rein { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+}
+/* PC: neben „Woche weiter“ im Kalender */
+.dfl-sim-pc { margin-left: 8px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 10px; cursor: pointer;
+  border: 2px solid var(--k-blau-schatten, #1d5a85); background: var(--k-blau-knopf, #2c7cb5); color: #fff; font: 800 12px var(--font-text, inherit); }
+.dfl-sim-pc[hidden], body.dfl-shell .dfl-sim-pc { display: none !important; }
+
+/* ── Blatt ──────────────────────────────────────────────────────────────── */
+#dfl-sim { position: fixed; inset: 0; z-index: 9600; font-family: var(--font-text, system-ui, sans-serif); color: var(--text, #2c3e50); }
+#dfl-sim[hidden] { display: none !important; }
+body.sim-offen { overflow: hidden; }
+/* Hinter dem Blatt (Handy: deckt alles unter dem App-Kopf) kein Gelände zeichnen – die Kulisse zeichnet jeden Canvas mit Platz
+   im Layout bis 30 Bilder/s, auch verdeckt; das kostete „bis …“ am gedrosselten Handy spürbar Zeit */
+body.sim-offen .gel-buehne canvas { display: none; }
+.sim-dimmer { position: absolute; inset: 0; background: rgb(20 14 6 / .5); }
+html.dark .sim-dimmer { background: rgb(0 0 0 / .6); }
+.sim-blatt {
+  position: absolute; left: 0; right: 0; bottom: 0; top: calc(52px + env(safe-area-inset-top, 0px)); display: flex; flex-direction: column; min-height: 0;
+  background-color: var(--bg, #f4e3c1); background-image: radial-gradient(var(--k-punkt, transparent) 15%, transparent 16%); background-size: 22px 22px;
+  border-top: 4px solid var(--sim-rand); border-radius: 22px 22px 0 0; box-shadow: 0 -6px 24px rgb(0 0 0 / .25);
+}
+@media (min-width: 700px) {
+  .sim-blatt { left: 50%; right: auto; width: min(520px, calc(100vw - 32px)); transform: translateX(-50%); top: 32px; bottom: 32px;
+    border: 4px solid var(--sim-rand); border-radius: 26px; box-shadow: 0 7px 0 var(--sim-rand); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  #dfl-sim:not([hidden]) .sim-blatt { animation: sim-hoch .24s cubic-bezier(.2, .8, .3, 1); }
+  @keyframes sim-hoch { from { translate: 0 40px; opacity: .4; } to { translate: 0 0; opacity: 1; } }
+}
+.sim-griff { width: 46px; height: 5px; border-radius: 3px; background: var(--sim-linie); margin: 8px auto 2px; flex: none; }
+.sim-kopf { flex: none; display: flex; gap: 10px; align-items: flex-start; padding: 6px 14px 10px; }
+.sim-kopf > div { min-width: 0; flex: 1; }
+.sim-kopf h2 { margin: 0; font: 800 19px/1.2 var(--font-display, inherit); }
+.sim-kopf p { margin: 2px 0 0; font-size: 13px; color: var(--text2, #5c4a36); }
+.sim-eyebrow { margin: 0 !important; font-size: 11px !important; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--sim-gut) !important; }
+.sim-zu { flex: none; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; cursor: pointer;
+  background: var(--bg2, #fffdf9); border: 3px solid var(--sim-rand); box-shadow: 0 3px 0 var(--sim-rand); color: var(--text, #2c3e50); font-size: 18px; }
+.sim-zu:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--sim-rand); }
+.sim-inhalt { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.sim-fuss { flex: none; display: flex; gap: 10px; padding: 10px 12px calc(14px + env(safe-area-inset-bottom, 0px)); border-top: 3px solid var(--sim-linie); background: var(--bg, #f4e3c1); }
+.sim-fuss:empty { display: none; }
+
+/* Knöpfe */
+.sim-knopf { font: 800 15px var(--font-text, inherit); display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 48px;
+  padding: 9px 12px; border-radius: 14px; cursor: pointer; text-align: left; color: var(--text, #2c3e50); background: var(--bg2, #fffdf9);
+  border: 3px solid var(--sim-rand); box-shadow: 0 4px 0 var(--sim-rand); -webkit-tap-highlight-color: transparent; }
+.sim-knopf i { font-size: 20px; flex: none; }
+.sim-knopf small { display: block; font-size: 12px; font-weight: 600; opacity: .85; }
+.sim-knopf:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--sim-rand); }
+.sim-knopf[disabled] { opacity: .55; cursor: default; transform: none; }
+.sim-knopf.gruen { background: var(--sim-gruen); color: var(--sim-gruen-text); border-color: var(--sim-gruen-tief); box-shadow: 0 4px 0 var(--sim-gruen-tief); }
+.sim-knopf.blau { background: var(--sim-blau); color: #fff; border-color: var(--sim-blau-tief); box-shadow: 0 4px 0 var(--sim-blau-tief); }
+.sim-knopf.hell { background: var(--bg2, #fffdf9); }
+.sim-knopf:focus-visible, .sim-ziel:focus-visible, .sim-tippbar:focus-visible, .sim-seg button:focus-visible { outline: 3px solid var(--app-mittel, #d29a0c); outline-offset: 2px; }
+.sim-link { margin-left: auto; flex: none; font: 800 12px var(--font-text, inherit); color: var(--sim-blau); background: none; border: 0; padding: 4px; cursor: pointer; text-decoration: underline; }
+html.dark .sim-link { color: var(--k-blau, #5dade2); }
+
+/* Ziele + Schalter */
+.sim-zielwahl { display: flex; flex-direction: column; gap: 8px; }
+.sim-ziel { display: grid; grid-template-columns: 36px 1fr auto; gap: 2px 10px; align-items: center; text-align: left; cursor: pointer; font: inherit; color: var(--text, #2c3e50);
+  background: var(--bg2, #fffdf9); border: 3px solid var(--sim-rand); border-radius: 14px; box-shadow: 0 3px 0 var(--sim-rand); padding: 9px 10px; }
+.sim-ziel .sim-zi { grid-row: 1 / 3; width: 36px; height: 36px; border-radius: 10px; background: var(--bg4, #e8d3ab); display: grid; place-items: center; color: var(--text2, #5c4a36); font-size: 20px; }
+.sim-ziel b { font-size: 15px; font-weight: 800; }
+.sim-ziel small { grid-column: 2; color: var(--text3, #846d52); font-size: 12px; }
+.sim-ziel .sim-zt { grid-row: 1 / 3; grid-column: 3; font-size: 12px; font-weight: 800; color: var(--text3, #846d52); text-align: right; }
+.sim-ziel[aria-checked="true"] { border-color: var(--sim-blau); box-shadow: 0 3px 0 var(--sim-blau-tief); background: var(--bg3, #f6ead2); }
+.sim-ziel[aria-checked="true"] .sim-zi { background: var(--sim-blau); color: #fff; }
+.sim-unter { margin: 6px 2px 0; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text3, #846d52); }
+.sim-schalter { display: flex; flex-direction: column; background: var(--bg2, #fffdf9); border: 3px solid var(--sim-rand); border-radius: 14px; padding: 2px 10px; }
+.sim-schalter label { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-bottom: 2px dashed var(--sim-linie); font-size: 14px; font-weight: 700; cursor: pointer; }
+.sim-schalter label:last-child { border-bottom: 0; }
+.sim-schalter small { display: block; color: var(--text3, #846d52); font-size: 12px; font-weight: 500; }
+.sim-schalter input { appearance: none; -webkit-appearance: none; width: 48px; height: 28px; border-radius: 999px; background: var(--bg4, #e8d3ab); border: 2px solid var(--sim-rand); position: relative; cursor: pointer; margin: 0; flex: none; }
+.sim-schalter input::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: var(--bg2, #fffdf9); border: 2px solid var(--sim-rand); box-sizing: border-box; }
+.sim-schalter input:checked { background: var(--sim-gruen); border-color: var(--sim-gruen-tief); }
+.sim-schalter input:checked::after { left: 22px; border-color: var(--sim-gruen-tief); }
+.sim-schalter input:focus-visible { outline: 3px solid var(--app-mittel, #d29a0c); outline-offset: 2px; }
+
+/* Ticker */
+.sim-fortschritt { flex: none; height: 10px; border-radius: 6px; background: var(--bg4, #e8d3ab); overflow: hidden; border: 2px solid var(--sim-rand); }
+.sim-fortschritt div { height: 100%; width: 100%; background: var(--sim-blau); transform-origin: left; transform: scaleX(0); }
+@media (prefers-reduced-motion: no-preference) { .sim-fortschritt div { transition: transform .3s ease-out; } }
+.sim-ticker { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.sim-tw { background: var(--bg2, #fffdf9); border: 3px solid var(--sim-rand); border-radius: 14px; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; }
+@media (prefers-reduced-motion: no-preference) { .sim-tw.neu { animation: sim-tw-rein .3s ease-out; } @keyframes sim-tw-rein { from { transform: translateY(8px); opacity: .3; } to { transform: none; opacity: 1; } } }
+.sim-tw-kopf { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto auto; gap: 8px; align-items: center; }
+.sim-pause .sim-tw-kopf { grid-template-columns: 44px minmax(0, 1fr); }
+.sim-kw { font-size: 12px; font-weight: 800; color: var(--text3, #846d52); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.sim-kw small { display: block; font-weight: 600; }
+.sim-geg { display: flex; gap: 6px; align-items: center; font-weight: 800; font-size: 14px; min-width: 0; }
+.sim-geg .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sim-geg small { color: var(--text3, #846d52); font-weight: 600; flex: none; }
+.sim-pause { border-style: dashed; }
+.sim-pause-text { display: flex; gap: 6px; align-items: center; color: var(--text3, #846d52); font-size: 13px; font-weight: 700; }
+.sim-erg { font-weight: 800; font-size: 15px; border-radius: 8px; padding: 1px 8px; color: #fff; font-variant-numeric: tabular-nums; }
+.sim-erg.s { background: var(--sim-sieg); } .sim-erg.u { background: var(--sim-remis); } .sim-erg.n { background: var(--sim-niederlage); }
+.sim-platz { font-size: 12px; font-weight: 800; color: var(--text2, #5c4a36); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sim-sch { font-size: 12px; color: var(--text3, #846d52); padding-left: 52px; display: flex; gap: 4px; align-items: baseline; }
+.sim-z { list-style: none; margin: 2px 0 0; padding: 0 0 0 52px; display: flex; flex-direction: column; gap: 3px; }
+.sim-pause .sim-z { padding-left: 52px; }
+.sim-z li { font-size: 12.5px; display: flex; gap: 6px; align-items: flex-start; color: var(--text2, #5c4a36); }
+.sim-z li i { margin-top: 1px; font-size: 15px; flex: none; }
+.sim-z li.wichtig { color: var(--text, #2c3e50); font-weight: 700; }
+.sim-z li.gut i { color: var(--sim-gut); } .sim-z li.warn i { color: var(--sim-mittel); } .sim-z li.schlecht i { color: var(--sim-schlecht); }
+.sim-tippbar { cursor: pointer; }
+.sim-tippbar:hover { background: var(--bg3, #f6ead2); }
+.sim-laeuft { border-style: dashed; color: var(--text3, #846d52); font-size: 13px; font-weight: 700; flex-direction: row; gap: 8px; align-items: center; }
+@media (prefers-reduced-motion: no-preference) { .sim-laeuft i { animation: sim-dreh 1s linear infinite; } @keyframes sim-dreh { to { transform: rotate(360deg); } } }
+
+/* Halt */
+.sim-halt { border: 3px solid var(--app-mittel, #d29a0c); border-radius: 16px; background: var(--bg2, #fffdf9); box-shadow: 0 4px 0 var(--app-mittel, #d29a0c);
+  padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.sim-halt.ereignis { border-color: var(--sim-blau); box-shadow: 0 4px 0 var(--sim-blau-tief); }
+.sim-h-eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--sim-mittel); display: flex; gap: 6px; align-items: center; }
+.sim-halt.ereignis .sim-h-eyebrow { color: var(--k-info-fg, #1f5f8f); }
+.sim-halt h4 { margin: 0; font: 800 16px/1.25 var(--font-display, inherit); }
+.sim-halt p { margin: 0; font-size: 13px; color: var(--text2, #5c4a36); }
+.sim-teile { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.sim-teile div { display: flex; gap: 6px; align-items: center; }
+.sim-knoepfe { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sim-knoepfe .sim-knopf, .sim-wahl .sim-knopf { font-size: 14px; min-height: 44px; }
+.sim-wahl { display: flex; flex-direction: column; gap: 8px; }
+.sim-wahl .sim-knopf { justify-content: flex-start; }
+.exp-overlay.sim-gespiegelt { visibility: hidden !important; pointer-events: none !important; }
+
+/* Tafeln, Zusammenfassung */
+.sim-tafel { background: var(--bg2, #fffdf9); border: 3px solid var(--sim-rand); border-radius: 16px; box-shadow: 0 4px 0 var(--sim-rand); padding: 12px; min-width: 0; }
+.sim-h3 { margin: 0 0 8px; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text3, #846d52); display: flex; gap: 6px; align-items: center; }
+.sim-h3 i { font-size: 15px; }
+.sim-bilanz { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center; }
+.sim-bilanz div { background: var(--bg3, #f6ead2); border-radius: 10px; padding: 6px 2px; }
+.sim-bilanz b { display: block; font: 800 20px var(--font-display, inherit); font-variant-numeric: tabular-nums; }
+.sim-bilanz small { font-size: 11px; color: var(--text3, #846d52); font-weight: 700; }
+.sim-vn { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 6px 0; border-bottom: 2px dashed var(--sim-linie); }
+.sim-vn b { font-weight: 800; font-variant-numeric: tabular-nums; text-align: right; }
+.sim-kurve { width: 100%; height: auto; display: block; margin-top: 6px; }
+.sim-k-gitter { stroke: var(--sim-linie); stroke-width: 1; }
+.sim-k-linie { stroke: var(--sim-linie-po); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.sim-k-pfad { fill: none; stroke: var(--sim-blau); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.sim-k-punkt { fill: var(--bg2, #fffdf9); stroke: var(--sim-blau); stroke-width: 2; }
+.sim-k-punkt.ende { fill: var(--sim-blau); }
+.sim-k-text { font: 700 10px var(--font-text, inherit); fill: var(--text3, #846d52); }
+.sim-braucht { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.sim-braucht li { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+.sim-braucht li i { color: var(--sim-mittel); font-size: 16px; flex: none; }
+.sim-braucht li.ok i { color: var(--sim-gut); }
+.sim-kacheln { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.sim-kacheln .sim-knopf { justify-content: flex-start; font-size: 14px; }
+.sim-zeit { margin: 0; text-align: center; }
+
+/* Farben, Pfeile */
+.sim-gut { color: var(--sim-gut); } .sim-mittel { color: var(--sim-mittel); } .sim-schlecht { color: var(--sim-schlecht); } .sim-neutral { color: var(--text2, #5c4a36); }
+.sim-auf { color: var(--sim-gut); font-weight: 800; } .sim-ab { color: var(--sim-schlecht); font-weight: 800; }
+.sim-blass { color: var(--text3, #846d52); } .sim-klein { font-size: 12px; } .sim-zahl { font-variant-numeric: tabular-nums; }
+.sim-reihe { display: inline-flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.sim-leer { margin: 0; padding: 16px 8px; text-align: center; color: var(--text3, #846d52); font-size: 13px; }
+.sim-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Wappen */
+html .sim-wappen.lg-crest { width: 20px !important; height: 22px !important; min-width: 20px; flex: none; font-size: 0 !important; display: inline-block; vertical-align: middle; }
+html .sim-wappen-gross.lg-crest { width: 52px !important; height: 56px !important; flex: none; font-size: 0 !important; display: block; margin: 0 auto 4px; }
+
+/* Spielvorschau (D62 · 1) */
+.sim-duell { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 6px; text-align: center; }
+.sim-duell b { display: block; font: 800 14px/1.2 var(--font-display, inherit); }
+.sim-duell small { color: var(--text3, #846d52); font-size: 12px; font-variant-numeric: tabular-nums; }
+.sim-vs { font-weight: 800; color: var(--text3, #846d52); font-size: 13px; }
+.sim-dreier { display: flex; height: 22px; border-radius: 10px; overflow: hidden; border: 3px solid var(--sim-rand); gap: 2px; background: var(--sim-rand); margin-top: 10px; }
+.sim-dreier div { min-width: 0; }
+.sim-dreier .s { background: var(--sim-sieg); } .sim-dreier .u { background: var(--bg4, #e8d3ab); } .sim-dreier .n { background: var(--sim-niederlage); }
+html.dark .sim-dreier .u { background: #7c8798; }
+.sim-dreier-text { display: flex; justify-content: space-between; gap: 6px; font-size: 12px; font-weight: 700; color: var(--text2, #5c4a36); margin: 4px 0 2px; font-variant-numeric: tabular-nums; }
+.sim-dreier-text b { font-weight: 800; }
+.sim-zeile2 { display: flex; justify-content: space-between; gap: 10px; align-items: center; font-size: 13px; padding: 6px 0; border-bottom: 2px dashed var(--sim-linie); }
+.sim-zeile2:last-child { border-bottom: 0; padding-bottom: 0; }
+.sim-zeile2 > span:first-child { flex: none; display: inline-flex; gap: 4px; align-items: center; color: var(--text2, #5c4a36); }
+.sim-zeile2 > span:last-child { text-align: right; min-width: 0; }
+.sim-form { display: inline-flex; gap: 3px; }
+.sim-form i { font-style: normal; width: 18px; height: 18px; border-radius: 5px; display: grid; place-items: center; font: 800 10px/1 var(--font-text, inherit); color: #fff; }
+.sim-form i.s { background: var(--sim-sieg); } .sim-form i.u { background: var(--sim-remis); } .sim-form i.n { background: var(--sim-niederlage); }
+.sim-vorschau .pos-badge-sm { font-size: 10px; padding: 1px 5px; }
+.sim-office { padding: 0 12px; margin: 4px 0 12px; }
+body:not(.dfl-shell) .sim-office { padding: 0; margin: 0 0 14px; max-width: 720px; }
+.sim-spieltag-vorschau { margin: 0 0 12px; }
+body.dfl-shell .sim-spieltag-vorschau { margin: 8px 10px 12px; }
+
+/* Konferenz (D62 · 2) */
+.sim-paar { display: grid; grid-template-columns: 1fr auto 1fr; gap: 6px; align-items: center; padding: 6px 4px; border-bottom: 2px solid var(--sim-linie); }
+.sim-paar:last-child { border-bottom: 0; }
+.sim-paar.eigen { background: var(--bg3, #f6ead2); border-radius: 10px; outline: 3px solid var(--sim-blau); outline-offset: -3px; }
+.sim-t { display: flex; gap: 6px; align-items: center; font-weight: 800; font-size: 13px; min-width: 0; }
+.sim-t .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sim-t.r { justify-content: flex-end; }
+.sim-e { display: flex; flex-direction: column; align-items: center; font: 800 15px var(--font-display, inherit); background: var(--k-kopf, var(--bg4, #8b5a2b)); color: var(--k-kopf-text, #fff);
+  border-radius: 8px; padding: 1px 9px; font-variant-numeric: tabular-nums; line-height: 1.25; }
+.sim-e small { font-size: 9px; font-weight: 700; opacity: .9; }
+.sim-sch2 { grid-column: 1 / 4; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px; color: var(--text3, #846d52); line-height: 1.35; }
+.sim-sch2 span:last-child { text-align: right; }
+.sim-bewegung { display: flex; gap: 8px; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 700; margin-top: 8px;
+  background: var(--bg2, #fffdf9); border: 3px solid var(--sim-rand); border-radius: 14px; padding: 8px 10px; }
+.sim-pm-konf .sim-tafel { box-shadow: none; }
+.sim-blaettern { display: grid; grid-template-columns: 52px 1fr 52px; gap: 10px; align-items: center; margin-bottom: 10px; }
+.sim-blaettern b { text-align: center; font: 800 16px var(--font-display, inherit); }
+.sim-blaettern .sim-knopf { min-height: 42px; padding: 4px; }
+
+/* Tabelle (D62 · 3) */
+.sim-tab { width: 100%; border-collapse: collapse; font-size: 13px; }
+.sim-tab th { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--text3, #846d52); font-weight: 800; text-align: right; padding: 0 4px 4px; }
+.sim-tab th:nth-child(2) { text-align: left; }
+.sim-tab td { padding: 5px 3px; text-align: right; border-top: 2px solid var(--sim-linie); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sim-tab td.sim-verein { text-align: left; width: 100%; }
+.sim-tab td.sim-verein > span { display: inline-flex; gap: 6px; align-items: center; }
+.sim-tab td.sim-verein small { color: var(--text3, #846d52); font-size: 11px; }
+.sim-tab .sim-auf, .sim-tab .sim-ab { font-size: 10px; font-weight: 800; line-height: 1; }
+/* Pfeil an der Platzierung statt neben den Punkten (Testrückmeldung 2026-10-22): feste Breite, damit die Spalte ruhig bleibt */
+.sim-tab td.sim-platz { text-align: left; padding-left: 2px; }
+.sim-tab .sim-platz-in { display: inline-flex; align-items: center; gap: 3px; }
+.sim-tab .sim-pf { display: inline-block; min-width: 20px; text-align: left; }
+@media (max-width: 480px) { .sim-tab td.sim-verein small { display: none; } }
+.sim-tab tr.eigen td { background: var(--bg3, #f6ead2); font-weight: 800; }
+.sim-tab tr.linie td { border-bottom: 3px dashed var(--sim-linie-po); }
+.sim-tab tr.sim-luecke td { text-align: center; color: var(--text3, #846d52); padding: 0; line-height: 1; border-top: 0; }
+.sim-seed { display: inline-grid; place-items: center; width: 22px; height: 20px; border-radius: 6px; font-size: 11px; font-weight: 800; }
+.sim-seed.division { background: var(--sim-gold); color: #2a1c02; }
+.sim-seed.wildcard { background: var(--sim-blau); color: #fff; }
+.sim-krone { color: var(--sim-mittel); display: inline-flex; }
+.sim-chance { display: inline-block; min-width: 42px; text-align: center; font-weight: 800; font-size: 12px; border-radius: 999px; padding: 1px 6px; }
+.sim-chance.hoch { background: var(--sim-gut-bg); color: var(--sim-gut); }
+.sim-chance.mittel { background: var(--sim-mittel-bg); color: var(--sim-mittel); }
+.sim-chance.tief { background: var(--sim-schlecht-bg); color: var(--sim-schlecht); }
+.sim-chance.warten { color: var(--text3, #846d52); }
+.sim-legende { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 11px; color: var(--text3, #846d52); margin-top: 8px; }
+.sim-legende span { display: inline-flex; gap: 4px; align-items: center; }
+.sim-legende .sim-seed { width: 18px; height: 16px; font-size: 10px; }
+.sim-linie-text { color: var(--sim-schlecht); }
+.sim-seg { display: grid; grid-template-columns: 1fr 1fr; border: 3px solid var(--sim-rand); border-radius: 12px; overflow: hidden; margin: 6px 0 10px; }
+.sim-seg button { font: 800 13px var(--font-text, inherit); padding: 7px; border: 0; background: var(--bg2, #fffdf9); color: var(--text2, #5c4a36); cursor: pointer; }
+.sim-seg button + button { border-left: 2px solid var(--sim-linie); }
+.sim-seg button[aria-pressed="true"] { background: var(--sim-blau); color: #fff; }
+.sim-liga-tabelle .sim-tab { margin-top: 2px; }

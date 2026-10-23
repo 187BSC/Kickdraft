@@ -1,0 +1,62 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   DFL · Teamlage  ·  v1   (D110, 2026-10-11; lädt nach dfl_wechsel.css)
+   ─────────────────────────────────────────────────────────────────────────
+   Lage-Marken (Titel jetzt / Mittelfeld / Neuaufbau), Liga-Reiter „Lage“ (Liste mit Filter), Box des Trade-Partners.
+   Nur Tokens (Kenney Tag/Nacht), 2–3-px-Ränder wie die übrigen Kenney-Tafeln.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Lage-Marke ───────────────────────────────────────────────────────────── */
+.lage-marke { display: inline-flex; align-items: center; gap: 4px; font: 800 11px/1.35 var(--font-text, system-ui); border-radius: 999px;
+  padding: 1px 8px 1px 6px; white-space: nowrap; border: 2px solid transparent; }
+.lage-marke i { font-size: 13px; }
+.lage-marke.l-titel { background: var(--k-gold, #f1c40f); color: #2a1c02; border-color: color-mix(in oklab, #2a1c02 25%, transparent); }
+.lage-marke.l-mittelfeld { background: var(--bg3); color: var(--text); border-color: var(--k-linie, var(--border)); }
+.lage-marke.l-neuaufbau { background: var(--k-gruen, #78bc61); color: var(--k-gruen-text, #10230a); border-color: color-mix(in oklab, var(--k-gruen-text, #10230a) 25%, transparent); }
+/* Schild in der Trade-Zentrale (dfl_spiel.css: Neuaufbau blau) – dieselbe Farbe wie die Marke */
+.dfl-tr-badge.neuaufbau { background: var(--k-gruen, #78bc61); color: var(--k-gruen-text, #10230a); }
+
+/* ── Liga → „Lage“ ─────────────────────────────────────────────────────────── */
+.lage-box { display: flex; flex-direction: column; gap: 10px; }
+.lage-kopf { display: flex; flex-direction: column; gap: 2px; }
+.lage-kopf b { font: 800 17px/1.2 var(--font-display, var(--font-text, system-ui)); color: var(--text); }
+.lage-kopf small { font-size: 12px; color: var(--text2); }
+.lage-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.lage-chip { font: 700 12.5px/1 var(--font-text, system-ui); padding: 8px 12px; border-radius: 999px; background: var(--bg2); color: var(--text);
+  border: 2px solid var(--k-rand, var(--border)); box-shadow: 0 2px 0 var(--k-rand, transparent); cursor: pointer; min-height: 36px; }
+.lage-chip.an { background: var(--k-blau-knopf, #2c7cb5); color: #fff; border-color: var(--k-blau-schatten, #1d5a85); box-shadow: 0 2px 0 var(--k-blau-schatten, #1d5a85); }
+.lage-chip:active { transform: translateY(2px); box-shadow: none; }
+.lage-liste { display: flex; flex-direction: column; background: var(--bg2); border: 3px solid var(--k-rand, var(--border)); border-radius: 16px;
+  box-shadow: 0 4px 0 var(--k-rand, transparent); overflow: hidden; }
+.lage-zeile { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 9px 12px;
+  border-top: 2px solid var(--k-linie, var(--border)); }
+.lage-zeile:first-child { border-top: 0; }
+.lage-zeile.ich { background: color-mix(in oklab, var(--k-blau, #4aa3df) 12%, var(--bg2)); }
+.lage-wappen { width: 26px; height: 26px; min-width: 26px; }
+.lage-nm { display: flex; flex-direction: column; min-width: 0; }
+.lage-nm b { font-size: 14px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lage-nm b small { font-weight: 600; color: var(--text2); }
+.lage-nm > small { font-size: 12px; color: var(--text2); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lage-nm > small.lage-kader b { color: var(--text); }
+.lage-r { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+.lage-r .lage-marke { font-size: 10.5px; padding: 1px 6px 1px 5px; }
+.lage-frei { color: var(--k-gut-fg, var(--text)); font-weight: 700; }
+.lage-leer { padding: 14px; color: var(--text2); font-size: 13px; }
+.lage-fuss { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: 12px; color: var(--text2); }
+.lage-fuss .lage-marke { font-size: 10.5px; }
+
+/* ── Trade-Zentrale: Box des Partners ─────────────────────────────────────── */
+.lage-partner { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 10px; align-items: center; margin: 8px 0 10px; padding: 9px 12px;
+  background: var(--bg2); border: 2px solid var(--k-linie, var(--border)); border-radius: 14px; }
+.lage-partner > i { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 19px; background: var(--bg3);
+  color: var(--text); border: 2px solid var(--k-rand, var(--border)); }
+.lage-partner.l-titel > i { background: var(--k-gold, #f1c40f); color: #2a1c02; }
+.lage-partner.l-neuaufbau > i { background: var(--k-gruen, #78bc61); color: var(--k-gruen-text, #10230a); }
+.lage-partner > span:nth-child(2) { display: flex; flex-direction: column; min-width: 0; }
+.lage-partner b { font-size: 13.5px; color: var(--text); }
+.lage-partner small { font-size: 12px; color: var(--text2); line-height: 1.35; }
+.lage-partner-kader { display: flex; flex-direction: column; align-items: flex-end; text-align: right; font-variant-numeric: tabular-nums; }
+@media (max-width: 400px) {
+  .lage-partner { grid-template-columns: 30px minmax(0, 1fr); }
+  .lage-partner > i { width: 30px; height: 30px; font-size: 17px; }
+  .lage-partner-kader { grid-column: 2; flex-direction: row; gap: 6px; align-items: baseline; justify-content: flex-start; text-align: left; }
+}

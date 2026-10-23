@@ -1,0 +1,75 @@
+/* DFL · Verletzungen und Medizin (D102, js/dfl_medizin_patch.js): Office-Kachel, Medizin-Blatt, Karte unter Verein & Stadion,
+   Kaderliste (einsatzfähig, Reha-Marke), Spieler-Blatt mit Prognose. Nur Tokens (Kenney Tag/Nacht). */
+
+/* Office: mit der Medizin-Kachel sind es 9 – die letzte (Postfach) geht über die ganze Breite */
+#app-office-kopf .ok-kacheln > .ok-kachel:last-child:nth-child(odd) { grid-column: 1 / -1; min-height: 0; }
+
+/* ── Spieler-Blatt ── */
+.med-blatt { margin-top: 10px; padding: 10px 12px; border-radius: 14px; background: var(--bg3, #222221); border: 2px solid var(--k-linie, var(--border, #3b3a37));
+  display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--text, #eeeeec); }
+.med-zeile { display: flex; gap: 8px; align-items: flex-start; line-height: 1.35; }
+.med-zeile > .ti { font-size: 17px; color: var(--app-schlecht, #f07462); flex: none; margin-top: 1px; }
+.med-zeile.leise { color: var(--text2, #b5b3ad); font-size: 12px; }
+.med-reha-t { font-style: normal; font-weight: 800; color: var(--k-mittel-fg, var(--app-mittel, #f0c05a)); }
+.med-kurve { width: 100%; height: auto; display: block; }
+.med-k-aus { fill: color-mix(in oklab, var(--app-schlecht, #f07462) 18%, transparent); }
+.med-k-txt { font: 700 10px/1 var(--font-text, system-ui); fill: var(--text3, #8e8c86); }
+.med-k-linie { stroke: var(--text3, #8e8c86); stroke-width: 1; stroke-dasharray: 3 3; }
+.med-k-ohne { fill: none; stroke: var(--text3, #8e8c86); stroke-width: 2; }
+.med-k-mit { fill: none; stroke: var(--app-gut, #3fcf7a); stroke-width: 2.5; }
+.med-legende { display: flex; gap: 14px; font-size: 11px; color: var(--text3, #8e8c86); }
+.med-legende span::before { content: ''; display: inline-block; width: 14px; height: 3px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+.med-legende .mit::before { background: var(--app-gut, #3fcf7a); }
+.med-legende .ohne::before { background: var(--text3, #8e8c86); }
+
+/* ── Medizin-Blatt (Office-Kachel) ── */
+.med-kopf { display: flex; gap: 12px; align-items: center; margin: 2px 0 12px; padding-right: 44px; }
+.med-kopf > div { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.med-kopf b { font-size: 16px; }
+.med-kopf small { font-size: 12px; color: var(--text2, #b5b3ad); }
+.med-symbol { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; flex: none; font-size: 24px;
+  background: color-mix(in oklab, var(--app-schlecht, #f07462) 16%, var(--bg3, #222221)); color: var(--app-schlecht, #f07462); }
+.med-zahlen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+.med-zahlen > div { background: var(--bg3, #222221); border-radius: 14px; padding: 10px 8px; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.med-zahlen b { font: 900 22px/1 var(--font-display, system-ui); font-variant-numeric: tabular-nums; }
+.med-zahlen b small { font-size: 13px; color: var(--text3, #8e8c86); }
+.med-zahlen span { font-size: 11px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--text3, #8e8c86); }
+.med-saison { font-size: 12px; color: var(--text2, #b5b3ad); margin: 0 2px 10px; line-height: 1.4; }
+.med-saison b { color: var(--text, #eeeeec); }
+.med-liste { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.med-spieler { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 44px; padding: 8px 10px; border-radius: 12px; cursor: pointer;
+  border: 2px solid var(--k-linie, var(--border, #3b3a37)); background: var(--bg2, #191918); color: inherit; font: inherit; text-align: left; }
+.med-spieler.aus { border-left: 4px solid var(--app-schlecht, #f07462); }
+.med-spieler.reha { border-left: 4px solid var(--app-mittel, #f0c05a); }
+.med-name { font-weight: 800; font-size: 14px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.med-info { font-size: 12px; color: var(--text2, #b5b3ad); text-align: right; flex: none; max-width: 58%; }
+.med-leer { font-size: 13px; color: var(--text3, #8e8c86); margin: 4px 2px 12px; }
+.med-ausbau { display: flex; flex-direction: column; gap: 8px; }
+.med-naechste { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; border-radius: 14px; background: var(--bg3, #222221); }
+.med-naechste b { font-size: 14px; }
+.med-naechste span { font-size: 12px; color: var(--text2, #b5b3ad); line-height: 1.4; }
+.med-bau { display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: var(--k-mittel-fg, var(--app-mittel, #f0c05a)); }
+.med-bau-bahn { display: block; height: 12px; border: 2px solid var(--k-rand, var(--border, #3b3a37)); border-radius: 6px; background: var(--bg4, #3b3a37);
+  box-sizing: border-box; overflow: hidden; }
+.med-bau-bahn > i { display: block; height: 100%; background: var(--app-mittel, #f0c05a); }
+.med-bau.fertig { flex-direction: row; align-items: center; color: var(--k-gut-fg, var(--app-gut, #3fcf7a)); }
+.med-ausbau .app-knopf[disabled] { opacity: .5; cursor: not-allowed; }
+
+/* ── Karte unter Verein & Stadion ── */
+.fc-icon.medizin { background: color-mix(in oklab, var(--app-schlecht, #f07462) 22%, var(--bg3, #222221)); color: var(--app-schlecht, #f07462); }
+.med-karte .med-naechste { margin: 8px 0; }
+.med-karte .med-bau { margin-top: 8px; }
+
+/* ── Kaderliste: einsatzfähig, Reha-Marke ── */
+.med-einsatz { margin: 6px 0 8px; padding: 8px 10px; border-radius: 12px; background: var(--bg3, #222221); display: flex; flex-direction: column; gap: 6px; }
+.med-einsatz-kopf { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--text2, #b5b3ad); }
+.med-einsatz-kopf b { color: var(--text, #eeeeec); font-size: 15px; }
+.med-einsatz-kopf small { font-size: 11px; color: var(--text3, #8e8c86); }
+.med-balken { position: relative; height: 12px; border: 2px solid var(--k-rand, var(--border, #3b3a37)); border-radius: 6px; background: var(--bg4, #3b3a37); box-sizing: border-box; }
+.med-balken > i { display: block; height: 100%; border-radius: 3px 0 0 3px; background: var(--app-gut, #3fcf7a); }
+.med-balken.knapp > i { background: var(--app-schlecht, #f07462); }
+.med-balken > em { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--text, #eeeeec); }
+.med-reha-abz { display: inline-flex; align-items: center; gap: 1px; margin-left: 4px; padding: 0 4px; border-radius: 5px; vertical-align: 2px;
+  font: 800 9.5px/1.45 var(--font-zahl, system-ui); background: var(--k-mittel-bg, #f8ecc4); color: var(--k-mittel-fg, #7a5800);
+  border: 1px solid color-mix(in oklab, var(--k-mittel-fg, #7a5800) 35%, transparent); }
+.med-reha-abz .ti { font-size: 10px; }

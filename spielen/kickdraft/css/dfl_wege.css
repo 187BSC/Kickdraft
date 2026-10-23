@@ -1,0 +1,54 @@
+/* DFL · Kurze Wege (D121, dfl_wege_patch.js + dfl_app_shell.js) – nur Tokens (Kenney Tag/Nacht), Handy zuerst */
+
+/* Front Office: Cap-Zeile, große Kachel nach Phase, feste Kacheln, schmale Zeilen */
+.fo-kurz { gap: 12px; }
+.fo-capzeile { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 16px; background: var(--bg2, #1e2230);
+  border: 2px solid var(--k-rand, var(--border, #30363d)); }
+.fo-capzeile .fo-zeile b { font-size: 18px; }
+.fo-mini { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--text3, #8a95a6); }
+.fo-mini b { color: var(--text, #f5f6fa); font-variant-numeric: tabular-nums; }
+.fo-kurz .fo-kacheln { gap: 8px; }
+.fo-kurz .fo-kachel { min-height: 76px; padding: 10px 12px; gap: 3px; }
+.fo-kurz .fo-kachel i { font-size: 20px; }
+.fo-kurz .fo-kachel.fo-gross { grid-column: span 2; min-height: 92px; border-color: var(--app-gut, #3d9a2a); }
+.fo-kurz .fo-kachel.fo-gross b { font-size: 18px; }
+.fo-kurz .fo-kachel.fo-gross small { font-size: 13px; }
+.fo-kurz .fo-kachel.fo-gross.warn { border-color: var(--app-schlecht, #d0402f); }
+.fo-zeilen { display: flex; flex-direction: column; gap: 6px; }
+.fo-zeile2 { display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%; min-height: 46px; padding: 8px 12px; box-sizing: border-box;
+  border: 2px solid var(--k-rand, var(--border, #30363d)); border-radius: 12px; background: var(--bg2, #1e2230); color: var(--text, #f5f6fa);
+  font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
+.fo-zeile2 > span:first-child { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; }
+.fo-zeile2 > span:last-child { display: inline-flex; align-items: center; gap: 4px; color: var(--text3, #8a95a6); font-size: 13px; }
+.fo-zeile2.warn > span:last-child { color: var(--k-schlecht-fg, var(--app-schlecht, #d0402f)); font-weight: 800; }
+.fo-zeile2:focus-visible { outline: 2px solid var(--k-blau, #3498db); outline-offset: 2px; }
+details.fo-zeile2 { display: block; padding: 0; }
+details.fo-zeile2 > summary { display: flex; justify-content: space-between; align-items: center; min-height: 42px; padding: 0 12px; list-style: none; cursor: pointer; }
+details.fo-zeile2 > summary::-webkit-details-marker { display: none; }
+details.fo-zeile2 > summary > span { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; }
+details.fo-zeile2[open] > summary .ti-chevron-down { transform: rotate(180deg); }
+.fo-cap-pos { padding: 0 10px 10px; }
+.fo-cap-pos .dfl-blick-cap { border: 0; padding: 0; background: none; }
+
+/* Reiter in einer Zeile (Kader, Liga, Transfer): nichts versteckt, notfalls seitlich wischen */
+body.dfl-shell #view-squad .subtabs, body.dfl-shell #view-liga .subtabs, body.dfl-shell #view-transfer .subtabs {
+  flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; gap: 4px; }
+body.dfl-shell #view-squad .subtabs::-webkit-scrollbar, body.dfl-shell #view-liga .subtabs::-webkit-scrollbar, body.dfl-shell #view-transfer .subtabs::-webkit-scrollbar { display: none; }
+body.dfl-shell #view-squad .subtabs .subtab, body.dfl-shell #view-liga .subtabs .subtab, body.dfl-shell #view-transfer .subtabs .subtab {
+  flex: 0 0 auto; padding-left: 8px; padding-right: 8px; font-size: 13px; white-space: nowrap; }
+
+/* Verein: drei Reiter */
+.vt-reiter { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 4px 0 12px; border: 2px solid var(--k-rand, var(--border, #30363d)); border-radius: 12px; overflow: hidden; }
+.vt-reiter button { min-height: 42px; border: 0; background: var(--bg2, #1e2230); color: var(--text, #f5f6fa); font: 800 14px var(--font-text, system-ui); cursor: pointer; }
+.vt-reiter button + button { border-left: 2px solid var(--k-rand, var(--border, #30363d)); }
+.vt-reiter button.an { background: var(--k-blau-knopf, #2c7cb5); color: #fff; }
+.vt-reiter button:focus-visible { outline: 2px solid var(--k-blau, #3498db); outline-offset: -4px; }
+[data-vt-aus] { display: none !important; }
+
+/* Trade-Zentrale: Wertliste und Historie als Filter */
+.tz-wege { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+.tz-wege-zurueck { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; margin-bottom: 8px; padding: 0 4px; border: 0; background: none;
+  color: var(--text2, #a4b0be); font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
+
+/* Einstellungen: Spiel neu starten */
+.einst-neustart .app-knopf { width: 100%; min-height: 44px; border-color: var(--app-schlecht, #d0402f); color: var(--k-schlecht-fg, var(--app-schlecht, #d0402f)); }

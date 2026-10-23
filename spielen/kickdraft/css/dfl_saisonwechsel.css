@@ -1,0 +1,294 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   DFL · Saisonwechsel (D91–D93, 2026-10-10) – js/dfl_saisonwechsel_patch.js
+   Saisonvorbereitung (#view-sv am Handy, #dfl-sv-ov am PC), Vertragsblatt (Folgevertrag, „heute zahlen“),
+   Vormerken im Spieler-Blatt, Briefings Saisonabschluss/-start (#dfl-sw-briefing), Marken in Kaderliste und Aufstellung.
+   Stil wie die Vorschau spiel/dfl_saisonwechsel_vorschau.html: nur Tokens (Kenney Tag/Nacht), lädt vor theme_dfl_kenney.css.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  --sw-rand: var(--k-rand, var(--border, #8b5a2b));
+  --sw-linie: var(--k-linie, var(--border, #e3c99a));
+  --sw-blau: var(--k-blau-knopf, #2c7cb5); --sw-blau-schatten: var(--k-blau-schatten, #1d5a85);
+  --sw-gruen: var(--k-gruen, #78bc61); --sw-gruen-tief: var(--k-gruen-tief, #4d8236); --sw-gruen-text: var(--k-gruen-text, #10230a);
+  --sw-rot: var(--red, #c0392b); --sw-rot-knopf: #c0392b; --sw-rot-schatten: #7d241b;
+  --sw-gut: var(--k-gut-fg, #2f6b1f); --sw-gut-bg: #e3f1d8;
+  --sw-mittel: var(--k-mittel-fg, #7a5800); --sw-mittel-bg: #fbefc6;
+  --sw-schlecht: var(--k-schlecht-fg, #a52a1e); --sw-schlecht-bg: #f8ddd7;
+  --sw-fest: #2c7cb5; --sw-neu: #4d8236; --sw-neu-2: #b9dca8; --sw-rookie: #e0a800; --sw-dead: #c0392b; --sw-dead-2: #eba59d;
+  --sw-gold: var(--gold, #a86b12);
+}
+html.dark {
+  --sw-rot-schatten: #5c1a14;
+  --sw-gut-bg: #17352a; --sw-mittel-bg: #3a3219; --sw-schlecht-bg: #3f1f27;
+  --sw-fest: #3498db; --sw-neu: #2ecc71; --sw-neu-2: #1d5c39; --sw-rookie: #f1c40f; --sw-dead: #ff6b5b; --sw-dead-2: #6e2c2c;
+}
+
+/* ── Grundbausteine ─────────────────────────────────────────────────────────── */
+.sw { display: flex; flex-direction: column; gap: 12px; padding: 4px 2px 8px; font-family: var(--font-text, system-ui); color: var(--text); min-width: 0; }
+.sw-kopf h2 { margin: 2px 0 0; font: 900 24px/1.1 var(--font-display, system-ui); }
+.sw-kopf small { display: block; color: var(--text2); font-size: 13px; margin-top: 2px; }
+.sw-karte { background: var(--bg2); border: var(--k-rahmen, 1px solid var(--border)); border-radius: var(--rund, 16px); box-shadow: var(--k-hebung, none);
+  padding: 12px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.sw-ueber { font-size: 11.5px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--text3); }
+.sw-zeile { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.sw-zeile.sw-links { justify-content: flex-start; gap: 14px; }
+.sw-klein { font-size: 12.5px; color: var(--text2); }
+.sw-gross { font: 800 28px/1 var(--font-zahl, var(--font-display, system-ui)); font-variant-numeric: tabular-nums; }
+.sw-gross.klein { font-size: 24px; }
+.sw-gross small { font-size: 14px; font-weight: 700; color: var(--text2); }
+.sw-gross.gut { color: var(--sw-gut); } .sw-gross.schlecht { color: var(--sw-schlecht); }
+.sw-gross.gut small, .sw-gross.schlecht small { color: inherit; opacity: .8; }
+.sw-leer { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; padding: 40px 16px; color: var(--text2); }
+.sw-leer i { font-size: 34px; color: var(--text3); }
+.sw-leer b { color: var(--text); }
+.sw-gesicht { width: 44px; height: 50px; border-radius: 10px; overflow: hidden; background: var(--bg4); flex: none; position: relative; display: inline-block; }
+.sw-gesicht svg { position: absolute; width: 104%; height: auto; left: -2%; top: -5%; }
+.sw-gesicht.klein { width: 34px; height: 38px; border-radius: 8px; }
+.sw-gesicht.gross { width: 64px; height: 74px; border-radius: 12px; }
+.sw-roll { display: flex; gap: 6px; align-items: flex-start; font-size: 12.5px; color: var(--text2); background: var(--bg3); border-radius: 10px; padding: 5px 9px; }
+.sw-roll i { font-size: 16px; color: var(--sw-blau); margin-top: 1px; }
+
+/* ── Cap je Saison: Säulen ──────────────────────────────────────────────────── */
+.sw-saeulen { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; align-items: end; }
+.sw-sl { display: flex; flex-direction: column; align-items: stretch; gap: 3px; min-width: 0; text-align: center; }
+.sw-sl-frei { font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.sw-sl-frei small { display: block; font-size: 10.5px; font-weight: 700; color: var(--text3); }
+.sw-sl-frei.gut { color: var(--sw-gut); } .sw-sl-frei.schlecht { color: var(--sw-schlecht); }
+.sw-sl-flaeche { position: relative; height: 128px; border: 3px solid var(--sw-rand); border-radius: 10px 10px 6px 6px; background: var(--bg3); overflow: hidden; }
+.sw-sl.jetzt .sw-sl-flaeche { background: var(--bg4); }
+.sw-sl-flaeche .sw-seg { position: absolute; left: 0; right: 0; transition: bottom .35s ease, height .35s ease; }
+.sw-sl-limit { position: absolute; left: 0; right: 0; height: 0; border-top: 3px solid var(--text); transition: bottom .35s ease; }
+.sw-sl-limit.prognose { border-top-style: dashed; }
+.sw-sl-jahr { font-size: 12px; font-weight: 800; line-height: 1.2; }
+.sw-sl-art { font-size: 10.5px; color: var(--text3); font-weight: 700; line-height: 1.2; }
+.sw-seg.fest { background: var(--sw-fest); }
+.sw-seg.neu { background: var(--sw-neu); }
+.sw-seg.rookie { background: var(--sw-rookie); }
+.sw-seg.vorab { background: repeating-linear-gradient(135deg, var(--sw-neu) 0 5px, var(--sw-neu-2) 5px 9px); }
+.sw-seg.dead { background: repeating-linear-gradient(135deg, var(--sw-dead) 0 5px, var(--sw-dead-2) 5px 9px); }
+.sw-legende { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--text2); }
+.sw-legende > span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.sw-legende i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.sw-legende i.fest { background: var(--sw-fest); } .sw-legende i.neu { background: var(--sw-neu); } .sw-legende i.rookie { background: var(--sw-rookie); }
+.sw-legende i.vorab { background: repeating-linear-gradient(135deg, var(--sw-neu) 0 3px, var(--sw-neu-2) 3px 5px); }
+.sw-legende i.dead { background: repeating-linear-gradient(135deg, var(--sw-dead) 0 3px, var(--sw-dead-2) 3px 5px); }
+
+/* Waagerechter Cap-Balken (Briefings) */
+.sw-capbalken { position: relative; height: 24px; border: 3px solid var(--sw-rand); border-radius: 12px; background: var(--bg3); overflow: hidden; }
+.sw-capbalken.flach { height: 16px; }
+.sw-capbalken .sw-seg { position: absolute; top: 0; bottom: 0; }
+.sw-capbalken .sw-grenze { position: absolute; top: 0; bottom: 0; width: 4px; margin-left: -2px; background: var(--text); }
+.sw-capbalken.drueber { border-color: var(--sw-rot); }
+
+/* ── Kader: Leiste 28 mit Strich bei 21, Lücken, Picks ──────────────────────── */
+.sw-kaderleiste { display: grid; gap: 2px; position: relative; padding-top: 2px; }
+.sw-kaderleiste i { height: 14px; border-radius: 3px; background: var(--bg4); }
+.sw-kaderleiste i.voll { background: var(--sw-fest); }
+.sw-kaderleiste i.neu { background: var(--sw-neu); }
+.sw-kaderleiste i.rookie { background: var(--sw-rookie); }
+.sw-kaderleiste i.zuviel { background: var(--sw-dead); }
+.sw-kaderleiste .sw-min { position: absolute; top: -3px; bottom: -3px; width: 3px; background: var(--text); left: calc(21 / 28 * 100% - 2px); border-radius: 2px; }
+.sw-luecken { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.sw-luecke { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; padding: 1px 6px 1px 2px; border-radius: 8px; background: var(--bg3);
+  border: 2px solid var(--sw-linie); font-variant-numeric: tabular-nums; }
+.sw-luecke.fehlt { border-color: var(--sw-dead); background: var(--sw-schlecht-bg); color: var(--sw-schlecht); }
+.sw-luecke.ok { color: var(--text2); }
+.sw-luecke.mehr { color: var(--text2); border-style: dashed; }
+.sw-tickets { display: flex; flex-wrap: wrap; gap: 6px; }
+.sw-ticket { display: inline-flex; align-items: center; gap: 6px; border: 3px solid var(--sw-rand); border-radius: 10px; padding: 2px 9px 2px 7px; background: var(--bg2);
+  font-weight: 800; font-size: 13px; font-variant-numeric: tabular-nums; }
+.sw-ticket i { color: var(--sw-gold); font-size: 16px; }
+.sw-ticket small { font-weight: 600; color: var(--text2); font-size: 11.5px; }
+
+/* ── Reiter und Listen ──────────────────────────────────────────────────────── */
+.sw-reiter { display: grid; grid-template-columns: 1fr 1fr; background: var(--bg2); border: var(--k-rahmen, 1px solid var(--border)); border-radius: 14px; padding: 4px; gap: 4px; }
+.sw-reiter button { border: 0; border-radius: 10px; min-height: 44px; font: 800 14px var(--font-text, system-ui); color: var(--text2); background: none; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+.sw-reiter button[aria-selected="true"] { background: var(--sw-blau); color: #fff; box-shadow: 0 3px 0 var(--sw-blau-schatten); }
+.sw-panel { display: flex; flex-direction: column; gap: 8px; }
+.sw-listenkopf { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.sw-listenkopf h4 { margin: 0; font: 800 15px var(--font-display, system-ui); }
+.sw-liste { display: flex; flex-direction: column; gap: 8px; }
+.sw-vz { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 4px 10px; align-items: center; background: var(--bg2);
+  border: var(--k-rahmen, 1px solid var(--border)); border-radius: 14px; padding: 7px 8px; transition: background .2s; }
+.sw-vz-wer { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.sw-name { border: 0; background: none; padding: 0; text-align: left; cursor: pointer; color: var(--text); font: 800 14.5px/1.2 var(--font-text, system-ui); overflow-wrap: anywhere; }
+.sw-name:hover { text-decoration: underline; }
+.sw-meta { display: flex; flex-wrap: wrap; gap: 2px 6px; align-items: center; font-size: 12.5px; color: var(--text2); }
+.sw-meta b { color: var(--text); font-variant-numeric: tabular-nums; }
+.sw-vz-knoepfe { display: flex; flex-direction: column; gap: 7px; }
+.sw-status { grid-column: 1 / -1; font-size: 12.5px; font-weight: 700; border-radius: 8px; padding: 3px 8px; }
+.sw-status.gut { background: var(--sw-gut-bg); color: var(--sw-gut); }
+.sw-status.schlecht { background: var(--sw-schlecht-bg); color: var(--sw-schlecht); }
+.sw-vz.bleibt { border-color: var(--sw-gruen-tief); box-shadow: inset 6px 0 0 var(--sw-gruen); }
+.sw-vz.geht { background: var(--bg3); }
+.sw-vz.karriere { grid-template-columns: 44px minmax(0, 1fr); background: var(--bg3); }
+.sw-vz.vorgemerkt { border-color: var(--sw-rot); }
+.sw-link { border: 0; background: none; padding: 0; color: inherit; font: inherit; font-weight: 800; text-decoration: underline; cursor: pointer; }
+.sw-st { display: inline-flex; align-items: center; gap: 4px; font-weight: 800; font-size: 12px; padding: 0 7px; border-radius: 999px; line-height: 1.6; white-space: nowrap; }
+.sw-st i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; background: currentColor; }
+.sw-st.bereit { color: var(--sw-gut); background: var(--sw-gut-bg); }
+.sw-st.offen { color: var(--sw-mittel); background: var(--sw-mittel-bg); }
+.sw-st.markt, .sw-st.nein { color: var(--sw-schlecht); background: var(--sw-schlecht-bg); }
+.sw-knopf { border: 3px solid var(--sw-rand); border-radius: 10px; box-shadow: 0 3px 0 var(--sw-rand); background: var(--bg3); color: var(--text);
+  font: 800 12.5px var(--font-text, system-ui); padding: 4px 8px; min-height: 40px; cursor: pointer; white-space: nowrap;
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: transform .08s, box-shadow .08s; }
+.sw-knopf:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--sw-rand); }
+.sw-knopf.ja[aria-pressed="true"] { background: var(--sw-gruen); color: var(--sw-gruen-text); border-color: var(--sw-gruen-tief); box-shadow: 0 3px 0 var(--sw-gruen-tief); }
+.sw-knopf.nein[aria-pressed="true"], .sw-knopf.schere[aria-pressed="true"] { background: var(--sw-rot-knopf); color: #fff; border-color: var(--sw-rot-schatten); box-shadow: 0 3px 0 var(--sw-rot-schatten); }
+.sw-knopf:focus-visible, .sw-name:focus-visible, .sw-link:focus-visible, .sw-reiter button:focus-visible, .sw-segment button:focus-visible { outline: 3px solid var(--sw-gold); outline-offset: 2px; }
+.sw-mehr { align-self: center; flex: 0 0 auto !important; min-width: 180px; }
+
+/* ── Vertrag verlängern ─────────────────────────────────────────────────────── */
+.sw-vertrag { display: flex; flex-direction: column; gap: 10px; padding-bottom: 6px; }
+.sw-blatt-titel { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding-right: 48px; }
+.sw-blatt-titel b { font: 800 21px/1.1 var(--font-display, system-ui); }
+.sw-blatt-titel small { color: var(--text2); font-size: 12.5px; }
+.sw-v-kopf { display: flex; gap: 12px; align-items: center; }
+.sw-v-kopf > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sw-v-kopf > div > b { font: 800 18px/1.15 var(--font-display, system-ui); }
+.sw-v-kopf > div > span { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 13px; color: var(--text2); }
+.sw-segment { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: var(--bg3); border: 2px solid var(--sw-linie); border-radius: 12px; padding: 3px; }
+.sw-segment button { border: 0; border-radius: 9px; min-height: 44px; font: 800 13.5px var(--font-text, system-ui); color: var(--text2); background: none; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; gap: 1px; }
+.sw-segment button small { font-size: 10px; font-weight: 800; color: var(--sw-gut); }
+.sw-segment button[aria-pressed="true"] { background: var(--sw-blau); color: #fff; box-shadow: 0 3px 0 var(--sw-blau-schatten); }
+.sw-segment button[aria-pressed="true"] small { color: #fff; }
+.sw-regler { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.sw-regler input[type="range"] { width: 100%; accent-color: var(--sw-gruen-tief); height: 28px; margin: 0; }
+.sw-regler b { font-size: 16px; font-variant-numeric: tabular-nums; min-width: 84px; text-align: right; }
+.sw-ms-reihe { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; align-items: end; }
+.sw-ms { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; }
+.sw-ms-wert { font-size: 12.5px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.sw-ms-stapel { width: 100%; height: 92px; display: flex; flex-direction: column; justify-content: flex-end; border-bottom: 3px solid var(--sw-rand); }
+.sw-ms-stapel i { display: block; width: 100%; border-radius: 6px 6px 0 0; transition: height .3s ease; }
+.sw-ms-stapel i + i { border-radius: 0; }
+.sw-ms-stapel i.alt { background: var(--bg4); border: 2px solid var(--sw-linie); border-bottom: 0; }
+.sw-ms-stapel i.neu { background: var(--sw-neu); }
+.sw-ms-stapel i.vorab { background: repeating-linear-gradient(135deg, var(--sw-neu) 0 5px, var(--sw-neu-2) 5px 9px); }
+.sw-ms-jahr { font-size: 11.5px; font-weight: 800; line-height: 1.2; }
+.sw-ms-art { font-size: 10.5px; color: var(--text3); font-weight: 700; line-height: 1.2; }
+.sw-tabelle { overflow-x: auto; }
+table.sw-wirkung { width: 100%; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.sw-wirkung th, .sw-wirkung td { padding: 4px; text-align: right; border-bottom: 2px solid var(--sw-linie); white-space: nowrap; }
+.sw-wirkung th:first-child, .sw-wirkung td:first-child { text-align: left; color: var(--text2); font-weight: 700; }
+.sw-wirkung th { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .04em; }
+.sw-wirkung tr:last-child td { border-bottom: 0; font-weight: 800; }
+.sw-wirkung td.gut { color: var(--sw-gut); } .sw-wirkung td.schlecht { color: var(--sw-schlecht); }
+.sw-v-knoepfe { display: flex; flex-wrap: wrap; gap: 8px; }
+.sw-berater { align-self: center; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text2); min-height: 44px; padding: 0 6px; }
+.sw-berater i { font-size: 16px; }
+.sw-v-knoepfe .app-knopf[disabled] { opacity: .55; cursor: not-allowed; }
+.app-knopf.warn { color: var(--sw-schlecht); }
+
+/* ── Spieler-Blatt: Vormerken, Hinweise ─────────────────────────────────────── */
+.sw-info { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--text2); background: var(--bg3); border-radius: 10px; padding: 6px 10px; margin: 6px 0; }
+.sw-info i { font-size: 16px; margin-top: 1px; flex: none; }
+.sw-info.gut { color: var(--sw-gut); background: var(--sw-gut-bg); font-weight: 700; }
+.sw-info.schlecht { color: var(--sw-schlecht); background: var(--sw-schlecht-bg); font-weight: 700; }
+.sw-vergleich { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 6px 0; }
+.sw-vg { border: 3px solid var(--sw-linie); border-radius: 12px; padding: 8px 10px; background: var(--bg3); display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sw-vg small { font-size: 11.5px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--text3); }
+.sw-vg b { font: 800 19px/1.15 var(--font-zahl, var(--font-display, system-ui)); font-variant-numeric: tabular-nums; }
+.sw-vg span { font-size: 12.5px; color: var(--text2); }
+.sw-vg em { font-style: normal; font-weight: 800; }
+.sw-vg em.gut { color: var(--sw-gut); } .sw-vg em.schlecht { color: var(--sw-schlecht); }
+.sw-vg.an { border-color: var(--sw-rot); background: var(--sw-schlecht-bg); }
+.sw-marke { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 800; border-radius: 6px; padding: 0 6px; line-height: 1.6; white-space: nowrap; vertical-align: 1px; }
+.sw-marke i { font-size: 12px; }
+.sw-marke.schere { color: #fff; background: var(--sw-rot-knopf); }
+.sw-marke.ende { color: var(--text2); background: var(--bg3); border: 1px solid var(--sw-linie); }
+.sw-marke.kompakt { padding: 0 4px; gap: 0; }
+.sw-marke.kompakt i { font-size: 13px; }
+
+/* ── Verträge & Cap (Liste) ─────────────────────────────────────────────────── */
+.sw-vt { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 6px 8px; }
+.sw-vt-name { flex: 1 1 140px; min-width: 0; display: flex; flex-direction: column; }
+.sw-vt-name small { color: var(--text3); font-size: 11px; }
+.sw-vt-name .sw-vt-info { font-weight: 700; color: var(--text2); }
+.sw-vt-info.gut { color: var(--sw-gut); } .sw-vt-info.schlecht { color: var(--sw-schlecht); }
+.sw-vt-rechts { display: flex; flex-direction: column; align-items: flex-end; font-size: 11px; color: var(--text2); min-width: 92px; text-align: right; }
+.sw-vt-rechts small { color: var(--text3); }
+.sw-vt .vt-knoepfe { display: flex; gap: 4px; }
+.sw-vt.vorgemerkt { border-color: var(--sw-rot); }
+.sw-vt-sv { margin: 6px 0; }
+
+/* ── Briefings ──────────────────────────────────────────────────────────────── */
+.sw-verein { display: flex; gap: 10px; align-items: center; }
+.sw-verein > div { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.sw-verein b { font: 800 17px/1.15 var(--font-display, system-ui); }
+.sw-wappen { width: 40px; height: 46px; flex: none; display: inline-flex; align-items: center; justify-content: center; }
+.sw-meister { background: linear-gradient(180deg, var(--sw-mittel-bg), var(--bg2)); border-color: var(--sw-gold); box-shadow: 0 4px 0 var(--sw-gold); }
+.sw-weg { display: flex; flex-wrap: wrap; gap: 6px; }
+.sw-etappe { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; border-radius: 8px; padding: 1px 7px; background: var(--bg3); border: 2px solid var(--sw-linie); }
+.sw-etappe.sieg { border-color: var(--sw-gruen-tief); }
+.sw-etappe.aus { border-color: var(--sw-dead); }
+.sw-runde { font-size: 14px; }
+.sw-preise { display: flex; flex-wrap: wrap; gap: 6px; }
+.sw-preise span { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 700; color: var(--sw-mittel); background: var(--sw-mittel-bg); border-radius: 8px; padding: 2px 8px; }
+.sw-gruppe { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.sw-gruppe h4 { margin: 0; font: 800 15px var(--font-display, system-ui); display: flex; align-items: center; gap: 6px; }
+.sw-anzahl { font-size: 12px; font-weight: 800; border-radius: 999px; padding: 0 8px; background: var(--bg3); border: 2px solid var(--sw-linie); font-variant-numeric: tabular-nums; }
+.sw-minis { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 8px 6px; }
+.sw-mini { display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; min-width: 0; }
+.sw-mini-bild { position: relative; }
+.sw-mini .sw-gesicht { width: 48px; height: 54px; }
+.sw-mini-ovr { position: absolute; right: 2px; bottom: 2px; font-size: 11px; font-weight: 800; background: var(--bg2); color: var(--text); border-radius: 6px; padding: 0 4px; line-height: 1.4; font-variant-numeric: tabular-nums; }
+.sw-mini b { font-size: 11.5px; line-height: 1.2; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sw-grund { font-size: 10.5px; font-weight: 800; border-radius: 6px; padding: 0 5px; line-height: 1.5; white-space: nowrap; color: var(--text2); background: var(--bg3); }
+.sw-grund.vertrag, .sw-grund.frei { color: var(--sw-mittel); background: var(--sw-mittel-bg); }
+.sw-grund.entlassen { color: #fff; background: var(--sw-rot-knopf); }
+.sw-grund.abgeworben, .sw-grund.trade, .sw-grund.verein { color: var(--sw-schlecht); background: var(--sw-schlecht-bg); }
+.sw-grund.draft { color: #2a1c02; background: var(--sw-rookie); }
+.sw-grund.fa { color: #fff; background: var(--sw-blau); }
+.sw-strip { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.sw-kacheln { display: grid; grid-template-columns: 1.3fr 1fr; gap: 8px; }
+.sw-kacheln .sw-karte { padding: 10px; }
+.sw-fa-tipp { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 8px; align-items: center; border: 2px dashed var(--sw-linie); border-radius: 12px;
+  padding: 4px 8px; cursor: pointer; min-height: 48px; }
+.sw-fa-tipp:hover, .sw-fa-tipp:focus-visible { border-color: var(--sw-blau); outline: none; }
+.sw-fa-tipp b { font-size: 13.5px; }
+.sw-fa-tipp > span { font-size: 12px; color: var(--text2); display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.sw-ovr { font-size: 16px; font-variant-numeric: tabular-nums; }
+.sw-warnung { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; font-weight: 700; color: var(--sw-schlecht); background: var(--sw-schlecht-bg); border-radius: 10px; padding: 6px 10px; }
+.sw-warnung i { font-size: 16px; margin-top: 1px; }
+
+/* ── Fenster (Briefings, PC: Saisonvorbereitung und Vertrag) ────────────────── */
+.sw-ov { position: fixed; inset: 0; z-index: 9800; background: rgb(0 0 0 / .72); display: flex; align-items: center; justify-content: center;
+  padding: 16px; padding-top: calc(16px + env(safe-area-inset-top, 0px)); padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+.sw-dialog { position: relative; width: 100%; max-width: 520px; max-height: 100%; display: flex; flex-direction: column; background: var(--bg);
+  border: var(--k-rahmen, 1px solid var(--border)); border-radius: 22px; box-shadow: 0 10px 40px rgb(0 0 0 / .45); overflow: hidden; font-family: var(--font-text, system-ui); color: var(--text); }
+.sw-dialog.sw-breit { max-width: 760px; }
+.sw-dialog > .sw-inhalt, .sw-dialog > .sw-vertrag { order: 1; flex: 1 1 auto; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+.sw-dialog > .sw-fuss { order: 2; flex: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 16px 14px; border-top: var(--k-rahmen, 1px solid var(--border)); background: var(--bg2); }
+.sw-dialog > .sw-fuss .app-knopf { flex: 1 1 45%; }
+.sw-dialog > .sw-fuss .app-knopf.haupt { flex-basis: 100%; }
+.sw-dialog .sw-zu { z-index: 2; }
+.sw-dialog .sw-inhalt > .sw { padding: 0; }
+@media (max-width: 600px) {
+  .sw-ov { padding: 8px; padding-top: calc(8px + env(safe-area-inset-top, 0px)); padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); align-items: stretch; }
+  .sw-dialog { border-radius: 18px; }
+  .sw-kacheln { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 380px) {
+  .sw-vz { grid-template-columns: 38px minmax(0, 1fr); }
+  .sw-vz > .sw-gesicht { width: 38px; height: 44px; }
+  .sw-vz-knoepfe { grid-column: 1 / -1; flex-direction: row; }
+  .sw-vz-knoepfe .sw-knopf { flex: 1; }
+  .sw-vergleich { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sw-sl-flaeche .sw-seg, .sw-sl-limit, .sw-ms-stapel i, .sw-vz, .sw-knopf { transition: none; }
+}
+/* Verträge: kleines Spielerbild (Nutzer 2026-10-14) */
+.sw-vt-gesicht { flex: 0 0 34px; width: 34px; height: 34px; border-radius: 50%; overflow: hidden; background: var(--bg3); border: 2px solid var(--border); }
+.sw-vt-gesicht svg { width: 100%; height: 100%; display: block; }
+
+/* Verlängern: Cap danach, Potenzial (Nutzer 2026-10-17) */
+.sw-pot { font-weight: 800; color: var(--sw-blau); }
+.sw-capz { grid-column: 1 / -1; display: grid; gap: 2px; }
+.sw-capz small { font-size: 11.5px; color: var(--text2); font-variant-numeric: tabular-nums; }
+.sw-capbar { height: 7px; border-radius: 4px; background: var(--bg3); overflow: hidden; display: block; }
+.sw-capbar i { display: block; height: 100%; background: var(--sw-gruen); border-radius: 4px; }
+.sw-capz.ueber small { color: var(--sw-schlecht); font-weight: 700; }
+.sw-capz.ueber .sw-capbar i { background: var(--sw-rot-knopf); }
+.sw-knopf.sw-capvoll { opacity: .75; border-style: dashed; }

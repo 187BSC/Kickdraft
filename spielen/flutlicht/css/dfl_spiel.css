@@ -1,0 +1,584 @@
+/* DFL im Spiel: Vereinswahl und kleine Ergänzungen zu theme_dfl_freundlich.css (lädt danach). */
+.dfl-wahl { width: min(1100px, 100%); max-height: 100%; overflow-y: auto; padding: 8px 4px 20px; font-family: var(--font-text, system-ui); color: var(--text); }
+.dfl-wahl-kopf { text-align: center; margin: 8px 0 18px; }
+.dfl-wahl-titel { font: 800 30px/1.1 var(--font-display, system-ui); }
+.dfl-wahl-unter, .dfl-wahl-fuss { color: var(--text2); font-size: 13px; margin-top: 6px; text-align: center; }
+.dfl-wahl-raster { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); gap: 16px; }
+.dfl-wahl-konf { background: var(--bg2); border-radius: 18px; padding: 14px; box-shadow: var(--schatten, none); }
+.dfl-wahl-konf h3 { margin: 0 0 6px; font: 800 18px var(--font-display, system-ui); }
+/* D113: Vereinswahl als Bühne – vier Vereine je Division mit großem Wappen (96 px), am Handy zwei nebeneinander */
+.dfl-wahl-div { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px 10px; margin-top: 8px; }
+.dfl-wahl-div h4 { grid-column: 1 / -1; margin: 6px 0 0; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--text3); }
+.dfl-wahl-verein { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; cursor: pointer; min-width: 0;
+  padding: 10px 6px 9px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg3); color: var(--text); font: 700 13px var(--font-text, system-ui); }
+.dfl-wahl-verein:hover, .dfl-wahl-verein:focus-visible { border-color: var(--v1); box-shadow: 0 0 0 2px color-mix(in oklab, var(--v1) 55%, transparent); outline: none; }
+.dfl-wahl-wappen { width: 96px; height: 104px; display: block; line-height: 0; flex: none; }
+.dfl-wahl-wappen svg { width: 100%; height: 100%; }
+.dfl-wahl-name { display: flex; flex-direction: column; gap: 1px; max-width: 100%; min-width: 0; }
+.dfl-wahl-name b { font: 800 14px/1.15 var(--font-display, system-ui); overflow-wrap: break-word; hyphens: auto; }
+.dfl-wahl-name small { font: 700 12px/1.2 var(--font-text, system-ui); color: var(--text2); }
+/* Stärke als Plakette auf der Ecke – liegt nie auf dem Wappen */
+.dfl-wahl-ovr { position: absolute; top: -10px; right: -8px; min-width: 32px; height: 24px; padding: 0 6px; border-radius: 12px; display: grid; place-items: center;
+  font: 800 13px/1 var(--font-display, system-ui); color: var(--text); background: var(--bg2); border: 2px solid var(--k-rand, var(--border)); }
+.dfl-pcard-gesicht { display: flex; justify-content: center; margin-bottom: 8px; }
+.dfl-badge { background-color: transparent !important; border: 0 !important; box-shadow: none !important; }
+.squad-row .dfl-face { width: 30px; height: 30px; }
+@media (max-width: 520px) { .dfl-wahl-div { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 521px) { .dfl-wahl-name b { font-size: 13px; } }
+.dfl-tabellen { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 14px; }
+.dfl-div-tabelle { background: var(--bg2); border-radius: var(--rund, 12px); padding: 10px; box-shadow: var(--schatten, none); overflow-x: auto; }
+.dfl-tabelle td, .dfl-tabelle th { padding: 5px 7px; }
+.dfl-tabelle .lg-crest { display: inline-block; width: 20px; height: 21px; vertical-align: middle; margin-right: 6px; }
+/* Qualifikationsfarben der alten Ligen (CL/EL/Abstieg) haben in der DFL keine Bedeutung */
+.lg-zone { background: transparent !important; }
+/* Gesichter in den Kaderzeilen: klein halten, Name darf nicht verschwinden */
+.squad-row .dfl-face { width: 22px; height: 22px; margin-right: -3px; }
+.squad-row .squad-name { flex: 1 1 auto; min-width: 52px; white-space: normal !important; overflow: visible !important;
+  text-overflow: clip !important; line-height: 1.15; word-break: break-word; }
+
+/* ── DFL-Draft (dfl_kader_patch.js) ─────────────────────────────────────── */
+.dfl-draft-ov { position: fixed; inset: 0; z-index: 9000; background: rgba(0,0,0,.72); display: flex;
+  align-items: flex-start; justify-content: center; padding: 16px; overflow-y: auto; }
+.dfl-draft-karte { width: 100%; max-width: 920px; background: var(--bg2, #161b22); border: 1px solid var(--border, #30363d);
+  border-radius: 14px; padding: 18px; color: var(--text, #e6edf3); }
+.dfl-draft-kopf { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; flex-wrap: wrap; }
+.dfl-draft-titel { font-size: 20px; font-weight: 800; }
+.dfl-draft-sub { font-size: 11px; color: var(--text2, #8b949e); }
+.dfl-draft-cap { font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 8px; background: var(--bg3, #21262d); }
+.dfl-draft-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+.dfl-draft-chip { font-size: 11px; padding: 4px 8px; border-radius: 999px; border: 1px solid var(--border, #30363d); color: var(--text2, #8b949e); }
+.dfl-draft-chip.jetzt { border-color: var(--accent, #3fb950); color: var(--text, #e6edf3); font-weight: 700; }
+.dfl-draft-chip.erledigt { background: var(--bg3, #21262d); color: var(--text, #e6edf3); }
+.dfl-draft-status { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 12px; border-radius: 10px; background: var(--bg3, #21262d); font-size: 13px; }
+.dfl-draft-aktionen { display: flex; gap: 6px; flex-wrap: wrap; }
+.dfl-draft-btn { font: inherit; font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--accent, #3fb950); background: var(--accent, #3fb950); color: var(--bg, #0d1117); }
+.dfl-draft-btn.leise { background: transparent; color: var(--text2, #8b949e); border-color: var(--border, #30363d); }
+.dfl-draft-btn.gross { width: 100%; padding: 10px; font-size: 14px; margin-top: 10px; }
+.dfl-draft-tabelle { overflow-x: auto; margin-top: 10px; }
+.dfl-draft-tabelle table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 620px; }
+.dfl-draft-tabelle th { text-align: left; font-size: 10px; text-transform: uppercase; color: var(--text2, #8b949e); padding: 6px; border-bottom: 1px solid var(--border, #30363d); }
+.dfl-draft-tabelle td { padding: 6px; border-bottom: 1px solid var(--border, #30363d); vertical-align: middle; }
+.dfl-draft-tabelle td.num, .dfl-draft-tabelle th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.dfl-draft-hinweis { font-size: 11px; color: var(--text2, #8b949e); margin-top: 8px; }
+.dfl-draft-letzte { list-style: none; padding: 0; margin: 12px 0 0; font-size: 11px; color: var(--text2, #8b949e); columns: 2; }
+.dfl-draft-fertig h3 { font-size: 15px; margin: 4px 0 10px; }
+.dfl-draft-rookie { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 8px 10px; border-radius: 8px;
+  background: var(--bg3, #21262d); margin-bottom: 6px; font-size: 13px; }
+.dfl-draft-rookie span { color: var(--text2, #8b949e); font-size: 12px; }
+@media (max-width: 600px) { .dfl-draft-letzte { columns: 1; } .dfl-draft-karte { padding: 12px; } }
+.dfl-draft-ov { font-family: var(--font-text, system-ui, sans-serif); }
+.dfl-draft-titel { font-family: var(--font-display, var(--font-text, system-ui, sans-serif)); }
+.dfl-vertrag { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px;
+  padding: 8px 10px; border-radius: 10px; background: var(--bg3, #21262d); font-size: 12px; }
+.dfl-analyse { margin-top: 10px; padding: 10px 12px; border-radius: 10px; border: 1px dashed var(--border, #30363d); font-size: 12px; }
+.dfl-analyse-zeile { margin-top: 4px; }
+.dfl-hinweis { margin: 10px; padding: 10px 12px; border-radius: 10px; background: rgba(242, 193, 78, .14); border: 1px solid rgba(242, 193, 78, .5);
+  color: var(--text, #e6edf3); font-size: 13px; font-weight: 600; }
+.dfl-pk { display: inline-block; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 4px; background: #2d6a4f; color: #d8f3dc; vertical-align: middle; }
+
+/* ── Trade-Zentrale + Wertliste (dfl_trade_patch.js) ────────────────────── */
+.dfl-tr { font-size: 12px; }
+.dfl-tr-kopf { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.dfl-tr-lage { font-size: 12px; color: var(--text2, #8b949e); }
+.dfl-tr-partner select { width: 100%; max-width: 560px; font: inherit; font-size: 13px; padding: 8px; border-radius: 8px;
+  background: var(--bg3, #21262d); color: var(--text, #e6edf3); border: 1px solid var(--border, #30363d); margin: 6px 0 10px; }
+.dfl-tr-spalten { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 760px) { .dfl-tr-spalten { grid-template-columns: 1fr; } }
+.dfl-tr-spalte { min-width: 0; max-height: 460px; overflow-y: auto; border: 1px solid var(--border, #30363d); border-radius: 10px; padding: 8px; }
+.dfl-tr-spalte h4 { margin: 2px 4px 8px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--text2, #8b949e); }
+.dfl-tr-zeile { display: grid; grid-template-columns: 18px 1fr auto 42px; gap: 8px; align-items: center; padding: 6px; border-radius: 8px; cursor: pointer; }
+.dfl-tr-zeile:hover { background: var(--bg3, #21262d); }
+.dfl-tr-zeile.an { background: rgba(63, 185, 80, .14); }
+/* D50: Schutzstufen und Interesse */
+.dfl-tr-zeile.zu { opacity: .62; cursor: not-allowed; }
+.dfl-tr-schild { display: inline-flex; align-items: center; gap: 4px; margin-top: 2px; font-size: 11px; font-weight: 700; color: var(--text2, #8b949e); }
+.dfl-tr-schild i { font-size: 13px; }
+.dfl-tr-schild.zu { color: var(--red, #f07462); }
+.dfl-tr-schild.teuer { color: var(--gold, #f0c05a); }
+.dfl-tr-schild.auge { color: #3fcf7a; }
+.dfl-tr-name { display: flex; flex-direction: column; min-width: 0; }
+.dfl-tr-name span, .dfl-tr-vertrag span { font-size: 11px; color: var(--text2, #8b949e); }
+.dfl-tr-vertrag { display: flex; flex-direction: column; align-items: flex-end; font-variant-numeric: tabular-nums; }
+.dfl-tr-wert { font-weight: 800; text-align: right; font-variant-numeric: tabular-nums; }
+.dfl-tr-urteil { margin-top: 12px; padding: 12px; border-radius: 10px; border: 1px solid var(--border, #30363d); display: grid; gap: 6px; }
+.dfl-tr-urteil.gut { border-color: #3fb950; } .dfl-tr-urteil.knapp { border-color: #f2c14e; } .dfl-tr-urteil.schlecht { border-color: #f85149; }
+.dfl-tr-balken { height: 8px; border-radius: 4px; background: var(--bg3, #21262d); overflow: hidden; }
+.dfl-tr-balken span { display: block; height: 100%; background: linear-gradient(90deg, #f85149, #f2c14e 70%, #3fb950); }
+.dfl-tr-meldung { font-weight: 700; }
+.dfl-tr-urteil .dfl-draft-btn[disabled] { opacity: .45; cursor: not-allowed; }
+.dfl-tr-block { margin-top: 14px; padding: 12px; border-radius: 10px; border: 1px dashed var(--border, #30363d); }
+.dfl-tr-angebot { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 8px; border-radius: 8px; background: var(--bg3, #21262d); margin-top: 6px; }
+.dfl-tr-angebot > div:last-child { display: flex; gap: 8px; align-items: center; }
+
+/* ── Draft-Trades, Draft-Vorschau (dfl_kader_patch.js v3) ──────────────── */
+.dfl-draft-angebot { margin-top: 10px; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(242, 193, 78, .55);
+  background: rgba(242, 193, 78, .08); font-size: 13px; line-height: 1.5; }
+.dfl-draft-angebot > .dfl-draft-aktionen { display: flex; gap: 6px; margin-top: 8px; }
+.dfl-draft-hoch { margin-top: 6px; }
+.dfl-draft-hoch { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px; }
+.dfl-vorschau { margin-top: 12px; }
+.dfl-vorschau .subtabs { margin: 6px 0; }
+.dfl-auf { color: #3fb950; font-size: 10px; font-weight: 800; }
+.dfl-ab { color: #f85149; font-size: 10px; font-weight: 800; }
+.dfl-tr-log { margin-top: 14px; padding: 12px; border-radius: 10px; border: 1px solid var(--border, #30363d); }
+.dfl-tr-log li { margin: 4px 0; }
+
+/* ── Trainingsgruppe (D38) ─────────────────────────────────────────────── */
+.dfl-vl { background: #7a3b12; color: #fde2c4; }
+.tg { margin: 18px 16px 24px; max-width: 980px; display: grid; gap: 8px; }
+.tg h3 { margin: 0; font-size: 17px; }
+.tg h4 { margin: 14px 0 2px; font-size: 13px; display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+.tg h4 span { font-weight: 500; font-size: 11px; color: var(--text3); }
+.tg-intro { margin: 0; font-size: 12px; color: var(--text2); max-width: 75ch; line-height: 1.5; }
+.tg-zeile { display: grid; grid-template-columns: 44px minmax(150px, 220px) minmax(0, 1fr) auto; gap: 10px; align-items: center;
+  padding: 7px 10px; border-radius: 10px; background: var(--bg2); border: 1px solid var(--border); }
+.tg-name { display: grid; min-width: 0; }
+.tg-name b { font-size: 13px; }
+.tg-name span { font-size: 11px; color: var(--text3); }
+.tg-mitte { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-width: 0; }
+.tg-rechts { display: flex; gap: 6px; align-items: center; justify-content: flex-end; flex-wrap: wrap; }
+.tg-faktor { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: color-mix(in oklab, var(--green, #3fb950) 18%, transparent); color: var(--text); }
+.tg-wahl { font: inherit; font-size: 12px; padding: 4px 6px; border-radius: 8px; background: var(--bg3); color: var(--text); border: 1px solid var(--border); max-width: 100%; }
+.tg-leise { font-size: 11px; color: var(--text3); }
+.tg-unter { margin: 8px 0 0; font-size: 12px; color: var(--text2); }
+@media (max-width: 720px) { .tg-zeile { grid-template-columns: auto minmax(0, 1fr); } .tg-mitte, .tg-rechts { grid-column: 1 / -1; justify-content: flex-start; } }
+
+/* ── Eigentümer & Finanzen (D35) ───────────────────────────────────────── */
+.eig .eig-kopf { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.eig .eig-kopf span { font-size: 11px; color: var(--text3); }
+.eig-text, .eig-klein { margin: 4px 0; font-size: 11px; color: var(--text2); line-height: 1.45; }
+.eig-warn { margin: 6px 0; font-size: 11px; font-weight: 700; color: var(--red, #f85149); }
+.eig-teile { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 8px 0; }
+.eig-teil { background: var(--bg3); border-radius: 8px; padding: 6px 8px; display: grid; }
+.eig-teil span { font-size: 10px; color: var(--text3); }
+.eig-teil b { font-size: 16px; }
+.eig-stufen { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; margin: 6px 0; }
+.eig-stufe { font: inherit; font-size: 12px; font-weight: 700; padding: 6px 2px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg3); color: var(--text2); cursor: pointer; display: grid; justify-items: center; }
+.eig-stufe small { font-size: 9px; font-weight: 500; color: var(--text3); }
+.eig-stufe.aktiv { background: var(--accent, #2f6fca); color: var(--accent-ink, #fff); border-color: transparent; }
+.eig-stufe.aktiv small { color: inherit; opacity: .85; }
+
+/* ── Playoffs (dfl_playoffs_patch.js) ───────────────────────────────────── */
+.dfl-po-baum { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; align-items: start; }
+.dfl-po-kopf { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); margin-bottom: 4px; }
+.dfl-po-spiel { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 4px 6px; margin-bottom: 6px; font-size: 12px; }
+.dfl-po-team { display: grid; grid-template-columns: 14px 22px minmax(0, 1fr) auto; gap: 5px; align-items: center; padding: 2px 0; color: var(--text2); }
+.dfl-po-team.sieg { color: var(--text); font-weight: 700; }
+.dfl-po-team.eigen .dfl-po-name { color: var(--accent, #3fb950); }
+.dfl-po-seed { font-size: 10px; color: var(--text3); text-align: right; }
+.dfl-po-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dfl-po-team .lg-crest { width: 20px !important; height: 21px !important; font-size: 8px; }
+.dfl-po-zusatz { font-size: 10px; color: var(--text3); text-align: right; }
+.dfl-po-leer { font-size: 11px; color: var(--text3); padding: 6px 0; }
+.dfl-po-elfer { display: grid; grid-template-columns: 56px minmax(0, 1fr) 18px 34px; gap: 6px; font-size: 12px; padding: 2px 0; }
+.dfl-po-elfer.gast { color: var(--text2); }
+.dfl-po-weiter { font-weight: 700; font-size: 13px; }
+/* Meister-Blatt nach dem Finale (dfl_playoffs_patch.js meisterBlatt, 2026-10-10) */
+.po-meister { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 10px 16px; margin-bottom: 12px; border-radius: 16px;
+  background: color-mix(in oklab, var(--gold, #f2c14e) 16%, var(--bg2, #1b1b1a)); border: 2px solid color-mix(in oklab, var(--gold, #f2c14e) 55%, transparent);
+  text-align: center; position: relative; }
+.po-meister .po-meister-wappen { width: 64px; height: 64px; font-size: 20px; border-radius: 14px; }
+/* D113: große Bühne – Wappen in 96 px mit Ring, Band, Mauerkrone und Titelsternen */
+.po-meister .po-meister-wappen.gross { width: 96px; height: 104px; border-radius: 0; display: block; line-height: 0; flex: none; }
+.po-meister .po-meister-wappen.gross svg { width: 100%; height: 100%; display: block; }
+.po-meister .po-meister-wappen.gross.mit-sternen { width: 112px; height: 121px; }
+.po-meister-pokal { position: absolute; top: 10px; right: 12px; font-size: 26px; color: var(--gold, #f2c14e); }
+.po-meister-name { font: 800 22px/1.15 var(--font-display, var(--font-text, system-ui)); color: var(--text, #f2f1ec); }
+.po-meister-erg { font-size: 13px; color: var(--text2, #b5b3ad); }
+.po-meister-erg b { color: var(--text, #f2f1ec); white-space: nowrap; }
+.po-weg .po-weg-runde { flex: none; width: 84px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .02em; color: var(--text2, #b5b3ad); }
+.po-weg .po-weg-wappen { flex: none; width: 26px; height: 26px; font-size: 9px; border-radius: 7px; }
+.po-weg-erg { flex: none; font-size: 15px; white-space: nowrap; }
+.po-weg-erg small { font-size: 10px; font-weight: 600; color: var(--text2, #b5b3ad); margin-left: 3px; }
+.po-eigen { margin-top: 10px; }
+.po-knoepfe { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.po-meister-dialog { max-width: 440px; }
+
+/* ── Ehrungen: Hall of Fame, Preise, Pro Bowl (dfl_ehrungen_patch.js) ───── */
+.dfl-eh-wappen { display: inline-block; width: 16px; height: 17px; vertical-align: -3px; margin-right: 4px; }
+.dfl-eh-wappen svg { width: 100%; height: 100%; display: block; }
+.dfl-eh-hof { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 10px; align-items: center; padding: 8px 6px; border-bottom: 1px solid var(--border); }
+.dfl-eh-hof.eigen { background: color-mix(in oklab, var(--accent, #3fb950) 10%, transparent); border-radius: 8px; }
+.dfl-eh-gesicht { width: 48px; height: 48px; display: block; border-radius: 50%; overflow: hidden; background: var(--bg3); }
+.dfl-eh-gesicht svg { width: 100%; height: 100%; }
+.dfl-eh-pos { font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 999px; background: var(--bg3); color: var(--text2); }
+.dfl-eh-neu { font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 999px; background: var(--gold, #d29922); color: #111; }
+.dfl-eh-zeile { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.dfl-eh-balken { height: 4px; border-radius: 2px; background: var(--bg3); margin-top: 5px; overflow: hidden; }
+.dfl-eh-balken i { display: block; height: 100%; background: var(--gold, #d29922); }
+.dfl-eh-hinweis { font-size: 12px; color: var(--text2); margin: 8px 4px; }
+.dfl-eh-preise { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.dfl-eh-preise li { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 2px 8px; font-size: 13px; }
+.dfl-eh-preise li span { color: var(--text2); font-size: 12px; }
+.dfl-eh-preise li small { grid-column: 2; color: var(--text3); font-size: 11px; }
+.dfl-eh-preise .eigen, .dfl-eh-elf .eigen { color: var(--accent-text, var(--accent, #3fb950)); }
+.dfl-eh-elf { font-size: 12px; color: var(--text2); margin-top: 10px; line-height: 1.6; }
+.dfl-eh-h4 { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); margin: 14px 0 4px; }
+.dfl-eh-liste { margin: 0; padding-left: 16px; font-size: 12px; color: var(--text2); line-height: 1.7; }
+.dfl-eh-liste small { color: var(--text3); }
+.dfl-eh-ergebnis { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 6px 0 10px; font-weight: 700; }
+.dfl-eh-ergebnis b { font-size: 24px; color: var(--gold, #d29922); font-variant-numeric: tabular-nums; }
+.dfl-eh-ergebnis small { color: var(--text3); }
+.dfl-eh-kader { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 10px; }
+.dfl-eh-kader ul { list-style: none; margin: 0; padding: 0; font-size: 12px; }
+.dfl-eh-kader li { display: grid; grid-template-columns: 34px 20px minmax(0, 1fr) auto; gap: 4px; align-items: center; padding: 2px 0; }
+.dfl-eh-kader li.eigen { color: var(--accent-text, var(--accent, #3fb950)); font-weight: 700; }
+.dfl-eh-kader .pos { font-size: 10px; color: var(--text3); }
+.dfl-eh-kader .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 520px) { .dfl-eh-preise li { grid-template-columns: minmax(0, 1fr); } .dfl-eh-preise li small { grid-column: 1; } }
+/* D158: Pro Bowl – Aufgebot (Reiter Playoffs, Blatt, Postfach-Karte), Ergebnis, Conference-Marken */
+.dfl-eh-ergebnis { flex-wrap: wrap; row-gap: 0; }
+.dfl-eh-ergebnis > * { white-space: nowrap; }
+.dfl-eh-ergebnis small { flex-basis: 100%; text-align: center; }
+.dfl-eh-ergebnis.angesetzt b { color: var(--text3); }
+.dfl-eh-pb-termin { text-align: center; font-weight: 700; margin-top: -4px; }
+.dfl-eh-pb-fuss { display: flex; justify-content: center; margin: 10px 0 2px; }
+.dfl-eh-pb-cal { margin-right: 8px; }
+.pb-konf-marke { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 22px; height: 22px; border-radius: 7px;
+  font: 800 10px/1 var(--font-display, system-ui); letter-spacing: .02em; color: #fff !important; border: 2px solid rgb(0 0 0 / .18); vertical-align: middle; }
+.pb-konf-marke.sw { background: #c8102e; } .pb-konf-marke.no { background: #1d4ed8; }
+.pb-konf-marke.gross { width: 38px; height: 38px; border-radius: 11px; font-size: 14px; }
+.pb-blatt { display: flex; flex-direction: column; gap: 12px; }
+.pb-dialog { max-width: 640px; }
+.pb-status { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--text2); padding: 8px 10px; border-radius: 12px;
+  background: var(--bg3); border: 2px solid var(--k-linie, var(--border)); }
+.pb-kader { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 12px; }
+.pb-konf h4 { display: flex; align-items: center; gap: 6px; margin: 0 0 6px; font: 800 14px var(--font-display, system-ui); color: var(--text); }
+.pb-konf ul, .pb-k-eigen { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.pb-konf li, .pb-k-eigen li { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 3px 8px 3px 3px; border-radius: 12px;
+  background: var(--bg2); border: 2px solid var(--k-linie, var(--border)); }
+.pb-konf li.eigen { border-color: var(--accent, #3fb950); background: color-mix(in oklab, var(--accent, #3fb950) 14%, var(--bg2)); }
+.pb-gesicht { width: 36px; height: 36px; display: block; border-radius: 50%; overflow: hidden; background: var(--bg3); }
+.pb-gesicht svg { width: 100%; height: 100%; display: block; }
+.pb-wer { display: flex; flex-direction: column; min-width: 0; }
+.pb-wer b { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
+.pb-wer small { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text2); white-space: nowrap; overflow: hidden; }
+.pb-wer small .dfl-eh-wappen { margin-right: 0; }
+.pb-st { font: 800 15px var(--font-zahl, var(--font-display, system-ui)); color: var(--text); font-variant-numeric: tabular-nums; }
+.pb-erg { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; padding: 10px; border-radius: 16px; background: var(--bg2);
+  border: 3px solid var(--k-rand, var(--border)); }
+.pb-erg-t { display: flex; flex-direction: column; align-items: center; gap: 4px; font-weight: 800; color: var(--text); }
+.pb-erg-s { display: flex; flex-direction: column; align-items: center; }
+.pb-erg-s b { font: 800 34px/1 var(--font-zahl, var(--font-display, system-ui)); color: var(--gold, #d29922); }
+.pb-erg-s small { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.pb-tore { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pb-tore ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; font-size: 12.5px; color: var(--text); }
+.pb-tore ul + ul { text-align: right; }
+.pb-tore li .m { font-weight: 800; color: var(--text2); margin-right: 4px; }
+.pb-tore ul + ul li .m { margin: 0 0 0 4px; float: right; }
+.pb-tore li small { display: block; font-size: 11px; color: var(--text3); }
+.pb-mvp { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 14px; background: var(--bg3); border: 2px solid var(--gold, #d29922); }
+.pb-mvp .pb-gesicht { width: 44px; height: 44px; }
+.pb-mvp > span:last-child { display: flex; flex-direction: column; min-width: 0; }
+.pb-mvp small { font-size: 11px; color: var(--text2); }
+.pb-mvp small:first-child { font-weight: 800; letter-spacing: .08em; color: var(--gold, #d29922); }
+.pb-mvp b { color: var(--text); }
+.pb-k { display: flex; flex-direction: column; gap: 8px; }
+.pb-k-paar { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--text); flex-wrap: wrap; }
+.pb-k-paar small { color: var(--text3); font-weight: 700; }
+.pb-k-leer { margin: 0; font-size: 12.5px; color: var(--text2); }
+
+/* ── D54: Draft-Board mit Uhr (dfl_kader_patch.js) ───────────────────────── */
+.dfl-board { margin: 10px 0 12px; display: flex; flex-direction: column; gap: 7px; }
+.dfl-board-kopf { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 16px; background: var(--bg2, #161b22);
+  border: 3px solid var(--k-rand, var(--border, #30363d)); box-shadow: 0 4px 0 var(--k-rand, transparent); }
+.dfl-board-kopf > span { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.dfl-board-kopf small { font-size: 11.5px; font-weight: 800; color: var(--text3, #8b949e); letter-spacing: .03em; }
+.dfl-board-kopf b { font: 700 18px/1.15 var(--font-display, system-ui); }
+.dfl-uhr { width: 64px; height: 64px; flex: none; }
+.dfl-uhr .dfl-uhr-grund { fill: none; stroke: var(--bg3, #21262d); stroke-width: 7; }
+.dfl-uhr .dfl-uhr-zeit { fill: none; stroke-width: 7; stroke-linecap: round; transition: stroke-dasharray .9s linear; }
+.dfl-uhr text { fill: var(--text, #e6edf3); font: 700 15px var(--font-zahl, var(--font-display, system-ui)); }
+.dfl-uhr-knopf { width: 46px; height: 46px; border-radius: 50%; flex: none; cursor: pointer; display: grid; place-items: center; font-size: 20px;
+  background: var(--bg3, #21262d); color: var(--text, #e6edf3); border: 3px solid var(--k-rand, var(--border, #30363d)); box-shadow: 0 3px 0 var(--k-rand, transparent); }
+.dfl-board-titel { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 4px 2px 0; }
+.dfl-board-titel b { font: 700 16px var(--font-display, system-ui); }
+.dfl-board-titel small { font-size: 11.5px; color: var(--text3, #8b949e); }
+.dfl-prospekt { width: 100%; display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; gap: 10px; align-items: center; min-height: 66px; padding: 8px 12px;
+  border-radius: 14px; background: var(--bg2, #161b22); border: 3px solid var(--k-rand, var(--border, #30363d)); color: var(--text, #e6edf3); text-align: left; cursor: pointer; font: inherit; }
+.dfl-prospekt.offen { box-shadow: 0 0 0 2px var(--k-blau, var(--accent, #2fb36b)) inset; }
+.dfl-note { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; font: 700 19px var(--font-zahl, var(--font-display, system-ui)); color: #0f2a19; background: #3fcf7a; }
+.dfl-note.b { background: #a6d96a; color: #1d2a0c; } .dfl-note.c { background: #f0c05a; color: #2e2200; }
+.dfl-pr-name { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.dfl-pr-name b { font: 700 15px var(--font-display, system-ui); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dfl-pr-name small { font-size: 11.5px; color: var(--text3, #8b949e); display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; font-variant-numeric: tabular-nums; }
+.dfl-pr-cap { display: flex; flex-direction: column; align-items: flex-end; font-size: 11px; color: var(--text2, #b1bac4); font-weight: 700; }
+.dfl-pr-cap b { font: 700 16px var(--font-zahl, var(--font-display, system-ui)); color: var(--text, #e6edf3); }
+.dfl-pr-karte { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; padding: 6px 2px 10px; }
+.dfl-pr-karte .fut.dfl-pr-fut { width: 150px; flex: none; }
+.dfl-pr-fut .fut-wert { font-size: 30px; } .dfl-pr-fut .fut-pos { top: 44px; } .dfl-pr-fut .fut-name { top: 92px; font-size: 13px; }
+.dfl-pr-fut .fut-werte { font-size: 12px; bottom: 10px; left: 12px; right: 12px; gap: 2px 10px; }
+.dfl-pr-text { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 180px; font-size: 13px; color: var(--text2, #b1bac4); }
+.dfl-pr-text b { color: var(--text, #e6edf3); }
+
+/* ── D94: Fenster „will deinen Pick unbedingt“ (dfl_kader_patch.js) ──────── */
+.dfl-fenster-scrim { position: fixed; inset: 0; z-index: 9200; background: rgba(0, 0, 0, .55); display: flex; align-items: safe center;
+  justify-content: center; padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px)); overflow-y: auto; }
+.dfl-fenster { width: 100%; max-width: 440px; margin: auto 0; background: var(--bg2, #161b22); color: var(--text, #e6edf3); border: 4px solid var(--k-rand, var(--border, #30363d));
+  border-radius: 22px; box-shadow: 0 6px 0 var(--k-rand, transparent); padding: 14px; display: flex; flex-direction: column; gap: 10px; outline: none; }
+.dfl-fenster-kopf { display: flex; gap: 10px; align-items: center; }
+html .dfl-fenster-kopf .dfl-fenster-wappen.lg-crest { width: 44px !important; height: 46px !important; flex: none; }
+.dfl-fenster-titel { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.dfl-fenster-titel small { font-size: 12px; font-weight: 800; color: var(--text3, #8b949e); letter-spacing: .03em; }
+.dfl-fenster-titel b { font: 700 18px/1.15 var(--font-display, system-ui); }
+.dfl-uhr.dfl-fenster-uhr { width: 52px; height: 52px; }
+.dfl-uhr.dfl-fenster-uhr text { font-size: 14px; }
+.dfl-fenster-geruecht { font-size: 13px; line-height: 1.35; color: var(--text2, #b1bac4); background: var(--bg3, #21262d); border-radius: 10px; padding: 7px 9px; }
+.dfl-fenster-geruecht b { color: var(--text, #e6edf3); }
+.dfl-fenster-unter { font-size: 11.5px; font-weight: 800; color: var(--text3, #8b949e); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 5px; }
+.dfl-fenster-tickets { display: flex; flex-wrap: wrap; gap: 6px; }
+.dfl-ticket { display: inline-flex; flex-direction: column; border: 2px dashed var(--k-rand, var(--border, #30363d)); border-radius: 10px; padding: 4px 9px;
+  background: var(--bg3, #21262d); font-size: 11.5px; color: var(--text2, #b1bac4); line-height: 1.3; font-variant-numeric: tabular-nums; }
+.dfl-ticket b { color: var(--text, #e6edf3); font-size: 14px; }
+.dfl-ticket.neu { border-style: solid; border-color: var(--k-blau, var(--accent, #3fb950)); }
+.dfl-fenster-meter { display: flex; flex-direction: column; gap: 5px; }
+.dfl-fenster-zeile { display: grid; grid-template-columns: 98px minmax(0, 1fr) 46px; gap: 8px; align-items: center; font-size: 12.5px; color: var(--text2, #b1bac4); }
+.dfl-fenster-zeile b { color: var(--text, #e6edf3); text-align: right; font-variant-numeric: tabular-nums; }
+.dfl-fenster-balken { height: 12px; border-radius: 6px; background: var(--bg3, #21262d); overflow: hidden; }
+.dfl-fenster-balken i { display: block; height: 100%; border-radius: 0 4px 4px 0; }
+.dfl-fenster-balken i.du { background: var(--text3, #8b949e); }
+.dfl-fenster-balken i.sie { background: var(--app-gut, #3fcf7a); }
+.dfl-fenster-fazit { font-size: 13px; font-weight: 700; color: var(--text2, #b1bac4); }
+.dfl-fenster-fazit .plus { color: var(--k-gut-fg, #7ff0a8); }
+.dfl-fenster-fazit .minus { color: var(--k-schlecht-fg, #ff9aa9); }
+.dfl-fenster-knoepfe { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.dfl-fenster-knoepfe .app-knopf { min-height: 46px; padding: 0 6px; font-size: 14px; }
+.dfl-fenster-knoepfe .app-knopf[disabled] { opacity: .45; cursor: default; box-shadow: none; }
+.dfl-fenster-fuss { font-size: 11.5px; color: var(--text3, #8b949e); text-align: center; }
+@media (max-width: 380px) { .dfl-fenster-knoepfe { grid-template-columns: 1fr 1fr; } .dfl-fenster-knoepfe .haupt { grid-column: 1 / -1; } }
+
+/* ── D54: Trade-O-Meter mit Team-Kopf (dfl_trade_patch.js) ───────────────── */
+.dfl-tr-teams { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; margin: 10px 0; padding: 12px; border-radius: 16px;
+  background: var(--bg2, #161b22); border: 3px solid var(--k-rand, var(--border, #30363d)); box-shadow: 0 4px 0 var(--k-rand, transparent); }
+.dfl-tr-team { display: flex; flex-direction: column; align-items: center; gap: 5px; text-align: center; min-width: 0; }
+.dfl-tr-team b { font: 700 14px/1.15 var(--font-display, system-ui); }
+html .dfl-tr-team .dfl-tr-wappen.lg-crest { width: 44px !important; height: 46px !important; }
+.dfl-tr-pfeil { font-size: 26px; color: var(--text3, #8b949e); }
+.dfl-tr-badge { font: 800 10.5px/1 var(--font-text, system-ui); letter-spacing: .06em; text-transform: uppercase; padding: 5px 8px; border-radius: 6px; }
+.dfl-tr-badge.titel { background: #f1c40f; color: #2a1c02; } .dfl-tr-badge.neuaufbau { background: #3b82f6; color: #fff; }
+.dfl-tr-badge.mittelfeld { background: var(--bg3, #21262d); color: var(--text2, #b1bac4); border: 1px solid var(--border, #30363d); }
+.dfl-tr-stil { font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 999px; background: var(--bg3, #21262d); color: var(--text2, #b1bac4); }
+.dfl-tr-meter-kopf { display: flex; justify-content: space-between; align-items: center; }
+.dfl-tr-meter-kopf b { font: 700 15px var(--font-display, system-ui); }
+.dfl-tr-chip { font-size: 12px; font-weight: 800; padding: 3px 10px; border-radius: 999px; }
+.dfl-tr-chip.gut { background: color-mix(in oklab, #2ecc71 24%, transparent); color: var(--k-gut-fg, #7ff0a8); }
+.dfl-tr-chip.knapp { background: color-mix(in oklab, #f1c40f 26%, transparent); color: var(--k-mittel-fg, #ffe27a); }
+.dfl-tr-chip.schlecht { background: color-mix(in oklab, #e74c3c 22%, transparent); color: var(--k-schlecht-fg, #ff9aa9); }
+.dfl-tr-meter { position: relative; height: 18px; border-radius: 10px; margin: 8px 0 4px; background: linear-gradient(90deg, #e74c3c, #f1c40f 55%, #2ecc71 72%, #2ecc71); }
+.dfl-tr-meter i { position: absolute; top: -6px; width: 6px; height: 30px; border-radius: 3px; background: var(--text, #e6edf3); box-shadow: 0 0 0 2px var(--bg2, #161b22); transition: left .35s cubic-bezier(.3, 1.4, .5, 1); }
+.dfl-tr-meter em { position: absolute; top: -4px; bottom: -4px; width: 2px; left: 57%; background: var(--bg2, #161b22); }
+@media (prefers-reduced-motion: reduce) { .dfl-tr-meter i, .dfl-uhr .dfl-uhr-zeit { transition: none; } }
+
+/* ── D54: Ehrenhalle nach Jahrgang + Bestenlisten (dfl_ehrungen_patch.js) ── */
+.dfl-eh-klasse + .dfl-eh-klasse { margin-top: 12px; padding-top: 10px; border-top: 2px dashed var(--k-linie, var(--border, #30363d)); }
+.dfl-eh-klasse-titel { margin: 4px 0 6px; font: 700 15px var(--font-display, system-ui); display: flex; align-items: center; gap: 8px; }
+.dfl-eh-bestenlisten { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.dfl-eh-bl { padding: 10px; border-radius: 12px; background: var(--bg3, #21262d); border: 2px solid var(--k-linie, transparent); min-width: 0; }
+.dfl-eh-bl h4 { margin: 0 0 6px; font: 800 12px var(--font-text, system-ui); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.dfl-eh-bl h4 small { font-weight: 700; color: var(--text3, #8b949e); }
+.dfl-eh-bl ol { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.dfl-eh-bl li { display: flex; justify-content: space-between; gap: 6px; font-size: 12.5px; }
+.dfl-eh-bl li span { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.dfl-eh-bl li b { font: 700 13px var(--font-zahl, var(--font-display, system-ui)); font-variant-numeric: tabular-nums; }
+.dfl-eh-bl li.eigen span { font-weight: 800; color: var(--accent-text, var(--accent, #2fb36b)); }
+
+/* ── D55: Spielstil-Kreis im Reiter Taktik (dfl_taktik_patch.js) ─────────── */
+#dfl-stil-box { margin-bottom: 14px; }
+.stil-box { display: flex; flex-direction: column; gap: 10px; font-family: var(--font-text, system-ui); }
+.stil-titel { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 6px 2px 0; }
+.stil-titel b { font: 700 18px/1.1 var(--font-display, system-ui); display: inline-flex; align-items: center; gap: 6px; }
+.stil-titel small { font-size: 11.5px; color: var(--text3, #8b949e); text-align: right; }
+.stil-rad { width: 100%; max-width: 320px; display: block; margin: 0 auto; }
+.stil-rad text { font: 800 12px var(--font-text, system-ui); fill: var(--text, #e6edf3); }
+.stil-rad .stil-mitte { fill: var(--text3, #8b949e); font-size: 11px; font-weight: 700; }
+.stil-rad .stil-pfeil { stroke: var(--text3, #8b949e); stroke-width: 2.5; }
+.stil-rad .stil-spitze { fill: var(--text3, #8b949e); }
+.stil-rad .stil-gegner { stroke: var(--red, #e74c3c); stroke-width: 3; stroke-dasharray: 6 5; }
+.stil-rad .stil-gegner-name { fill: var(--red, #e74c3c); font-size: 11px; }
+.stil-rad .stil-knoten { cursor: pointer; }
+.stil-rad .stil-knoten:focus-visible { outline: none; }
+.stil-rad .stil-knoten:focus-visible circle { stroke-width: 5; }
+.stil-karte { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 16px; background: var(--bg2, #161b22);
+  border: 3px solid var(--k-rand, var(--border, #30363d)); box-shadow: 0 4px 0 var(--k-rand, transparent); }
+.stil-karte b { font: 700 15px/1.2 var(--font-display, system-ui); display: block; }
+.stil-karte small { font-size: 12.5px; color: var(--text2, #b1bac4); }
+.stil-urteil.plus { background: color-mix(in oklab, #2ecc71 14%, var(--bg2, #161b22)); }
+.stil-urteil.minus { background: color-mix(in oklab, #e74c3c 14%, var(--bg2, #161b22)); }
+html .stil-urteil .stil-wappen.lg-crest { width: 34px !important; height: 36px !important; flex: none; }
+.stil-eing > span { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+.stil-ring { width: 64px; height: 64px; flex: none; }
+.stil-ring .stil-ring-grund { fill: none; stroke: var(--bg3, #21262d); stroke-width: 7; }
+.stil-ring text { fill: var(--text, #e6edf3); font: 700 15px var(--font-zahl, var(--font-display, system-ui)); }
+.stil-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 800;
+  background: var(--bg3, #21262d); color: var(--text2, #b1bac4); white-space: nowrap; }
+.stil-chip.gut { background: color-mix(in oklab, #2ecc71 24%, transparent); color: var(--k-gut-fg, #7ff0a8); }
+.stil-chip.mittel { background: color-mix(in oklab, #f1c40f 26%, transparent); color: var(--k-mittel-fg, #ffe27a); }
+.stil-chip.schlecht { background: color-mix(in oklab, #e74c3c 22%, transparent); color: var(--k-schlecht-fg, #ff9aa9); }
+.stil-chip.form { cursor: pointer; border: 2px solid transparent; }
+.stil-chip.form.an { border-color: var(--k-blau, var(--accent, #2fb36b)); color: var(--text, #e6edf3); }
+.stil-faktor { flex-direction: column; align-items: stretch; gap: 2px; }
+.stil-faktor .stil-titel { margin: 0 0 4px; }
+.stil-fz { display: grid; grid-template-columns: minmax(0, 1fr) 74px 46px; gap: 8px; align-items: center; min-height: 28px; font-size: 13px; color: var(--text2, #b1bac4); }
+.stil-bal { position: relative; height: 10px; border-radius: 5px; background: var(--bg3, #21262d); }
+.stil-bal::after { content: ''; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 2px; background: var(--text3, #8b949e); }
+.stil-bal i { position: absolute; top: 0; bottom: 0; border-radius: 5px; }
+.stil-fz b { text-align: right; font: 700 14px var(--font-zahl, var(--font-display, system-ui)); color: var(--text, #e6edf3); }
+.stil-summe { display: flex; justify-content: space-between; align-items: baseline; border-top: 2px dashed var(--k-linie, var(--border, #30363d)); margin-top: 6px; padding-top: 6px; }
+.stil-summe span { font-weight: 800; color: var(--text2, #b1bac4); }
+.stil-summe b { font: 700 24px var(--font-zahl, var(--font-display, system-ui)); }
+.stil-summe b.plus { color: var(--k-gut-fg, #7ff0a8); } .stil-summe b.minus { color: var(--k-schlecht-fg, #ff9aa9); }
+.stil-klein { font-size: 12px !important; color: var(--text3, #8b949e) !important; }
+.stil-uebernehmen { flex-basis: auto; }
+.stil-wahl-karte { width: 100%; display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 4px 10px; align-items: center; min-height: 64px; padding: 10px 12px;
+  border-radius: 14px; background: var(--bg2, #161b22); border: 3px solid var(--k-rand, var(--border, #30363d)); color: var(--text, #e6edf3); text-align: left; cursor: pointer; font: inherit; }
+.stil-wahl-karte[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--k-blau, var(--accent, #2fb36b)) inset; border-color: var(--k-blau, var(--accent, #2fb36b)); }
+.stil-icon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; color: #10161f; font-size: 22px; }
+.stil-name { font: 700 15px var(--font-display, system-ui); }
+.stil-pass { height: 8px; border-radius: 4px; background: var(--bg3, #21262d); overflow: hidden; width: 80px; }
+.stil-pass i { display: block; height: 100%; }
+.stil-zeile2 { grid-column: 2 / 4; display: flex; gap: 6px; flex-wrap: wrap; }
+.stil-wer { display: flex; flex-direction: column; gap: 4px; }
+.stil-wer-zeile { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px 10px; border-radius: 12px; background: var(--bg2, #161b22); border: 2px solid var(--k-linie, var(--border, #30363d)); font-size: 13.5px; }
+.stil-wer-zeile b { font: 700 15px var(--font-zahl, var(--font-display, system-ui)); color: var(--app-mittel, #f1c40f); }
+.stil-wer-zeile b.plus { color: var(--app-gut, #2ecc71); }
+.stil-wer-zeile small { font-size: 11.5px; font-weight: 700; color: var(--text2); }   /* D156: Torwart-Typ */
+
+/* ── Taktik v2 (2026-10-09): nur der Stil-Kreis; alte Regler, Repertoire, Eingespieltheit aus ─────────────
+   Spielansicht: eine Engine (v3), ein Knopf „Anpfiff“ – Live-Momentum, Statistik und Trainer-Eingriffe
+   gehörten zur alten Minuten-Engine. Klasse body.dfl-taktik setzt dfl_taktik_patch.js. */
+body.dfl-taktik #sub-tactics > :not(#dfl-stil-box) { display: none !important; }
+body.dfl-taktik #view-match #sim-btn,
+body.dfl-taktik #view-match .sidebar .sb-sec:not(:first-child),
+body.dfl-taktik #view-match #tactics-col { display: none !important; }
+/* Draft-Karte (Prospekt): 2 Spalten, Kürzel links, Wert rechts (FUT-Karte des Spieler-Blatts zeigt 3 × 2) */
+.dfl-pr-fut .fut-werte { grid-template-columns: 1fr 1fr; }
+.dfl-pr-fut .fut-werte span { flex-direction: row; justify-content: space-between; align-items: baseline; }
+.dfl-pr-fut .fut-werte em { font-size: 11px; }
+/* Ehrenhalle: Legenden (je 99 erreicht) */
+.dfl-eh-legende { display: inline-flex; align-items: center; gap: 3px; padding: 1px 7px; border-radius: 8px; font-size: 11px; font-weight: 800; color: #1a1033;
+  background: linear-gradient(125deg, #ff9a9e, #fad0c4, #a1c4fd, #c2e9fb, #d4fc79); }
+/* Saison-Rückblick: Meister oben (chronicle_patch.js, 2026-10-10) */
+.cr-meister { display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 12px; border-radius: 14px;
+  background: color-mix(in oklab, var(--gold, #f2c14e) 14%, var(--bg2, #1b1b1a)); border: 2px solid color-mix(in oklab, var(--gold, #f2c14e) 50%, transparent); }
+.cr-meister .lg-crest { flex: none; width: 46px; height: 46px; font-size: 15px; border-radius: 11px; }
+.cr-meister b { display: block; font-size: 17px; color: var(--text, #f2f1ec); }
+.cr-meister small { display: block; font-size: 11px; color: var(--text2, #b5b3ad); }
+.cr-meister .cr-kicker i { color: var(--gold, #f2c14e); }
+
+/* ── Hall of Fame als eigenes Fenster (D157) ─────────────────────────────────────────────────────────
+   Bewusst eine feste Welt wie der Playoff-Ticker (D133): dunkles Holz, Bronze, Gold – in Tag und Nacht gleich.
+   Farben nur über die Variablen am Fenster. */
+#dfl-hof {
+  --hof-holz: #3b2a1e; --hof-holz2: #4d3727; --hof-plakette1: #5a412d; --hof-plakette2: #46321f;
+  --hof-text: #f3e6cf; --hof-text2: #d8c6a8; --hof-gold: #e3b021; --hof-gold-text: #2a1c00; --hof-bronze: #b9773a;
+  --hof-buste1: #e0a868; --hof-buste2: #7a4a1f; --hof-buste-text: #3a210b; --hof-schatten: rgba(0, 0, 0, .55);
+  position: fixed; inset: 0; z-index: 9400; display: flex; justify-content: center; align-items: stretch;
+  background: var(--hof-schatten);
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+}
+#dfl-hof .hof-blatt {
+  position: relative; width: min(720px, 100%); display: flex; flex-direction: column; min-height: 0;
+  background: radial-gradient(120% 60% at 50% 0%, var(--hof-holz2), var(--hof-holz) 70%); color: var(--hof-text);
+  border-left: 3px solid #000; border-right: 3px solid #000;
+}
+#dfl-hof .hof-zu {
+  position: absolute; top: 10px; right: 10px; width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--hof-bronze);
+  background: var(--hof-holz2); color: var(--hof-text); font-size: 20px; display: grid; place-items: center; cursor: pointer;
+}
+#dfl-hof .hof-kopf { text-align: center; padding: 18px 56px 8px; display: grid; gap: 2px; }
+#dfl-hof .hof-titel { font: 700 28px var(--font-display, system-ui); letter-spacing: .08em; color: var(--hof-gold); }
+#dfl-hof .hof-kopf small { color: var(--hof-text2); font-size: 13px; }
+#dfl-hof .hof-reiter { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; padding: 6px 12px 10px; }
+#dfl-hof .hof-reiter button {
+  border: 0; border-radius: 999px; padding: 6px 14px; font: 600 14px var(--font-display, system-ui); cursor: pointer;
+  background: var(--hof-holz2); color: var(--hof-text);
+}
+#dfl-hof .hof-reiter button.an { background: var(--hof-gold); color: var(--hof-gold-text); }
+#dfl-hof .hof-inhalt { flex: 1; min-height: 0; overflow-y: auto; padding: 4px 14px calc(24px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 16px; align-content: start; }
+#dfl-hof .hof-klasse { display: grid; gap: 8px; }
+#dfl-hof .hof-klasse h3 { margin: 0; text-align: center; font: 600 14px var(--font-display, system-ui); letter-spacing: .06em; text-transform: uppercase; color: var(--hof-text2); }
+#dfl-hof .hof-tafeln { display: grid; grid-template-columns: repeat(auto-fill, minmax(138px, 1fr)); gap: 10px; }
+#dfl-hof .hof-plakette {
+  background: linear-gradient(var(--hof-plakette1), var(--hof-plakette2)); border: 2px solid var(--hof-bronze);
+  border-radius: 14px 14px 8px 8px; padding: 10px 8px 9px; text-align: center; display: grid; gap: 3px; justify-items: center; min-width: 0;
+}
+#dfl-hof .hof-plakette.eigen { border-color: var(--hof-gold); box-shadow: 0 0 0 2px var(--hof-gold); }
+#dfl-hof .hof-plakette b { font: 600 14px/1.2 var(--font-display, system-ui); overflow-wrap: anywhere; }
+#dfl-hof .hof-plakette small { color: var(--hof-text2); font-size: 12px; line-height: 1.3; }
+#dfl-hof .hof-buste {
+  width: 58px; height: 58px; border-radius: 50%; overflow: hidden; display: grid; place-items: center;
+  background: radial-gradient(circle at 35% 30%, var(--hof-buste1), var(--hof-bronze) 60%, var(--hof-buste2));
+  border: 2px solid #000; font: 700 19px var(--font-display, system-ui); color: var(--hof-buste-text);
+}
+#dfl-hof .hof-buste.mit-bild svg { width: 100%; height: 100%; display: block; filter: sepia(.55) saturate(1.15); }
+#dfl-hof .hof-vereine { display: flex; gap: 3px; justify-content: center; }
+#dfl-hof .hof-vereine .dfl-eh-wappen { width: 16px; height: 17px; display: inline-block; }
+#dfl-hof .hof-vereine .dfl-eh-wappen svg { width: 100%; height: 100%; }
+#dfl-hof .hof-spitz { font-size: 12px; color: var(--hof-gold); font-style: italic; }
+#dfl-hof .hof-leer { margin: 4px 0; text-align: center; color: var(--hof-text2); font-size: 14px; }
+#dfl-hof .hof-rekorde { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+#dfl-hof .hof-rekord { background: var(--hof-holz2); border: 2px solid var(--hof-bronze); border-radius: 12px; padding: 10px; display: grid; gap: 2px; text-align: center; }
+#dfl-hof .hof-rekord span { font-size: 12px; color: var(--hof-text2); text-transform: uppercase; letter-spacing: .05em; }
+#dfl-hof .hof-rekord b { font: 700 26px var(--font-display, system-ui); color: var(--hof-gold); font-variant-numeric: tabular-nums; }
+#dfl-hof .hof-rekord small { font-size: 12px; color: var(--hof-text); }
+/* Bestenlisten aus der Ehrenhalle im Fenster lesbar halten */
+#dfl-hof .dfl-div-tabelle { background: var(--hof-holz2); border-color: var(--hof-bronze); color: var(--hof-text); }
+#dfl-hof .dfl-div-tabelle h3, #dfl-hof .dfl-div-tabelle h4, #dfl-hof .dfl-div-tabelle li, #dfl-hof .dfl-div-tabelle span { color: var(--hof-text) !important; }
+#dfl-hof .dfl-div-tabelle small { color: var(--hof-text2); }
+#dfl-hof .hof-meister { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+#dfl-hof .hof-meister li { display: grid; grid-template-columns: 74px 1fr; gap: 2px 10px; align-items: center; background: var(--hof-holz2); border-radius: 10px; padding: 8px 10px; }
+#dfl-hof .hof-meister li.eigen { box-shadow: inset 0 0 0 2px var(--hof-gold); }
+#dfl-hof .hof-meister li > span { color: var(--hof-text2); font-variant-numeric: tabular-nums; }
+#dfl-hof .hof-meister b { display: flex; align-items: center; gap: 6px; font: 600 15px var(--font-display, system-ui); }
+#dfl-hof .hof-meister b .dfl-eh-wappen { width: 20px; height: 22px; display: inline-block; }
+#dfl-hof .hof-meister b .dfl-eh-wappen svg { width: 100%; height: 100%; }
+#dfl-hof .hof-meister small { grid-column: 2; color: var(--hof-text2); }
+/* Eingang im Reiter Ehrenhalle */
+.hof-eingang {
+  width: 100%; display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto; align-items: center; gap: 2px 10px;
+  text-align: left; padding: 14px 16px; border-radius: 16px; cursor: pointer; border: 3px solid #000;
+  background: radial-gradient(120% 120% at 0% 0%, #4d3727, #3b2a1e 70%); color: #f3e6cf;
+}
+.hof-eingang-titel { font: 700 18px var(--font-display, system-ui); color: #e3b021; display: flex; align-items: center; gap: 8px; letter-spacing: .04em; }
+.hof-eingang small { grid-row: 2; color: #d8c6a8; font-size: 13px; }
+.hof-eingang .ti { grid-row: 1 / 3; grid-column: 2; font-size: 22px; }
+
+/* Draft vor dem eigenen Pick (Rückmeldung 18.10.): Team am Zug mit Wappen, Picks bis zu dir, letzte Picks, einklappbare Extras */
+.dfl-dz { display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 4px 12px; margin-top: 12px; padding: 12px 14px;
+  border-radius: 14px; background: var(--bg3, #efe2c8); border: 2px solid var(--k-rand, #d9c29a); }
+.dfl-dz-wappen { width: 44px; height: 48px; grid-row: 1 / 3; } .dfl-dz-wappen svg { width: 100%; height: 100%; display: block; }
+.dfl-dz-text { display: flex; flex-direction: column; min-width: 0; }
+.dfl-dz-text small { font-size: 11px; color: var(--text3, #846d52); letter-spacing: .02em; }
+.dfl-dz-text b { font: 700 18px/1.15 var(--font-titel, var(--font-display, system-ui)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dfl-dz-rest { display: flex; flex-direction: column; align-items: flex-end; line-height: 1; }
+.dfl-dz-rest b { font: 800 28px/1 var(--font-zahl, var(--font-display, system-ui)); color: var(--k-blau, #2c7cb5); }
+.dfl-dz-rest small { font-size: 10px; color: var(--text3, #846d52); margin-top: 2px; white-space: nowrap; }
+.dfl-dz-balken { grid-column: 2 / 4; height: 6px; border-radius: 3px; background: var(--bg4, #d9c7a3); overflow: hidden; }
+.dfl-dz-balken i { display: block; height: 100%; border-radius: 3px; background: var(--k-blau, #2c7cb5); transition: width .3s; }
+.dfl-dz-knoepfe { display: grid; grid-template-columns: 1fr 1.3fr 1fr; gap: 6px; margin-top: 8px; }
+.dfl-dz-knoepfe .dfl-draft-btn { margin: 0; padding-left: 6px; padding-right: 6px; font-size: 12px; }
+.dfl-dz-letzte { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 10px; }
+.dfl-dz-pick { display: grid; grid-template-columns: 22px 1fr; grid-template-rows: auto auto; gap: 2px 6px; align-items: center; padding: 6px 8px; border-radius: 10px;
+  background: var(--bg2, #fffaf0); border: 1px solid var(--k-rand, #d9c29a); min-width: 0; }
+.dfl-dz-pick:first-child { border-color: var(--k-blau, #2c7cb5); }
+.dfl-dz-pick.ich { background: color-mix(in srgb, var(--k-gruen, #3a9b5c) 14%, var(--bg2, #fffaf0)); border-color: var(--k-gruen, #3a9b5c); }
+.dfl-dz-pick .pos-badge-sm { grid-column: 2; justify-self: start; font-size: 9.5px; padding: 1px 5px; margin: 0; }
+.dfl-dz-w { width: 22px; height: 24px; grid-row: 1 / 3; } .dfl-dz-w svg { width: 100%; height: 100%; display: block; }
+.dfl-dz-pt { display: flex; flex-direction: column; min-width: 0; }
+.dfl-dz-pt small { font-size: 10px; color: var(--text3, #846d52); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dfl-dz-pt b { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+details.dfl-dz-mehr { margin-top: 10px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--k-rand, #d9c29a); background: var(--bg2, #fffaf0); font-size: 12px; }
+details.dfl-dz-mehr > summary { display: flex; align-items: center; gap: 8px; padding: 10px 0; cursor: pointer; list-style: none; }
+details.dfl-dz-mehr > summary::-webkit-details-marker { display: none; }
+details.dfl-dz-mehr > summary::after { content: ''; margin-left: auto; width: 8px; height: 8px; border: solid currentColor; border-width: 0 2px 2px 0; transform: rotate(45deg); opacity: .6; transition: transform .2s; }
+details.dfl-dz-mehr[open] > summary::after { transform: rotate(-135deg); }
+details.dfl-dz-mehr > summary .ti { font-size: 16px; opacity: .8; }
+details.dfl-dz-mehr[open] { padding-bottom: 10px; }
+.dfl-dz-zahl { min-width: 20px; padding: 2px 6px; border-radius: 999px; background: var(--k-blau, #2c7cb5); color: #fff; font: 700 11px/1.2 system-ui; text-align: center; }
+.dfl-dz-hoch { display: grid; grid-template-columns: 22px 1fr auto; gap: 8px; align-items: center; padding: 6px 0; border-top: 1px solid var(--k-rand, #e3d3b2); }
+.dfl-dz-hoch .dfl-dz-w { grid-row: auto; }
+.dfl-dz-hoch .dfl-dz-pt small { white-space: normal; }
+.dfl-dz-hoch .dfl-draft-btn { margin: 0; }
+details.dfl-analyse.dfl-dz-mehr { border-style: dashed; }
