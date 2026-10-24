@@ -61,6 +61,8 @@
     // alte Einträge: alles, was jetzt woanders steht, bleibt unsichtbar
     eintraege().forEach(e => { if (!e.classList.contains('ksm-alt')) e.classList.add('ksm-alt'); });
   }
+  // Tipps zur richtigen Zeit (kickstil_tipps.js) an/aus – localStorage gesamt-tipps, gilt für beide Spiele
+  const tippsAn = () => { try { return localStorage.getItem('gesamt-tipps') !== 'aus'; } catch (e) { return true; } };
   function optionen() {
     const sh = window.DFLAppShell; if (!sh || !sh.einstellungenBlatt) return;
     const s = document.getElementById('app-sheet'); if (s) s.classList.remove('auf');
@@ -76,7 +78,9 @@
       if (knopfSp && ns0) ns0.querySelector('h4').insertAdjacentHTML('afterend', knopfSp);
       const html = `${knopfSp && !ns0 ? `<section class="einst-gruppe ksm-hilfe" aria-label="Spielstand"><h4><i class="ti ti-device-floppy" aria-hidden="true"></i>Spielstand</h4>${knopfSp}</section>` : ''}
         ${hilfe.length ? `<section class="einst-gruppe ksm-hilfe" aria-label="Hilfe und Rechtliches"><h4><i class="ti ti-help-circle" aria-hidden="true"></i>Hilfe &amp; Rechtliches</h4>
-          <div class="ksm-knoepfe">${hilfe.map(e => `<button type="button" class="app-knopf" data-ksm-e="${esc('^' + titel(e).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))}">${esc(titel(e))}</button>`).join('')}</div></section>` : ''}`;
+          <div class="ksm-knoepfe">${hilfe.map(e => `<button type="button" class="app-knopf" data-ksm-e="${esc('^' + titel(e).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))}">${esc(titel(e))}</button>`).join('')}</div></section>` : ''}
+        ${window.KSTipps ? `<section class="einst-gruppe ksm-hilfe" aria-label="Tipps"><h4><i class="ti ti-bulb" aria-hidden="true"></i>Tipps</h4>
+          <div class="ksm-knoepfe"><button type="button" class="app-knopf${tippsAn() ? ' an' : ''}" data-ksm="tipps" aria-pressed="${tippsAn()}">${tippsAn() ? 'Tipps an' : 'Tipps aus'}</button></div></section>` : ''}`;
       const ns = box.querySelector('.einst-neustart');
       if (ns) ns.insertAdjacentHTML('beforebegin', html); else box.insertAdjacentHTML('beforeend', html);
     };
@@ -98,6 +102,7 @@
     else if (k === 'tempo' && T && T.setzeTempo) T.setzeTempo((T.tempo ? T.tempo() : 1) > 1 ? 1 : 4);
     else if (k === 'ton' && window.DFLTon) { DFLTon.setzen(!DFLTon.an()); if (DFLTon.an()) DFLTon.spiele('pfiff'); }
     else if (k === 'optionen') { optionen(); return; }
+    else if (k === 'tipps' && window.KSTipps) { KSTipps.an(!tippsAn()); b.classList.toggle('an', tippsAn()); b.setAttribute('aria-pressed', tippsAn()); b.textContent = tippsAn() ? 'Tipps an' : 'Tipps aus'; return; }
     else if (b.hasAttribute('data-ksm-e')) { eintragTippen(b.getAttribute('data-ksm-e')); return; }
     zeichne();
   }, true);

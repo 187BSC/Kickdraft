@@ -604,3 +604,79 @@ details.dfl-dz-mehr[open] { padding-bottom: 10px; }
 .dfl-dz-hoch .dfl-dz-pt small { white-space: normal; }
 .dfl-dz-hoch .dfl-draft-btn { margin: 0; }
 details.dfl-analyse.dfl-dz-mehr { border-style: dashed; }
+
+/* ── Draft am PC (Nutzer 2026-10-24, Entwurf A): links die nächsten 20 Picks, rechts die Talente als Tabelle ── */
+body.pcu-an .dfl-draft-ov:has(.dpc) { align-items: center; padding: 16px 24px; overflow: hidden; }
+body.pcu-an .dfl-draft-karte.dpc { max-width: 1480px; height: calc(100vh - 32px); display: flex; flex-direction: column; gap: 12px; padding: 16px 18px; }
+.dpc-kopf { align-items: center; flex-wrap: nowrap; }
+.dpc-titel { min-width: 0; flex: 1; }
+.dpc-titel .dfl-draft-chips { margin: 6px 0 0; }
+.dpc-zug { display: flex; align-items: center; gap: 10px; padding: 6px 14px 6px 8px; border-radius: 14px; background: var(--bg3, #efe2c8); border: 2px solid var(--k-rand, #d9c29a); }
+.dpc-zug.ich { background: var(--k-blau, #2c7cb5); border-color: var(--k-blau, #2c7cb5); color: #fff; }
+.dpc-zug > span:not(.dfl-dz-wappen):not(.dpc-rest) { display: flex; flex-direction: column; line-height: 1.15; }
+.dpc-zug small { font-size: 11px; opacity: .8; }
+.dpc-zug b { font: 700 17px/1.15 var(--font-titel, var(--font-display, system-ui)); white-space: nowrap; }
+.dpc-zug .dfl-dz-wappen { width: 34px; height: 38px; grid-row: auto; }
+.dpc-zug .dfl-uhr { width: 46px; height: 46px; }
+.dpc-zug.ich .dfl-uhr .dfl-uhr-grund { stroke: rgba(255,255,255,.25); }
+.dpc-zug.ich .dfl-uhr text { fill: #fff; }
+.dpc-zug .dfl-uhr-knopf { margin-left: 4px; }
+.dpc-rest { display: flex; flex-direction: column; align-items: flex-end; line-height: 1; margin-left: 10px; padding-left: 12px; border-left: 2px solid var(--k-rand, #d9c29a); }
+.dpc-rest b { font: 800 24px/1 var(--font-zahl, var(--font-display, system-ui)); color: var(--k-blau, #2c7cb5); }
+.dpc-rest small { font-size: 10px; margin-top: 2px; white-space: nowrap; }
+.dpc-knoepfe { display: flex; gap: 6px; flex: none; }
+.dpc-knoepfe .dfl-draft-btn { margin: 0; padding: 9px 14px; font-size: 13px; white-space: nowrap; }
+.dpc .dfl-draft-angebot { margin: 0; }
+.dpc-raster { flex: 1; min-height: 0; display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 12px; }
+.dpc-spalte { min-width: 0; min-height: 0; display: flex; flex-direction: column; border: 2px solid var(--k-rand, #d9c29a); border-radius: 14px; background: var(--bg2, #fffaf0); overflow: hidden; }
+.dpc-kt { display: flex; align-items: center; gap: 10px; padding: 9px 14px; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text3, #846d52);
+  border-bottom: 2px solid var(--k-rand, #d9c29a); flex: none; min-height: 48px; }
+.dpc-scroll { flex: 1; min-height: 0; overflow-y: auto; }
+.dpc-pick { display: grid; grid-template-columns: 44px 84px minmax(0, 1fr); gap: 6px; align-items: center; padding: 6px 12px; border-bottom: 1px solid var(--k-rand, #e6d5b2); font-size: 13px; }
+.dpc-pick > b { font: 800 14px/1 var(--font-zahl, var(--font-display, system-ui)); }
+.dpc-pick.fertig { opacity: .7; }
+.dpc-pick.ich { background: color-mix(in srgb, var(--k-gold, #e0a92e) 18%, transparent); box-shadow: inset 4px 0 0 var(--k-gold, #e0a92e); }
+.dpc-pick.jetzt { background: color-mix(in srgb, var(--k-blau, #2c7cb5) 16%, transparent); box-shadow: inset 4px 0 0 var(--k-blau, #2c7cb5); opacity: 1; }
+.dpc-team { display: flex; align-items: center; gap: 6px; font-weight: 700; min-width: 0; }
+.dpc-team svg { width: 18px; height: 20px; flex: none; display: block; }
+.dpc-wahl { display: flex; align-items: center; gap: 6px; min-width: 0; } .dpc-wahl > span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+.dpc-wahl .pos-badge-sm { margin: 0; flex: none; }
+.dpc-offen { color: var(--text3, #a08a6a); font-style: italic; }
+.dpc-pick.ich .dpc-offen, .dpc-pick.jetzt .dpc-offen { color: var(--text, #2b1a0d); font-weight: 700; }
+.dpc-mehr { padding: 0 10px 10px; }
+.dpc-spalte .dfl-draft-letzte { columns: 1; margin: 0; padding: 0 14px 12px; }
+.dpc-reiter { margin-left: auto; display: flex; gap: 6px; text-transform: none; letter-spacing: 0; }
+.dpc-reiter button { font: inherit; font-size: 12.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 9px; cursor: pointer;
+  border: 2px solid var(--k-rand, #c99a62); background: transparent; color: var(--text, #2b1a0d); }
+.dpc-reiter button.an { background: var(--k-blau, #2c7cb5); border-color: var(--k-blau, #2c7cb5); color: #fff; }
+.dpc-stil { text-transform: none; letter-spacing: 0; }
+.dpc-stil .dfl-draft-filter, .dpc-stil > * { margin: 0; }
+.dpc-luecken { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 14px; border-bottom: 1px solid var(--k-rand, #e6d5b2); font-size: 12px; flex: none; }
+.dpc-luecken .db-lk { cursor: default; }
+table.dpc-tab { width: 100%; border-collapse: collapse; font-size: 13px; }
+.dpc-tab th { position: sticky; top: 0; z-index: 1; text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--text3, #846d52); padding: 8px; background: var(--bg3, #f6ead2); white-space: nowrap; }
+.dpc-tab th.dpc-sort { cursor: pointer; } .dpc-tab th.dpc-sort.an { color: var(--text, #2b1a0d); } .dpc-tab th .ti { font-size: 12px; margin-left: 2px; }
+.dpc-tab td { padding: 4px 8px; border-bottom: 1px solid var(--k-rand, #ecdcbc); white-space: nowrap; vertical-align: middle; }
+.dpc-tab .num { text-align: right; font-variant-numeric: tabular-nums; }
+.dpc-tab th.num { text-align: right; }
+.dpc-tab tbody tr:hover td { background: color-mix(in srgb, var(--k-blau, #2c7cb5) 8%, transparent); }
+.dpc-tab tr.gemerkt td { background: color-mix(in srgb, var(--k-gold, #e0a92e) 12%, transparent); }
+.dpc-tab tr.tipp td { background: color-mix(in srgb, var(--k-blau, #2c7cb5) 14%, transparent); }
+.dpc-tab tr.weg td { opacity: .55; }
+.dpc-tab td.dpc-st { width: 46px; padding: 2px 4px; } .dpc-tab td.dpc-st .db-nr { font-weight: 800; font-size: 12px; margin-right: 2px; }
+.dpc-tab .db-stern { width: 32px; height: 32px; }
+.dpc-name { cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.dpc-name:hover b { text-decoration: underline; }
+.dpc-tipp { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; color: var(--k-blau, #2c7cb5); }
+.dpc-weg { margin-left: 8px; color: var(--text3, #846d52); }
+.dpc-tab .dfl-note { width: auto; height: auto; min-width: 34px; padding: 2px 6px; border-radius: 8px; font-size: 13px; display: inline-grid; }
+.dpc-tab td.dpc-akt { text-align: right; width: 1%; } .dpc-akt .db-ordnung { display: inline-flex; margin-right: 6px; }
+.dpc-tab .db-waehlen { margin: 0; padding: 5px 14px; }
+.dpc-leer { padding: 18px !important; text-align: center; white-space: normal !important; }
+/* Angebote fürs Runtertauschen am PC nebeneinander statt untereinander */
+.dpc .dfl-draft-angebot { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) auto; align-items: stretch; gap: 6px 10px; padding: 10px 12px; flex: none; }
+.dpc .dfl-draft-angebot > b { grid-column: 1 / 2; } .dpc .dfl-draft-angebot > .dfl-draft-sub { grid-column: 2 / -1; align-self: center; }
+.dpc .dfl-draft-angebot .dfl-draft-hoch { display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 6px; margin: 0; padding: 8px 10px; border-radius: 10px; background: var(--bg2, #fffaf0); border: 1px solid var(--k-rand, #e6d5b2); }
+.dpc .dfl-draft-angebot .dfl-draft-hoch > span { display: block; line-height: 1.9; }
+.dpc .dfl-draft-angebot .dfl-draft-hoch .dfl-draft-btn { align-self: stretch; margin: 0; }
+.dpc .dfl-draft-angebot > .dfl-draft-aktionen { grid-row: 2; grid-column: 4; align-self: end; }

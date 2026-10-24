@@ -15158,6 +15158,44 @@ body.dfl-shell .ksk-pc{display:none}`;
   console.log('[Kickstil-Neu v1] aktiv — Tipps beim ersten Kontakt, Neu-Blatt für bestehende Spielstände');
 })();
 
+;/* ── js/kickstil_staerke_wort.js ── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   KICKSTIL · „STÄRKE“ STATT „OVR“  ·  v1   (2026-10-24, Nutzer-Regel: sichtbar immer „Stärke“, nie „OVR“)
+   ─────────────────────────────────────────────────────────────────────────
+   Die automatische Prüfung (analyse/ansichten.js, ERWARTUNGEN.md) fand in der Vereinskarriere noch „OVR“ im Sichtbaren
+   (Scouting „Talent-Niveau OVR ~66“, Kauf- und Vertragsfenster, Meldungen, Zeitung). Kickdraft hat dafür einen Wächter
+   (dfl_oberflaeche_patch.js, Teil L) – derselbe hier: ein MutationObserver ersetzt „OVR“ in Texten und Titeln.
+   Ausnahme: alles mit [data-ovr-ok] und Eingabefelder. Interne Namen (p.ovr) bleiben.
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+  if (typeof document === 'undefined' || typeof MutationObserver !== 'function') return;
+  const RE = /\bOVR\b/g, RE_T = /\bOVR\b/;
+  const text = s => String(s == null ? '' : s).replace(/OVR\/Sai\./g, 'Stärke/Saison').replace(RE, 'Stärke');
+  const SKIP = 'script,style,textarea,input,select,noscript,template,[contenteditable="true"],[data-ovr-ok]';
+  function ersetzen(w) {
+    if (!w) return;
+    if (w.nodeType === 3) { if (RE_T.test(w.nodeValue) && !(w.parentElement && w.parentElement.closest(SKIP))) w.nodeValue = text(w.nodeValue); return; }
+    if (w.nodeType !== 1 && w.nodeType !== 11) return;
+    if (w.nodeType === 1 && w.closest(SKIP)) return;
+    const tw = document.createTreeWalker(w, NodeFilter.SHOW_TEXT, { acceptNode: x => (RE_T.test(x.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT) });
+    const l = []; let x; while ((x = tw.nextNode())) l.push(x);
+    l.forEach(n => { if (!(n.parentElement && n.parentElement.closest(SKIP))) n.nodeValue = text(n.nodeValue); });
+    if (w.querySelectorAll) w.querySelectorAll('[title*="OVR"]').forEach(e => { e.title = text(e.title); });
+  }
+  const mo = new MutationObserver(liste => {
+    for (const r of liste) {
+      if (r.type === 'characterData') { if (RE_T.test(r.target.nodeValue || '')) ersetzen(r.target); continue; }
+      if (r.type === 'attributes') { const t = r.target.getAttribute && r.target.getAttribute('title'); if (t && RE_T.test(t)) r.target.title = text(t); continue; }
+      r.addedNodes.forEach(ersetzen);
+    }
+  });
+  function start() { ersetzen(document.body); mo.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['title'] }); }
+  if (document.body) start(); else document.addEventListener('DOMContentLoaded', start);
+  window.KSStaerkeWort = { text, ersetzen };
+  console.log('[Kickstil-Stärke-Wort v1] aktiv — „OVR“ wird im Sichtbaren zu „Stärke“');
+})();
+
 ;/* ── js/dfl_anlagen_bilder.js ── */
 /* ═══════════════════════════════════════════════════════════════════════════
    DFL · ANLAGEN-BILDER  ·  v1   (2026-10-14)
@@ -17067,47 +17105,51 @@ body:has(.zm-angebot) .toast-host,body:has(.zm-sprung) .toast-host{visibility:hi
   const CSS = `
   #dfl-ts.pcs-an{padding:0 24px}
   #dfl-ts.pcs-an .ts-box{max-width:1500px;display:grid;
-    grid-template-columns:clamp(250px,19vw,310px) minmax(0,1.2fr) minmax(300px,.8fr) clamp(250px,19vw,310px);
+    grid-template-columns:clamp(250px,18vw,300px) minmax(0,1fr) clamp(360px,26vw,430px) clamp(250px,18vw,300px);
     grid-template-rows:auto auto auto auto minmax(0,1fr) auto auto;
-    grid-template-areas:"kopf kopf kopf kopf" "anz anz anz anz" "links druck druck rechts" "links hinweis lage rechts" "links ticker lage rechts" "ansagen ansagen ansagen ansagen" "steuer steuer steuer steuer"}
-  #dfl-ts.pcs-an .ts-kopf{grid-area:kopf} #dfl-ts.pcs-an .ts-anzeige{grid-area:anz;padding:14px 24px 12px}
-  #dfl-ts.pcs-an .ts-druck{grid-area:druck;border-bottom:none;padding:10px 16px 6px}
-  #dfl-ts.pcs-an .ts-druck svg{height:46px}
+    /* Steuerpult rechts unter Feld und Zahlen statt drei Leisten unten (2026-10-24, Nutzer: „die Leisten sind nicht dafür gemacht“) */
+    grid-template-areas:"kopf kopf kopf kopf" "anz anz anz anz" "links druck druck rechts" "links hinweis lage rechts" "links ticker lage rechts" "links ticker ansagen rechts" "links ticker steuer rechts"}
+  #dfl-ts.pcs-an .ts-kopf{padding-top:6px;padding-bottom:6px;min-height:0}
+  #dfl-ts.pcs-an .ts-kopf .ts-wappen{width:24px;height:26px}
+  #dfl-ts.pcs-an .ts-kopf-txt b{font-size:14px} #dfl-ts.pcs-an .ts-kopf-txt small{font-size:11px}
+  #dfl-ts.pcs-an .ts-kopf{grid-area:kopf} #dfl-ts.pcs-an .ts-anzeige{grid-area:anz;padding:6px 24px}
+  #dfl-ts.pcs-an .ts-druck{grid-area:druck;border-bottom:none;padding:6px 16px 2px}
+  #dfl-ts.pcs-an .ts-druck svg{height:36px}
   #dfl-ts.pcs-an .ts-hinweis{grid-area:hinweis;margin:8px 8px 0 16px}
   #dfl-ts.pcs-an .ts-ticker{grid-area:ticker;padding:10px 8px 16px 16px}
-  #dfl-ts.pcs-an .ts-lagebild{grid-area:lage;display:flex;flex-direction:column;align-items:stretch;gap:12px;padding:10px 16px 16px 8px;overflow-y:auto;min-height:0}
+  #dfl-ts.pcs-an .ts-lagebild{grid-area:lage;display:flex;flex-direction:column;align-items:stretch;gap:12px;padding:10px 16px 6px 8px;overflow-y:auto;min-height:0}
   #dfl-ts.pcs-an .ts-live{gap:5px;font-size:13px}
-  #dfl-ts.pcs-an .ts-steuer{grid-area:steuer;justify-content:center;padding:10px 16px 14px;border-top:none}
-  #dfl-ts.pcs-an .ts-tempo{flex:0 1 460px}
+  #dfl-ts.pcs-an .ts-steuer{grid-area:steuer;justify-content:stretch;padding:0 16px 14px 8px;border-top:none}
+  #dfl-ts.pcs-an .ts-tempo{flex:1 1 auto}
   #dfl-ts.pcs-an .ts-bericht{inset:0;align-items:center}
   #dfl-ts.pcs-an .ts-bericht > *{width:min(560px,100%)}
-  #dfl-ts.pcs-an .ts-team{font-size:22px;gap:12px}
-  #dfl-ts.pcs-an .ts-team .ts-wappen-k{width:38px!important;height:44px!important}
+  #dfl-ts.pcs-an .ts-team{font-size:19px;gap:12px}
+  #dfl-ts.pcs-an .ts-team .ts-wappen-k{width:32px!important;height:37px!important}
   #dfl-ts.pcs-an .ts-team .pcs-voll{display:block;font:700 12px/1.2 var(--font-text,inherit);color:var(--text2,#5c4a36);letter-spacing:0}
   #dfl-ts.pcs-an .ts-team.g .pcs-teamtxt{text-align:right}
-  #dfl-ts.pcs-an .ts-stand{font-size:44px;padding:6px 20px;min-width:140px}
+  #dfl-ts.pcs-an .ts-stand{font-size:34px;padding:2px 18px;min-width:120px}
   #dfl-ts.pcs-an .ts-uhr{font-size:13px;padding:2px 12px}
   #dfl-ts.pcs-an .ts-tore{font-size:13px}
   /* Mannschaften */
-  .pcs-team{display:none;min-height:0;overflow-y:auto;background:var(--bg2,#fffdf9);padding:12px 12px 16px;scrollbar-width:thin}
+  .pcs-team{display:none;min-height:0;overflow-y:auto;background:var(--bg2,#fffdf9);padding:8px 10px 12px;scrollbar-width:thin}
   #dfl-ts.pcs-an .pcs-team{display:block}
   .pcs-team.links{grid-area:links;border-right:3px solid var(--ts-linie)} .pcs-team.rechts{grid-area:rechts;border-left:3px solid var(--ts-linie)}
-  .pcs-tk{display:flex;align-items:center;gap:10px;padding-bottom:10px;margin-bottom:6px;border-bottom:3px solid var(--pcs-farbe)}
+  .pcs-tk{display:flex;align-items:center;gap:10px;padding-bottom:6px;margin-bottom:2px;border-bottom:3px solid var(--pcs-farbe)}
   .pcs-tk .ts-wappen-k{width:30px!important;height:34px!important;flex:none}
   .pcs-tk-txt{min-width:0;flex:1}
   .pcs-tk-txt b{display:block;font:800 15px/1.15 var(--font-display,inherit);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .pcs-tk-txt small{font-size:11.5px;font-weight:700;color:var(--text2,#5c4a36)}
-  .pcs-teil{font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--text3,#846d52);margin:10px 0 4px;display:flex;justify-content:space-between}
-  .pcs-sp{display:grid;grid-template-columns:28px minmax(0,1fr) auto 24px;align-items:center;gap:4px 8px;padding:4px;border-radius:9px;min-height:36px;border:2px solid transparent}
+  .pcs-teil{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--text3,#846d52);margin:6px 0 2px;display:flex;justify-content:space-between}
+  .pcs-sp{display:grid;grid-template-columns:24px minmax(0,1fr) auto 24px;align-items:center;gap:4px 8px;padding:2px 4px;border-radius:9px;min-height:30px;border:2px solid transparent}
   .pcs-sp:nth-of-type(odd){background:color-mix(in srgb,var(--bg3,#f6ead2) 55%,transparent)}
   .pcs-sp.raus{opacity:.5}
   .pcs-klickbar .pcs-sp[data-wahl]{cursor:pointer} .pcs-klickbar .pcs-sp[data-wahl]:hover{border-color:var(--ts-linie)}
   .pcs-sp.gewaehlt{border-color:var(--ts-blau,#2c7cb5)!important;background:color-mix(in srgb,var(--ts-blau,#2c7cb5) 14%,transparent)!important}
   .pcs-sp.geplant{border-style:dashed;border-color:var(--ts-blau,#2c7cb5)}
-  .pcs-gs{width:28px;height:28px;border-radius:50%;overflow:hidden;background:var(--bg3,#f6ead2);border:2px solid var(--pcs-farbe);display:grid;place-items:center}
+  .pcs-gs{width:24px;height:24px;border-radius:50%;overflow:hidden;background:var(--bg3,#f6ead2);border:2px solid var(--pcs-farbe);display:grid;place-items:center}
   .pcs-gs svg{width:100%;height:100%;display:block}
   .pcs-nm{min-width:0;line-height:1.15}
-  .pcs-nm b{display:block;font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pcs-nm b{display:block;font-size:12.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .pcs-nm small{font-size:10.5px;font-weight:700;color:var(--text3,#846d52)}
   .pcs-ev{display:flex;gap:3px;align-items:center;justify-content:flex-end;flex-wrap:wrap;max-width:96px}
   .pcs-e{display:inline-flex;align-items:center;gap:2px;font-size:10.5px;font-weight:800;font-variant-numeric:tabular-nums;border-radius:6px;padding:1px 4px;line-height:1.4;white-space:nowrap}
@@ -17126,9 +17168,17 @@ body:has(.zm-angebot) .toast-host,body:has(.zm-sprung) .toast-host{visibility:hi
   .pcs-wechselinfo{font-size:12px;line-height:1.4;margin:8px 0 2px;padding:8px 10px;border-radius:10px;background:var(--bg3,#f6ead2);border:2px dashed var(--ts-linie)}
   .pcs-wechselinfo button{margin-left:6px}
   /* Ansagen */
-  .pcs-ansagen{grid-area:ansagen;display:none;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 16px;background:var(--bg2,#fffdf9);border-top:3px solid var(--ts-rand)}
+  .pcs-ansagen{grid-area:ansagen;display:none;flex-wrap:wrap;gap:6px;align-content:flex-start;margin:0 16px 8px 8px;padding:10px;background:var(--bg2,#fffdf9);border:3px solid var(--ts-rand);border-radius:14px;box-shadow:0 3px 0 var(--ts-rand)}
   #dfl-ts.pcs-an .pcs-ansagen.an{display:flex}
-  .pcs-ansagen .pcs-t{font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--text3,#846d52);margin-right:2px}
+  .pcs-ansagen .pcs-t{flex:1 0 100%;margin:4px 0 0;font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--text3,#846d52)}
+  .pcs-ansagen .pcs-trenn,.pcs-ansagen .pct-umbruch{display:none!important}
+  .pcs-ansagen .pct-auf{flex:1 0 100%;justify-content:center}
+  .pcs-ansagen .pct-zurufe{flex:1 0 100%;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .pcs-ansagen .pcs-knopf{padding:6px 8px;font-size:12px;justify-content:center}
+  .pcs-ansagen .pcs-status{flex:1 0 100%;font-size:11.5px} .pcs-ansagen .pcs-status:empty{display:none}
+  .pcs-ansagen .pcs-stufen{flex:1 0 100%;display:grid;grid-template-columns:repeat(5,1fr)}
+  .pcs-ansagen .pcs-stufen .pcs-stufe{padding:6px 2px;font-size:11px}
+  .pcs-ansagen [data-coach]{flex:1 1 0}
   .pcs-knopf{font:800 13px var(--font-text,inherit);color:var(--text,#2c3e50);background:var(--bg3,#f6ead2);border:3px solid var(--ts-rand);border-radius:12px;box-shadow:0 3px 0 var(--ts-rand);padding:7px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
   .pcs-knopf:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ts-rand)}
   .pcs-knopf:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:0 3px 0 var(--ts-rand)}
@@ -17591,7 +17641,7 @@ body:has(.zm-angebot) .toast-host,body:has(.zm-sprung) .toast-host{visibility:hi
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(start, 0)); else setTimeout(start, 0);
 
-  W.KSPcSpieltag = { CFG, zeichnen, live: () => LIVE, neu: () => { zuletzt = ''; zeichnen(); }, tsUi, AUSRICHTUNG_ANZ: () => AUSRICHTUNG, ansagen, ausrichtungSetzen, coachSetzen, AUSRICHTUNG, vorAusrichtung, liveMoeglich, coachModus: () => coachModus() };
+  W.KSPcSpieltag = { CFG, zeichnen, live: () => LIVE, neu: () => { zuletzt = ''; zeichnen(); }, tsUi, AUSRICHTUNG_ANZ: () => AUSRICHTUNG, ansagen, ausrichtungSetzen, coachSetzen, AUSRICHTUNG, vorAusrichtung, liveMoeglich, coachModus: () => coachModus(), gegnerKader };
   console.log('[Kickstil-PC-Spieltag v3] aktiv — nur PC-Version: Spieltag auf voller Breite, Live-Coaching mit Wechseln, Kraft und Ansagen');
 })();
 
@@ -18270,6 +18320,27 @@ body.pcu-an .pcu-trenner { display: block; height: 0; border-top: 1px dashed var
   border: 2px solid var(--k-linie, var(--border)); border-radius: 12px; padding: 8px 16px; font-weight: 800; box-shadow: 0 4px 0 var(--k-linie, var(--border)); }
 /* doppelt: Training steckt im Kader (Taste 2, dann T) – beide Spiele (Kickdraft seit 2026-10-20, Nutzer: „wie Flutlicht“) */
 body.pcu-an .app > .appnav > #nav-training { display: none; }
+/* Weiter-Knopf (Nutzer 2026-10-24, Vorschau A: „der hässliche Button oben passt nicht in unser Design und es läuft dadurch auch nicht“):
+   statt „Woche weiter“ des Kalenders ein Knopf im Spiel-Look, der genau das macht, was die Leertaste macht (DFLAppShell.ctaZustand:
+   zum Spiel, Testspiel, Draft, Kader auffüllen … sonst Woche weiter). Der alte Kalender-Knopf bleibt versteckt im DOM (andere Module klicken ihn). */
+body.pcu-an #view-home .cal-head .cal-next { display: none !important; }
+body.pcu-an #view-home .cal-head { display: flex; align-items: center; gap: 8px; }
+#pcu-weiter { margin-left: auto; display: inline-flex; align-items: center; gap: 12px; padding: 7px 10px 7px 14px; border-radius: 12px; cursor: pointer; font: inherit; text-align: left;
+  min-width: 0; max-width: 100%; background: #2e9b57; color: #fff; border: 2px solid #1f7a42; box-shadow: 0 4px 0 #17603a; transition: transform .08s, box-shadow .08s; }
+#pcu-weiter:hover { filter: brightness(1.06); }
+#pcu-weiter:active { transform: translateY(3px); box-shadow: 0 1px 0 #17603a; }
+#pcu-weiter.warn { background: #d9822b; border-color: #b0651c; box-shadow: 0 4px 0 #8c4f14; }
+#pcu-weiter > .ti { font-size: 20px; flex: none; }
+#pcu-weiter .pcu-w-txt { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+#pcu-weiter .pcu-w-txt b { font: 800 16px/1.1 var(--font-titel, var(--font-display, system-ui)); white-space: nowrap; }
+#pcu-weiter .pcu-w-txt small { font-size: 11px; opacity: .88; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#pcu-weiter kbd { font: 800 10px/1 var(--font-text, system-ui); padding: 3px 7px; border-radius: 6px; border: 1px solid rgba(255,255,255,.5); background: rgba(255,255,255,.18); flex: none; }
+body.pcu-an #view-home .cal-head #dfl-sim-pc { flex: none; width: 44px; height: 44px; padding: 0; margin: 0; display: grid; place-items: center; font-size: 0; border-radius: 12px; cursor: pointer;
+  color: var(--text); background: var(--bg2); border: 2px solid var(--k-rand, #c99a62); box-shadow: 0 4px 0 var(--k-rand, #c99a62); }
+body.pcu-an #view-home .cal-head #dfl-sim-pc[hidden] { display: none; }
+body.pcu-an #view-home .cal-head #dfl-sim-pc .ti { font-size: 19px; }
+body.pcu-an #view-home .cal-head #dfl-sim-pc:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--k-rand, #c99a62); }
+@media (max-width: 1450px) { #pcu-weiter kbd { display: none; } #pcu-weiter .pcu-w-txt b { font-size: 15px; } }
 `;
 
   // Übersicht als Schreibtisch – Vereinskarriere
@@ -18283,10 +18354,6 @@ body.pcu-an #view-home > .k-moral .k-skala-text { display: none; }
 body.pcu-an #view-home > .k-moral .k-moral-kopf { margin-bottom: 6px; }
 body.pcu-an #view-home #calendar-widget > .cal-head { grid-area: 1 / 4 / 2 / 6; align-self: stretch; margin: 0; padding: 10px 16px; align-items: center;
   background: var(--bg2); border: 2px solid var(--k-linie, var(--border)); border-radius: 14px; }
-body.pcu-an #view-home .cal-head .cal-next { margin-left: auto; font-size: 16px; padding: 9px 18px; }
-body.pcu-an #view-home .cal-head #dfl-sim-pc { white-space: nowrap; flex: none; }
-body.pcu-an #view-home .cal-head .cal-next::after { content: 'Leertaste'; font-size: 10px; font-weight: 800; margin-left: 10px; padding: 1px 6px; border-radius: 6px;
-  border: 1px solid rgba(255,255,255,.45); background: rgba(255,255,255,.18); vertical-align: 2px; }
 body.pcu-an #view-home > #app-office-kopf { grid-area: 2 / 1 / 3 / 5; }
 body.pcu-an #app-office-kopf.ks-pc-kopf .gel-buehne { height: clamp(200px, 15.5vw, 290px); }
 body.pcu-an #view-home .home-grid > .home-match { grid-area: 3 / 1 / 4 / 5; display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 18px; align-items: center; padding-block: 10px; }
@@ -18300,8 +18367,6 @@ body.pcu-an #view-home .home-match .hm-name { white-space: normal; overflow: vis
   body.pcu-an .app { grid-template-columns: 188px minmax(0, 1fr); }
   body.pcu-an .appnav-btn { font-size: 13.5px; padding: 8px 10px; }
   body.pcu-an #view-home.active { grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(250px, 290px); gap: 12px; padding: 12px; }
-  body.pcu-an #view-home .cal-head .cal-next::after { display: none; }
-  body.pcu-an #view-home .cal-head .cal-next { font-size: 15px; padding: 8px 14px; }
   body.pcu-an #view-home .home-grid > .home-card .hc-big { font-size: 23px; }
   body.pcu-an #view-home > .k-moral .k-moral-effekt { display: none; }
 }
@@ -18317,8 +18382,14 @@ body.pcu-an #view-home .home-wrap > .mgmt-details { grid-area: 6 / 1 / 7 / 5; }
 body.pcu-an #view-home .home-wrap > .postfach-section { grid-area: 1 / 5 / 8 / 6; grid-row: 2 / span 6; position: sticky; top: 14px;
   max-height: calc(100vh - 28px); overflow: auto; overscroll-behavior: contain; }
 body.pcu-an #view-home .postfach-section .pf-head { flex-direction: column; align-items: stretch; gap: 8px; }
-body.pcu-an #view-home .postfach-section #pf-filters.pf-filters { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; width: auto; }
-body.pcu-an #view-home .postfach-section #pf-filters .pf-chip { flex: 0 0 auto; width: auto; padding: 4px 9px; font-size: 12.5px; }
+body.pcu-an #view-home .postfach-section #pf-filters.pf-filters { display: flex; flex-wrap: nowrap; gap: 3px; padding: 3px; margin-top: 6px; width: auto; overflow: visible; }
+body.pcu-an #view-home .postfach-section #pf-filters .pf-chip { position: relative; flex: 1 1 auto; width: auto; min-width: 0; min-height: 30px; padding: 3px 5px; font-size: 11.5px; white-space: nowrap; overflow: visible; }
+/* Zähler als kleines Abzeichen an der Ecke statt im Knopf – so passen alle Filter in eine Zeile */
+body.pcu-an #view-home .postfach-section #pf-filters .pf-cnt { position: absolute; top: -6px; right: -3px; min-width: 15px; height: 15px; padding: 0 3px; margin: 0; font-size: 9.5px; line-height: 15px;
+  background: var(--k-rot, #c0392b); color: #fff; box-shadow: 0 0 0 2px var(--bg2, #fff); z-index: 1; }
+/* „Leeren“ nur als Papierkorb – sonst bricht die Leiste in der schmalen Spalte in zwei Zeilen (Nutzer 2026-10-24: „die Leisten sind nicht dafür gemacht“) */
+body.pcu-an #view-home .postfach-section #pf-filters .pf-chip.pf-leeren { flex: 0 0 32px; font-size: 0; padding: 0; margin-left: 2px; }
+body.pcu-an #view-home .postfach-section #pf-filters .pf-chip.pf-leeren > .ti { display: inline-block; font-size: 16px; }
 body.pcu-an #view-home .postfach-section .pf-item { display: grid; grid-template-columns: 34px minmax(0, 1fr); column-gap: 10px; align-items: start; }
 body.pcu-an #view-home .postfach-section .pf-actions { grid-column: 2; flex-direction: row; flex-wrap: wrap; justify-content: flex-start; gap: 6px; margin-top: 8px; }
 `;
@@ -18335,8 +18406,6 @@ body.pcu-an #view-home > .k-moral .k-skala-text { display: none; }
 body.pcu-an #view-home > .k-moral .k-moral-kopf { margin-bottom: 6px; }
 body.pcu-an #view-home #calendar-widget > .cal-head { grid-area: 1 / 4 / 2 / 6; align-self: stretch; padding: 10px 16px; align-items: center; flex-wrap: wrap; gap: 8px;
   background: var(--bg2); border: 2px solid var(--k-linie, var(--border)); border-radius: 14px; }
-body.pcu-an #view-home .cal-head .cal-next { margin-left: auto; font-size: 15px; padding: 8px 14px; }
-body.pcu-an #view-home .cal-head #dfl-sim-pc { white-space: nowrap; flex: none; }
 body.pcu-an #view-home #calendar-widget > .kw-leiste { grid-area: 2 / 1 / 3 / 5; background: var(--bg2); border: 2px solid var(--k-linie, var(--border)); border-radius: 14px; padding: 8px; }
 body.pcu-an #view-home .home-grid > .home-match { grid-area: 3 / 1 / 4 / 5; display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 18px; align-items: center; padding-block: 10px; }
 body.pcu-an #view-home .home-match > .hc-label { grid-column: 1 / 3; margin-bottom: 4px; }
@@ -18354,15 +18423,18 @@ body.pcu-an #view-home .home-wrap > .mgmt-details { grid-area: 6 / 1 / 7 / 5; }
 body.pcu-an #view-home .home-wrap > .postfach-section { grid-area: 1 / 5 / 8 / 6; grid-row: 2 / span 6; position: sticky; top: 14px;
   max-height: calc(100vh - 28px); overflow: auto; overscroll-behavior: contain; }
 body.pcu-an #view-home .postfach-section .pf-head { flex-direction: column; align-items: stretch; gap: 8px; }
-body.pcu-an #view-home .postfach-section #pf-filters.pf-filters { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; width: auto; }
-body.pcu-an #view-home .postfach-section #pf-filters .pf-chip { flex: 0 0 auto; width: auto; padding: 4px 9px; font-size: 12.5px; }
+body.pcu-an #view-home .postfach-section #pf-filters.pf-filters { display: flex; flex-wrap: nowrap; gap: 3px; padding: 3px; margin-top: 6px; width: auto; overflow: visible; }
+body.pcu-an #view-home .postfach-section #pf-filters .pf-chip { position: relative; flex: 1 1 auto; width: auto; min-width: 0; min-height: 30px; padding: 3px 5px; font-size: 11.5px; white-space: nowrap; overflow: visible; }
+/* Zähler als kleines Abzeichen an der Ecke statt im Knopf – so passen alle Filter in eine Zeile */
+body.pcu-an #view-home .postfach-section #pf-filters .pf-cnt { position: absolute; top: -6px; right: -3px; min-width: 15px; height: 15px; padding: 0 3px; margin: 0; font-size: 9.5px; line-height: 15px;
+  background: var(--k-rot, #c0392b); color: #fff; box-shadow: 0 0 0 2px var(--bg2, #fff); z-index: 1; }
+/* „Leeren“ nur als Papierkorb – sonst bricht die Leiste in der schmalen Spalte in zwei Zeilen (Nutzer 2026-10-24: „die Leisten sind nicht dafür gemacht“) */
+body.pcu-an #view-home .postfach-section #pf-filters .pf-chip.pf-leeren { flex: 0 0 32px; font-size: 0; padding: 0; margin-left: 2px; }
+body.pcu-an #view-home .postfach-section #pf-filters .pf-chip.pf-leeren > .ti { display: inline-block; font-size: 16px; }
 body.pcu-an #view-home .postfach-section .pf-item { display: grid; grid-template-columns: 34px minmax(0, 1fr); column-gap: 10px; align-items: start; }
 body.pcu-an #view-home .postfach-section .pf-actions { grid-column: 2; flex-direction: row; flex-wrap: wrap; justify-content: flex-start; gap: 6px; margin-top: 8px; }
-body.pcu-an #view-home .cal-head .cal-next::after { content: 'Leertaste'; font-size: 10px; font-weight: 800; margin-left: 10px; padding: 1px 6px; border-radius: 6px;
-  border: 1px solid rgba(255,255,255,.45); background: rgba(255,255,255,.18); vertical-align: 2px; }
 @media (max-width: 1450px) {
   body.pcu-an #view-home.active { grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(250px, 290px); gap: 12px; padding: 12px; }
-  body.pcu-an #view-home .cal-head .cal-next::after { display: none; }
   body.pcu-an #view-home .home-grid > .home-card .hc-big { font-size: 23px; }
 }
 `;
@@ -18454,6 +18526,36 @@ body.pcu-an #view-home .cal-head .cal-next::after { content: 'Leertaste'; font-s
     const el = document.elementFromPoint(W.innerWidth / 2, W.innerHeight / 2);
     return !!(el && el.closest('.app'));
   }
+  // Weiter wie der Haupt-Knopf der App (Leertaste und #pcu-weiter); false, wenn gerade nichts geht
+  const ctaJetzt = () => { try { return W.DFLAppShell && DFLAppShell.ctaZustand ? DFLAppShell.ctaZustand() : null; } catch (e) { return null; } };
+  function weiter() {
+    const c = ctaJetzt();
+    if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
+    if (c && typeof c.go === 'function') { c.go(); setTimeout(weiterKnopf, 80); return true; }
+    const n = document.querySelector('#calendar-widget .cal-next');
+    if (n && !n.disabled) { n.click(); setTimeout(weiterKnopf, 80); return true; }
+    return false;
+  }
+  function weiterKnopf() {
+    if (!document.body.classList.contains('pcu-an')) return;
+    const head = document.querySelector('#view-home #calendar-widget .cal-head'); if (!head) return;
+    let k = $('pcu-weiter');
+    if (!k || k.parentNode !== head) {
+      if (k) k.remove();
+      k = document.createElement('button'); k.type = 'button'; k.id = 'pcu-weiter';
+      k.addEventListener('click', ev => { ev.preventDefault(); weiter(); });
+      const sim = $('dfl-sim-pc');
+      if (sim && sim.parentNode === head) head.insertBefore(k, sim); else head.appendChild(k);
+    }
+    const c = ctaJetzt() || { text: 'Woche weiter', sub: '', icon: 'ti-arrow-right' };
+    // Unterzeile nicht doppelt: „KW1 · Juli 2026“ steht schon links in der Karte
+    const kw = head.querySelector('.cal-week'), sub = c.sub && !(kw && kw.textContent.trim() === String(c.sub).trim()) ? c.sub : '';
+    const html = `<i class="ti ${c.icon || 'ti-arrow-right'}" aria-hidden="true"></i><span class="pcu-w-txt"><b>${c.text}</b>${sub ? `<small>${sub}</small>` : ''}</span><kbd>Leertaste</kbd>`;
+    if (k.innerHTML !== html) k.innerHTML = html;
+    k.classList.toggle('warn', !!c.warn);
+    const sim = $('dfl-sim-pc');
+    if (sim) { const t = sim.textContent.trim() === 'weiter' ? 'Simulation fortsetzen' : 'Simulieren bis …'; if (sim.title !== t) { sim.title = t; sim.setAttribute('aria-label', t); } }
+  }
   function taste(ev) {
     if (!document.body.classList.contains('pcu-an') || ev.altKey || ev.metaKey || ev.defaultPrevented) return;
     const ziel = ev.target || {};
@@ -18468,18 +18570,7 @@ body.pcu-an #view-home .cal-head .cal-next::after { content: 'Leertaste'; font-s
       // Nutzer 2026-10-22: „die Leertaste soll mich schnell zum Spieltag bringen, mehr nicht“ – sie macht genau das, was der
       // Haupt-Knopf gerade anbietet (zum Spiel, Playoff-Spiel, Draft, Kader auffüllen … sonst Woche weiter). Der Kalender-Knopf
       // allein kennt Playoffs, Draft und Kaderpflichten nicht.
-      let c = null; try { c = W.DFLAppShell && DFLAppShell.ctaZustand ? DFLAppShell.ctaZustand() : null; } catch (e) { c = null; }
-      if (c && typeof c.go === 'function') {
-        ev.preventDefault();
-        if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
-        c.go(); return;
-      }
-      const n = document.querySelector('#calendar-widget .cal-next');
-      if (n && n.offsetParent !== null && !n.disabled) {
-        ev.preventDefault();
-        if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
-        n.click();
-      }
+      if (weiter()) ev.preventDefault();
     }
   }
 
@@ -18499,12 +18590,17 @@ body.pcu-an #view-home .cal-head .cal-next::after { content: 'Leertaste'; font-s
     document.addEventListener('keydown', taste);
     document.addEventListener('click', tabelleKlick);
     anwenden();
-    setInterval(() => { if (!breit()) return; navAusbauen(); if (!KD && $('view-home') && $('view-home').classList.contains('active')) tabelleZeichnen(); }, CFG.takt);
+    const _cal = W.renderCalendarWidget;
+    if (typeof _cal === 'function') {
+      W.renderCalendarWidget = function () { const r = _cal.apply(this, arguments); try { weiterKnopf(); } catch (e) { /* nur Anzeige */ } return r; };
+      try { renderCalendarWidget = W.renderCalendarWidget; } catch (e) { /* window reicht */ }
+    }
+    setInterval(() => { if (!breit()) return; navAusbauen(); weiterKnopf(); if (!KD && $('view-home') && $('view-home').classList.contains('active')) tabelleZeichnen(); }, CFG.takt);
     if (mq) { if (mq.addEventListener) mq.addEventListener('change', anwenden); else if (mq.addListener) mq.addListener(anwenden); }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
-  W.KSPcUebersicht = { CFG, anwenden, tabelleZeichnen, bereiche: () => bereiche.map(b => b.id) };
+  W.KSPcUebersicht = { CFG, anwenden, tabelleZeichnen, weiter, weiterKnopf, bereiche: () => bereiche.map(b => b.id) };
   console.log('[Kickstil-PC-Übersicht v1] aktiv — Navigation links, Tasten, Übersicht als Schreibtisch (nur PC ≥ 1200 px)');
 })();
 
@@ -19102,6 +19198,16 @@ body.pcv-an #pcv-vor { display: grid; grid-template-columns: minmax(0, 1fr) minm
     return `<section class="pcv-k" aria-label="Deine Elf"><h3>Deine Elf <small>${esc(CLUB.formation || '')}</small></h3><ul class="pcv-elf">${li}</ul>
       <div class="pcv-fuss"><small>${probleme.length ? `${probleme.length} Spieler nicht fit` : 'Alle fit'}</small><button type="button" class="app-knopf" data-pcv="aufstellung">Aufstellung ändern</button></div></section>`;
   }
+  // Gegner im Blick: die drei Stärksten seines Kaders mit Gesicht (ersetzt den Erklärsatz, wenn kein Live-Coaching möglich ist)
+  function gegnerHtml(f) {
+    let l = [];
+    try { const S = W.KSPcSpieltag; l = (S && S.gegnerKader ? S.gegnerKader() : []).find(x => Array.isArray(x) && x.length) || []; } catch (e) { l = []; }
+    const top = l.filter(p => p && (p.ovr || p.str)).slice().sort((a, b) => (b.ovr || b.str) - (a.ovr || a.str)).slice(0, 3);
+    if (!top.length) return '';
+    const g = p => { try { return W.KSVerein ? KSVerein.gesicht(p, f.opponentId) : ''; } catch (e) { return ''; } };
+    return `<div class="pcv-wahl pcv-gegner"><span class="pcv-et">Gegner im Blick</span><ul class="pcv-elf">${top.map(p => `<li><span class="pcv-pl">${esc(p.pos || '')}</span>
+      <span class="pcv-g" aria-hidden="true">${g(p)}</span><span class="pcv-n">${esc(p.name || '')}${p.age ? `<small>${esc(p.age)} J.</small>` : ''}</span><span></span><span class="pcv-o">${Math.round(p.ovr || p.str)}</span></li>`).join('')}</ul></div>`;
+  }
   function duellHtml(f) {
     const tab = tabelle(), heim = f.isHome !== false;
     let opp = null; try { opp = W.KSVerein ? KSVerein.daten(f.opponentId) : null; } catch (e) { opp = null; }
@@ -19129,7 +19235,7 @@ body.pcv-an #pcv-vor { display: grid; grid-template-columns: minmax(0, 1fr) minm
         <span class="pcv-et">Coaching</span>
         <div class="pcv-coach" role="group" aria-label="Coaching"><button type="button" data-pcv-c="selbst" class="${coach === 'selbst' ? 'an' : ''}">Selbst coachen</button><button type="button" data-pcv-c="co" class="${coach === 'co' ? 'an' : ''}">Co-Trainer übernimmt</button></div>${W.KSPcTaktik && KSPcTaktik.vorOeffnen ? `<span class="pcv-et">Mannschaftsanweisungen</span>
         <div class="pcv-anw"><p>${esc(KSPcTaktik.vorText())}</p><button type="button" class="app-knopf" data-pcv="taktik"><i class="ti ti-clipboard-list" aria-hidden="true"></i> Taktikbrett</button></div>` : ''}</div>`
-      : `<div class="pcv-wahl"><p>Live-Coaching gibt es, wenn „Spiel als Text“ an ist (rechts).</p></div>`;
+      : gegnerHtml(f);   // statt Erklärsatz (Nutzer 2026-10-24: „Live-Coaching gibt es, wenn …“ war Meta-Text)
     return `<section class="pcv-k" aria-label="Das Duell"><h3>Das Duell <small>${esc(wettbewerb(f))}</small></h3>
       <div class="pcv-duell">${team(wir, iw, heim ? 'Heim' : 'Auswärts')}
         <div class="pcv-mitte"><span class="pcv-wb">Stärke</span><span class="pcv-st">${wir.st ?? '–'}<span>:</span>${geg.st ?? '–'}</span><small>${heim ? 'im eigenen Stadion' : 'auswärts'}</small></div>
@@ -22900,7 +23006,7 @@ window.KS_GEO = {
     const malen = () => {
       const T = CLUB.training || {}, r = alteRegler();
       const zu = b => !b || b.disabled || /🔒|gesperrt/.test(b.textContent) || b.classList.contains('zu');
-      const F = { leicht: '×0,57', normal: '×1,00', intensiv: '×1,57' };
+      const F = { leicht: '×0,57 · Fitness +5', normal: '×1,00 · Fitness ±0', intensiv: '×1,57 · Fitness −5' };   // Fitness je Woche (fitness_patch.js)
       box.innerHTML = `<div class="app-griff"></div><button class="app-blatt-zu" aria-label="Schließen"><i class="ti ti-x" aria-hidden="true"></i></button>
         <div class="ksk-bt"><i class="ti ti-barbell" aria-hidden="true"></i>Training</div>
         <h4 class="ksk-h4">Intensität</h4>
@@ -23068,6 +23174,486 @@ window.KS_GEO = {
   console.log('[KS-Kader v1] aktiv — Kader: Aufstellung · Spieler · Training, Gegner-Karte, Tauschen, Spielstil als Blatt, rote Marken');
 })();
 
+;/* ── js/kickstil_belohnung.js ── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   KICKSTIL · BELOHNEN UND BESTRAFEN  ·  v1   (2026-10-24, beide Spiele – gleiche Datei in kickdraft/spiel/js)
+   ─────────────────────────────────────────────────────────────────────────
+   Nutzer: „Was kann man dem Kader Gutes tun als Belohnung? Wellness usw. als Moral-Boost“ – „Belohnungen gehen nicht immer,
+   sondern nur einmal pro Halbserie, genauso wie Bestrafungen. Bei Bestrafungen KANN-Effekte, die positiv, aber auch negativ sein
+   können, selbes für die Belohnungen, dass die Konzentration vielleicht ein wenig sinkt“.
+   · Kader → Training: Karte „Mannschaft“ mit Belohnen und Bestrafen; je Halbserie (Hinrunde/Rückrunde nach LEAGUE.matchday
+     gegen die Hälfte von LEAGUE.matchWeeks) eine Belohnung und eine Strafe.
+   · Kosten in Prozent der Wochengehälter (passt in jeder Liga), vom Kontostand CLUB.budget.
+   · Feste Wirkung (Moral, Fitness) plus je Maßnahme Kann-Folgen mit Wahrscheinlichkeit, gut oder schlecht:
+     nächstes Spiel ±% (CLUB._nextMatchMod wie die Ereignisse in bundle_economy.js), Verletzungsrisiko (CLUB._injuryRiskMod),
+     einzelne Spieler (Moral, Fitness, kurze Verletzung).
+   · Siegprämie: wird erst nach dem nächsten Pflichtspiel fällig und nur bei Sieg (Hülle um processFixtureResult).
+   Zustand CLUB.ksBelohnung = { genutzt: { 'Saison-Hälfte': { b: id, s: id } }, praemie: { betrag } }.
+   API: KSBelohnung.oeffnen('b'|'s') · .frei() · .CFG
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+  const W = window;
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const euro = v => (typeof formatEuro === 'function' ? formatEuro(Math.round(v)) : Math.round(v) + ' €');
+  const KD = /\/kickdraft\//.test(location.pathname) || !!W.DFLSpiel;
+
+  // Kann-Folgen: { p: Wahrscheinlichkeit, gut: true|false, text, wirk: { spiel: ±%, moral, fitness, einer: {moral, fitness, verletzt}, risiko } }
+  const CFG = {
+    BELOHNUNG: [
+      { id: 'frei', icon: 'ti-sofa', name: 'Freier Tag', kosten: 0, moral: 3, fitness: 8,
+        kann: [{ p: 0.25, gut: false, text: 'Ein paar kommen nicht ganz bei der Sache zurück – die Konzentration leidet.', wirk: { spiel: -1 } }] },
+      { id: 'abend', icon: 'ti-grill', name: 'Teamabend', kosten: 0.08, moral: 4, neu: 6,
+        kann: [{ p: 0.15, gut: false, text: '{N} hat über die Stränge geschlagen und ist am nächsten Tag nicht zu gebrauchen.', wirk: { einer: { moral: -5, fitness: -10 } } },
+          { p: 0.2, gut: true, text: 'Der Abend schweißt zusammen – die Mannschaft zieht im nächsten Spiel an einem Strang.', wirk: { spiel: 1 } }] },
+      { id: 'wellness', icon: 'ti-bath', name: 'Wellness-Tag', kosten: 0.15, moral: 5, fitness: 6, risiko: 0.5,
+        kann: [{ p: 0.25, gut: false, text: 'Fast zu entspannt: Die Spannung fürs nächste Spiel fehlt ein wenig.', wirk: { spiel: -2 } }] },
+      { id: 'praemie', icon: 'ti-coin', name: 'Siegprämie', kosten: 0.3, nurSieg: true, moral: 3, spiel: 2,
+        kann: [{ p: 0.15, gut: false, text: 'Der Druck ist spürbar – {N} wirkt nervös.', wirk: { einer: { moral: -3 }, zwei: true } }] },
+      { id: 'trip', icon: 'ti-plane', name: 'Kurztrip', kosten: 0.6, moral: 8, fitness: 10, nurPause: true,
+        kann: [{ p: 0.1, gut: false, text: '{N} hat sich beim Ausflug leicht verletzt.', wirk: { einer: { verletzt: [1, 2] } } },
+          { p: 0.3, gut: true, text: 'Die Neuen sind jetzt richtig angekommen.', wirk: { neu: 5 } }] }
+    ],
+    STRAFE: [
+      { id: 'geld', icon: 'ti-receipt', name: 'Mannschaftsstrafe', kosten: -0.05, moral: -3,
+        kann: [{ p: 0.5, gut: true, text: 'Der Weckruf sitzt – die Mannschaft will es zeigen.', wirk: { spiel: 2 } },
+          { p: 0.3, gut: false, text: 'Trotz in der Kabine – die Stimmung kippt.', wirk: { spiel: -2 } }] },
+      { id: 'straftraining', icon: 'ti-run', name: 'Straftraining', kosten: 0, moral: -4, fitness: -6,
+        kann: [{ p: 0.5, gut: true, text: 'Konzentration und Wille steigen.', wirk: { spiel: 2 } },
+          { p: 0.2, gut: false, text: '{N} hat sich beim Straftraining verletzt.', wirk: { einer: { verletzt: [1, 1] } } }] },
+      { id: 'predigt', icon: 'ti-speakerphone', name: 'Kabinenpredigt', kosten: 0, moral: -2,
+        kann: [{ p: 0.4, gut: true, text: 'Die Ansage kommt an.', wirk: { spiel: 3 } },
+          { p: 0.3, gut: false, text: '{N} fühlt sich zu Unrecht angegriffen.', wirk: { einer: { moral: -6 }, fuehrung: true } }] }
+    ]
+  };
+
+  // ── Zustand ───────────────────────────────────────────────────────────────
+  const da = () => typeof CLUB !== 'undefined' && CLUB && typeof LEAGUE !== 'undefined' && LEAGUE && typeof SQUAD !== 'undefined';
+  function zustand() { if (!CLUB.ksBelohnung) CLUB.ksBelohnung = { genutzt: {} }; if (!CLUB.ksBelohnung.genutzt) CLUB.ksBelohnung.genutzt = {}; return CLUB.ksBelohnung; }
+  function haelfte() {
+    const n = (LEAGUE.matchWeeks || []).length, md = LEAGUE.matchday || 0;
+    return n && md >= Math.ceil(n / 2) ? 2 : 1;
+  }
+  const schluessel = () => (LEAGUE.season || 1) + '-' + haelfte();
+  const haelfteName = () => haelfte() === 1 ? 'Hinrunde' : 'Rückrunde';
+  function frei(art) { const g = zustand().genutzt[schluessel()] || {}; return !g[art]; }
+  const kader = () => SQUAD.filter(p => p && !p.onLoanAt);
+  const lohn = () => kader().reduce((s, p) => s + (p.wage || 0), 0);
+  const kosten = m => Math.round(lohn() * m.kosten / 1000) * 1000;
+  function pause() {
+    // ohne Pflichtspiel diese Woche: Vorbereitung oder Winterpause
+    const w = LEAGUE.week, mw = LEAGUE.matchWeeks || [];
+    if (!mw.length) return true;
+    if (w < mw[0]) return true;
+    return !mw.includes(w) && !(typeof CURRENT_FIXTURE !== 'undefined' && CURRENT_FIXTURE && CURRENT_FIXTURE.type !== 'friendly');
+  }
+  function sperre(m) {
+    if (m.nurPause && !pause()) return 'nur in Vorbereitung und Pause';
+    if (m.kosten > 0 && (CLUB.budget || 0) < kosten(m)) return 'zu wenig Geld';
+    if (m.id === 'praemie' && zustand().praemie) return 'schon ausgelobt';
+    return '';
+  }
+
+  // ── Wirkung ───────────────────────────────────────────────────────────────
+  const clamp = v => Math.max(0, Math.min(100, Math.round(v)));
+  const zufall = l => l[Math.floor(Math.random() * l.length)];
+  function moral(spieler, d) {
+    if (!d) return;
+    if (typeof W.addMorale === 'function') W.addMorale(spieler, d);
+    else spieler.forEach(p => { p.morale = clamp((p.morale == null ? 70 : p.morale) + d); });
+  }
+  function fitness(spieler, d) { if (d) spieler.forEach(p => { p.fitness = clamp((p.fitness == null ? 95 : p.fitness) + d); }); }
+  function spiel(pct, label) {
+    if (!pct) return;
+    const alt = CLUB._nextMatchMod && CLUB._nextMatchMod.pct || 0;
+    CLUB._nextMatchMod = { pct: alt + pct, scope: 'any', label };
+  }
+  const neue = () => kader().filter(p => p.acquiredSeason === LEAGUE.season || p.dflNeu);
+  const name = p => (typeof displayName === 'function' ? displayName(p) : p.name);
+  function einerWaehlen(wirk) {
+    let l = kader().filter(p => !(p.injuryWeeks > 0));
+    if (wirk.fuehrung) l = l.slice().sort((a, b) => (b.age || 0) - (a.age || 0) || (b.ovr || 0) - (a.ovr || 0)).slice(0, 4);
+    return l.length ? zufall(l) : null;
+  }
+  function anwenden(m) {
+    const alle = kader(), folgen = [];
+    if (m.kosten) CLUB.budget = (CLUB.budget || 0) - (m.nurSieg ? 0 : kosten(m));
+    moral(alle, m.moral); fitness(alle, m.fitness);
+    if (m.neu) moral(neue(), m.neu);
+    if (m.spiel && !m.nurSieg) spiel(m.spiel, m.name);
+    if (m.nurSieg) { zustand().praemie = { betrag: kosten(m) }; spiel(m.spiel, m.name); }
+    if (m.risiko) CLUB._injuryRiskMod = { weeks: 1, factor: m.risiko };
+    (m.kann || []).forEach(k => {
+      if (Math.random() >= k.p) return;
+      const w = k.wirk; let text = k.text;
+      if (w.einer) {
+        const opfer = [einerWaehlen(w)]; if (w.zwei) { const z = einerWaehlen(w); if (z && z !== opfer[0]) opfer.push(z); }
+        if (!opfer[0]) return;
+        opfer.forEach(p => {
+          if (w.einer.moral) moral([p], w.einer.moral);
+          if (w.einer.fitness) fitness([p], w.einer.fitness);
+          if (w.einer.verletzt) { p.injuryWeeks = w.einer.verletzt[0] + Math.floor(Math.random() * (w.einer.verletzt[1] - w.einer.verletzt[0] + 1)); p.injuryType = 'Zerrung'; }
+        });
+        text = text.replace('{N}', opfer.map(name).join(' und '));
+      }
+      if (w.spiel) spiel(w.spiel, m.name);
+      if (w.moral) moral(alle, w.moral);
+      if (w.neu) moral(neue(), w.neu);
+      folgen.push({ gut: k.gut, text });
+    });
+    return folgen;
+  }
+
+  // ── Siegprämie erst nach dem Spiel ──────────────────────────────────────
+  if (typeof W.processFixtureResult === 'function') {
+    const _orig = W.processFixtureResult;
+    W.processFixtureResult = function () {
+      let gf = null, ga = null, test = false;
+      try { gf = G.homeGoals; ga = G.awayGoals; test = typeof CURRENT_FIXTURE !== 'undefined' && CURRENT_FIXTURE && CURRENT_FIXTURE.type === 'friendly'; } catch (e) { /* ohne */ }
+      const r = _orig.apply(this, arguments);
+      try {
+        const z = da() && CLUB.ksBelohnung, pr = z && z.praemie;
+        if (pr && !test && gf != null) {
+          if (gf > ga) { CLUB.budget = (CLUB.budget || 0) - pr.betrag; if (typeof addNews === 'function') addNews('club', 'Siegprämie ausgezahlt', `Die Mannschaft bekommt ${euro(pr.betrag)} für den Sieg.`); }
+          delete z.praemie;
+        }
+      } catch (e) { console.warn('[Kickstil-Belohnung] Prämie', e); }
+      return r;
+    };
+    try { processFixtureResult = W.processFixtureResult; } catch (e) { /* nur window */ }
+  }
+
+  // ── Oberfläche ────────────────────────────────────────────────────────────
+  const CSS = `
+  .ksb-karte{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;padding:10px 12px;border-radius:14px;background:var(--bg2,#fffdf9);
+    border:3px solid var(--k-rand,var(--border,#d9c7a6));box-shadow:0 3px 0 var(--k-rand,var(--border,#d9c7a6));color:var(--text,#2c2418)}
+  .ksb-karte > span{grid-column:1 / -1;min-width:0} .ksb-karte b{display:block;font-size:14px} .ksb-karte small{font-size:12px;color:var(--text2,#6b5a43)}
+  .ksb-karte button{width:100%;justify-content:center;white-space:nowrap}
+  .ksb-karte button:disabled{opacity:.45;cursor:not-allowed}
+  .ksb-liste{display:flex;flex-direction:column;gap:8px;margin:8px 0 12px}
+  .ksb-m{display:grid;grid-template-columns:36px minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px;border-radius:12px;text-align:left;width:100%;
+    background:var(--bg3,#f6ead2);border:2px solid var(--border,#d9c7a6);color:inherit;font:inherit;cursor:pointer}
+  .ksb-m:disabled{opacity:.5;cursor:not-allowed}
+  .ksb-m > i{font-size:22px;justify-self:center} .ksb-m b{display:block;font-size:14px} .ksb-m small{font-size:12px;color:var(--text2,#6b5a43)}
+  .ksb-m .ksb-preis{font-weight:800;font-size:13px;white-space:nowrap}
+  .ksb-wirk{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+  .ksb-wirk em{font-style:normal;font-size:11.5px;font-weight:700;border-radius:999px;padding:1px 7px;background:var(--bg2,#fffdf9)}
+  .ksb-wirk em.gut{color:var(--gut,#3d9a2a)} .ksb-wirk em.schlecht{color:var(--schlecht,#b8402f)} .ksb-wirk em.kann{color:var(--text2,#6b5a43)}
+  .ksb-folge{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:10px;margin:6px 0;background:var(--bg3,#f6ead2)}
+  .ksb-folge.gut i{color:var(--gut,#3d9a2a)} .ksb-folge.schlecht i{color:var(--schlecht,#b8402f)}`;
+  function stil() { if (document.getElementById('ksb-css')) return; const s = document.createElement('style'); s.id = 'ksb-css'; s.textContent = CSS; document.head.appendChild(s); }
+
+  function wirkHtml(m) {
+    const e = [];
+    const z = (v, t) => v ? e.push(`<em class="${v > 0 ? 'gut' : 'schlecht'}">${t} ${v > 0 ? '+' : '−'}${Math.abs(v)}</em>`) : 0;
+    z(m.moral, 'Moral'); z(m.fitness, 'Fitness'); z(m.neu, 'Neue Moral'); z(m.spiel, 'Nächstes Spiel %');
+    if (m.risiko) e.push('<em class="gut">Verletzungen −50 %</em>');
+    if (m.nurSieg) e.push('<em class="kann">zahlbar nur bei Sieg</em>');
+    if ((m.kann || []).length) e.push('<em class="kann">kann gut oder schlecht ausgehen</em>');
+    return `<span class="ksb-wirk">${e.join('')}</span>`;
+  }
+  function blatt() {
+    let b = document.getElementById('app-blatt');
+    if (!b) {
+      b = document.createElement('div'); b.id = 'app-blatt';
+      b.innerHTML = '<div class="app-sheet-bg"></div><div class="app-blatt-box" role="dialog" aria-modal="true"></div>';
+      document.body.appendChild(b);
+      b.querySelector('.app-sheet-bg').addEventListener('click', zu);
+    }
+    return b;
+  }
+  function zu() { const b = document.getElementById('app-blatt'); if (b) b.classList.remove('auf'); document.body.classList.remove('app-gesperrt'); }
+  function oeffnen(art) {
+    if (!da()) return; stil();
+    const b = blatt(), box = b.querySelector('.app-blatt-box'), liste = art === 's' ? CFG.STRAFE : CFG.BELOHNUNG, ist = frei(art);
+    delete box.dataset.spieler;
+    box.innerHTML = `<div class="app-griff"></div><button class="app-blatt-zu" aria-label="Schließen"><i class="ti ti-x" aria-hidden="true"></i></button>
+      <div class="ksk-bt"><i class="ti ${art === 's' ? 'ti-gavel' : 'ti-gift'}" aria-hidden="true"></i>${art === 's' ? 'Bestrafen' : 'Belohnen'} <small>· ${haelfteName()}</small></div>
+      ${ist ? '' : `<p class="ksb-folge"><i class="ti ti-clock" aria-hidden="true"></i><span>In der ${haelfteName()} schon genutzt.</span></p>`}
+      <div class="ksb-liste">${liste.map(m => { const s = sperre(m), k = kosten(m);
+        return `<button type="button" class="ksb-m" data-ksb="${m.id}"${!ist || s ? ' disabled' : ''}><i class="ti ${m.icon}" aria-hidden="true"></i>
+          <span><b>${esc(m.name)}</b>${wirkHtml(m)}${s && ist ? `<small>${esc(s)}</small>` : ''}</span>
+          <span class="ksb-preis">${m.kosten > 0 ? euro(k) : m.kosten < 0 ? '+' + euro(-k) : 'gratis'}</span></button>`; }).join('')}</div>`;
+    box.onclick = ev => {
+      if (ev.target.closest('.app-blatt-zu, .ksb-ok')) { zu(); return; }
+      const k = ev.target.closest('[data-ksb]'); if (!k || k.disabled) return;
+      const m = liste.find(x => x.id === k.dataset.ksb); if (!m || sperre(m) || !frei(art)) return;
+      const g = zustand().genutzt, sl = schluessel(); g[sl] = Object.assign({}, g[sl], { [art]: m.id });
+      const folgen = anwenden(m);
+      if (typeof addNews === 'function') addNews('club', `${art === 's' ? 'Strafe' : 'Belohnung'}: ${m.name}`, folgen.map(f => f.text).join(' ') || 'Die Mannschaft nimmt es auf.');
+      box.innerHTML = `<div class="app-griff"></div><button class="app-blatt-zu" aria-label="Schließen"><i class="ti ti-x" aria-hidden="true"></i></button>
+        <div class="ksk-bt"><i class="ti ${m.icon}" aria-hidden="true"></i>${esc(m.name)}</div>${wirkHtml(Object.assign({}, m, { kann: [] }))}
+        ${folgen.length ? folgen.map(f => `<div class="ksb-folge ${f.gut ? 'gut' : 'schlecht'}"><i class="ti ${f.gut ? 'ti-trending-up' : 'ti-trending-down'}" aria-hidden="true"></i><span>${esc(f.text)}</span></div>`).join('')
+          : '<div class="ksb-folge gut"><i class="ti ti-check" aria-hidden="true"></i><span>Alles nach Plan, keine Nebenwirkungen.</span></div>'}
+        <button type="button" class="app-knopf ksk-fertig ksb-ok">Fertig</button>`;
+      try { if (typeof saveGameState === 'function') saveGameState(); } catch (e) { /* Tests */ }
+      karte();
+    };
+    b.classList.add('auf'); document.body.classList.add('app-gesperrt');
+  }
+  function karte() {
+    const c = document.getElementById('training-content'); if (!c || !da()) return;
+    stil();
+    const fb = frei('b'), fs = frei('s');
+    const html = `<span><b>Mannschaft</b><small>${haelfteName()}: Belohnung ${fb ? 'frei' : 'genutzt'} · Strafe ${fs ? 'frei' : 'genutzt'}</small></span>
+      <button type="button" class="app-knopf" data-ksb-auf="b"${fb ? '' : ' disabled'}><i class="ti ti-gift" aria-hidden="true"></i> Belohnen</button>
+      <button type="button" class="app-knopf" data-ksb-auf="s"${fs ? '' : ' disabled'}><i class="ti ti-gavel" aria-hidden="true"></i> Bestrafen</button>`;
+    let k = c.querySelector('.ksb-karte');
+    if (!k) {
+      k = document.createElement('div'); k.className = 'ksb-karte';
+      k.addEventListener('click', ev => { const x = ev.target.closest('[data-ksb-auf]'); if (x && !x.disabled) oeffnen(x.dataset.ksbAuf); });
+    }
+    // direkt unter der Trainings-Karte (Intensität · Schwerpunkt)
+    const vor = c.querySelector(':scope > .ksk-tr-neu > .ksk-einst') || c.querySelector(':scope > .ksk-tr-neu');
+    if (vor && vor.nextElementSibling !== k) vor.after(k); else if (!vor && !k.parentNode) c.prepend(k);
+    if (k.dataset.sig !== html) { k.innerHTML = html; k.dataset.sig = html; }
+  }
+  // Training wird neu gezeichnet → Karte jeweils wieder einsetzen (gebündelt)
+  let warte = 0;
+  const mo = new MutationObserver(() => { if (warte) return; warte = requestAnimationFrame(() => { warte = 0; try { karte(); } catch (e) { /* still */ } }); });
+  function start() { const c = document.getElementById('training-content'); if (c) { mo.observe(c, { childList: true, subtree: false }); karte(); } else setTimeout(start, 1000); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+
+  W.KSBelohnung = { CFG, oeffnen, frei, haelfte, karte, KD };
+  console.log('[Kickstil-Belohnung v1] aktiv — Belohnen und Bestrafen einmal je Halbserie, mit Kann-Folgen');
+})();
+
+;/* ── js/kickstil_tipps.js ── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   KICKSTIL · TIPPS ZUR RICHTIGEN ZEIT  ·  v1   (2026-10-24, beide Spiele – gleiche Datei in kickdraft/spiel/js, auch in der Demo)
+   ─────────────────────────────────────────────────────────────────────────
+   Nutzer: „die Tutorials müssen übernommen werden und sogar noch einfacher und angepasster werden – wenn man auf was klickt, wenn
+   manche Werte unter einen gewissen Threshold fallen wie Fitness, was man so machen kann, und dadurch noch im späteren Spielverlauf
+   Erklärungen bekommt; das müsste in die Demo übernommen werden“ (Konzept freigegeben 2026-10-24).
+   · Erster Klick: ein Satz beim ersten Besuch eines Bereichs (Kader, Training, Liga, Front Office/Transfers, Verein).
+   · Schwellen: müde Spieler in der Elf, schlechte Moral, Verletzte in der Elf, Konto im Minus, Vertrag eines Stammspielers läuft
+     aus, Kader zu klein – jeweils mit einem Knopf, der die Lösung öffnet.
+   · Später: erstes Angebot, Rückrunde (Belohnen/Bestrafen wieder frei), Winterfenster, letzte Woche vor Fensterschluss.
+   · Vereinskarriere: „Erster Tag“ (4 Stationen mit Markierung) nach der Vereinswahl – Kickdraft hat seinen eigenen (dfl_tutorial.js).
+   Jeder Tipp einmal je Karriere (CLUB.ksTipps.g), Schwellen-Tipps dürfen nach 8 Wochen wiederkommen; höchstens ein Tipp je Woche
+   (erste Klicks ausgenommen); nie über Spiel, Ticker, Fenstern oder Blättern. Aus: Mehr → Optionen bzw. localStorage gesamt-tipps = aus.
+   Tests (navigator.webdriver) ohne Tipps, außer localStorage kst-test = an.
+   API: KSTipps.zeigen(id) · .ersterTag() · .an(bool) · .liste
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+  const W = window;
+  const KD = !!W.DFLSpiel || /\/kickdraft\//.test(location.pathname);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const lies = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const testlauf = () => !!navigator.webdriver && lies('kst-test') !== 'an';
+  const an = () => lies('gesamt-tipps') !== 'aus' && !testlauf();
+  const da = () => typeof CLUB !== 'undefined' && CLUB && typeof LEAGUE !== 'undefined' && LEAGUE && typeof SQUAD !== 'undefined' && Array.isArray(SQUAD);
+  // irgendein Treffer sichtbar (ein verstecktes .exp-overlay davor darf ein offenes dahinter nicht verdecken)
+  const sichtbar = sel => [...document.querySelectorAll(sel)].some(e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden' && getComputedStyle(e).display !== 'none');
+  const CFG = { wiederNachWochen: 8, muede: 70, moral: 55, kaderMin: KD ? 24 : 18, takt: 1500 };
+
+  // ── Zustand ───────────────────────────────────────────────────────────────
+  function zustand() { if (!CLUB.ksTipps) CLUB.ksTipps = { g: {}, w: -1 }; if (!CLUB.ksTipps.g) CLUB.ksTipps.g = {}; return CLUB.ksTipps; }
+  const wochenIndex = () => (LEAGUE.season || 1) * 60 + (LEAGUE.week || 0);
+  function gesehen(id, wieder) {
+    const t = zustand().g[id]; if (t == null) return false;
+    return !wieder || wochenIndex() - t < CFG.wiederNachWochen;
+  }
+
+  // ── Helfer für Knöpfe ─────────────────────────────────────────────────────
+  function zeige(view) {
+    try { if (W.DFLAppShell && DFLAppShell.zeige && document.getElementById('app-nav')) { DFLAppShell.zeige(view); return; } } catch (e) { /* weiter */ }
+    try { if (typeof switchAppView === 'function') switchAppView(view, document.getElementById('nav-' + view) || document.createElement('button')); } catch (e) { /* ohne */ }
+  }
+  function training() {
+    zeige('squad');
+    setTimeout(() => { const t = [...document.querySelectorAll('button, [role=tab]')].find(x => x.getClientRects().length && /^\s*Training\s*$/.test(x.textContent)); if (t) t.click(); }, 250);
+  }
+  function leichtTrainieren() {
+    if (!CLUB.training) CLUB.training = {};
+    CLUB.training.intensity = 'leicht';
+    try { if (typeof saveGameState === 'function') saveGameState(); } catch (e) { /* Tests */ }
+    training();
+  }
+  const eigen = () => SQUAD.filter(p => p && !p.onLoanAt);
+  function elf() { try { return (getLineupIds() || []).map(getPlayer).filter(Boolean); } catch (e) { return []; } }
+  const name = p => (typeof displayName === 'function' ? displayName(p) : p.name);
+  const namen = l => l.length > 2 ? `${l.slice(0, 2).map(name).join(', ')} und ${l.length - 2} ${l.length - 2 === 1 ? 'weiterer' : 'weitere'}` : l.map(name).join(' und ');
+  const verletzt = p => (typeof isInjured === 'function' ? isInjured(p) : (p.injuryWeeks || 0) > 0);
+  const fensterInfo = () => { try { return typeof transferWindowInfo === 'function' ? transferWindowInfo(LEAGUE.week) : null; } catch (e) { return null; } };
+  const halbzeitSaison = () => { const n = (LEAGUE.matchWeeks || []).length; return n && (LEAGUE.matchday || 0) >= Math.ceil(n / 2); };
+
+  // ── Katalog ───────────────────────────────────────────────────────────────
+  // art: 'klick' (erster Besuch, wenn: aktive Ansicht), 'schwelle' (darf wiederkommen), 'spaeter' (einmal)
+  const TIPPS = [
+    { id: 'k-kader', art: 'klick', icon: 'ti-users', titel: 'Kader', ansicht: 'squad',
+      text: 'Aufstellung, Spieler und Training. Der Balken unter dem Namen ist die Kraft, die Zahl die Stärke.' },
+    { id: 'k-liga', art: 'klick', icon: 'ti-trophy', titel: 'Liga', ansicht: 'liga',
+      text: KD ? 'Tabelle, Spielplan und das Playoff-Bild deiner Conference.' : 'Tabelle, Spielplan und Pokal. Die farbigen Zonen zeigen Auf- und Abstieg.' },
+    { id: 'k-fo', art: 'klick', icon: 'ti-briefcase', titel: 'Front Office', ansicht: KD ? 'fo' : 'transfer',
+      text: KD ? 'Trades, Free Agency, Draft und Anlagen – hier baust du die Franchise.' : 'Transfers, Scouting, Verein und Finanzen – hier baust du den Verein.' },
+    { id: 'k-verein', art: 'klick', icon: 'ti-building-stadium', titel: 'Verein', ansicht: 'club',
+      text: 'Ausbau kostet heute Geld und bringt auf Dauer mehr Einnahmen.' },
+    { id: 's-muede', art: 'schwelle', icon: 'ti-battery-2', titel: 'Müde Spieler',
+      wenn: () => { const l = elf().filter(p => (p.fitness == null ? 100 : p.fitness) < CFG.muede && !verletzt(p)); return l.length >= 2 ? l : null; },
+      text: l => `${namen(l)} sind müde. Müde Spieler spielen schwächer und verletzen sich leichter.`,
+      knoepfe: [['Leichter trainieren', leichtTrainieren], ['Auf die Bank', () => zeige('squad')]] },
+    { id: 's-moral', art: 'schwelle', icon: 'ti-mood-sad', titel: 'Stimmung im Keller',
+      wenn: () => (typeof W.teamMorale === 'function' && W.teamMorale() < CFG.moral) || null,
+      text: () => 'Die Moral der Elf ist schlecht. Das kostet Stärke im Spiel.',
+      knoepfe: [['Belohnen', () => { training(); setTimeout(() => W.KSBelohnung && KSBelohnung.oeffnen('b'), 450); }]] },
+    { id: 's-verletzt', art: 'schwelle', icon: 'ti-first-aid-kit', titel: 'Verletzt in der Elf',
+      wenn: () => { const l = elf().filter(verletzt); return l.length ? l : null; },
+      text: l => `${namen(l)} ${l.length > 1 ? 'stehen' : 'steht'} verletzt in der Aufstellung.`,
+      knoepfe: [['Zur Aufstellung', () => zeige('squad')]] },
+    { id: 's-minus', art: 'schwelle', icon: 'ti-coin-off', titel: 'Konto im Minus',
+      wenn: () => (CLUB.budget || 0) < 0 || null,
+      text: () => 'Das Konto ist im Minus. Verkaufe Spieler oder spare an Gehältern.',
+      knoepfe: [[KD ? 'Zum Front Office' : 'Zu den Finanzen', () => zeige(KD ? 'fo' : 'club')]] },
+    { id: 's-vertrag', art: 'schwelle', icon: 'ti-file-alert', titel: 'Vertrag läuft aus',
+      wenn: () => { if (!halbzeitSaison()) return null; const l = elf().filter(p => p.contractUntil != null && p.contractUntil <= (LEAGUE.season || 1)); return l.length ? l : null; },
+      text: l => `Der Vertrag von ${namen(l)} endet nach dieser Saison.`,
+      knoepfe: [['Zu den Verträgen', () => zeige('squad')]] },
+    { id: 's-kader', art: 'schwelle', icon: 'ti-users-minus', titel: 'Kader zu klein',
+      wenn: () => eigen().length < CFG.kaderMin || null,
+      text: () => `Nur ${eigen().length} Spieler im Kader. Verletzungen und Sperren werden dann schnell zum Problem.`,
+      knoepfe: [[KD ? 'Free Agency' : 'Zum Transfermarkt', () => zeige(KD ? 'fo' : 'transfer')]] },
+    { id: 'p-angebot', art: 'spaeter', icon: 'ti-mail', titel: 'Erstes Angebot', nurFL: true,
+      wenn: () => (CLUB.transferBids || []).length || null,
+      text: () => 'Ein Verein will einen deiner Spieler. Du findest das Angebot im Postfach: annehmen, verhandeln oder ablehnen.',
+      knoepfe: [['Zum Postfach', () => zeige('home')]] },
+    { id: 'p-rueckrunde', art: 'spaeter', icon: 'ti-refresh', titel: 'Rückrunde',
+      wenn: () => halbzeitSaison() || null, schluessel: () => 'p-rueckrunde-' + (LEAGUE.season || 1),
+      text: () => 'Neue Halbserie: Belohnen und Bestrafen sind wieder frei.',
+      knoepfe: [['Zum Training', training]] },
+    { id: 'p-winter', art: 'spaeter', icon: 'ti-snowflake', titel: 'Winterfenster offen', nurFL: true,
+      wenn: () => { const f = fensterInfo(); return (f && f.open && f.type === 'Winter') || null; }, schluessel: () => 'p-winter-' + (LEAGUE.season || 1),
+      text: () => 'Das Transferfenster ist bis zum Deadline-Day offen.',
+      knoepfe: [['Zum Transfermarkt', () => zeige('transfer')]] },
+    { id: 'p-deadline', art: 'spaeter', icon: 'ti-clock', titel: 'Letzte Woche', nurFL: true,
+      wenn: () => { const f = fensterInfo(); const w = LEAGUE.week; return (f && f.open && (w === 8 || w === 29)) || null; }, schluessel: () => 'p-deadline-' + (LEAGUE.season || 1) + '-' + LEAGUE.week,
+      text: () => 'Nächste Woche ist Deadline-Day – danach sind Käufe erst im nächsten Fenster möglich.',
+      knoepfe: [['Zum Transfermarkt', () => zeige('transfer')]] }
+  ].filter(t => !(t.nurFL && KD));
+
+  // ── Anzeige ───────────────────────────────────────────────────────────────
+  const CSS = `
+  #kst-tipp{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 10px);transform:translate(-50%,-140%);z-index:9000;width:min(520px,calc(100vw - 24px));
+    display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:4px 10px;align-items:start;padding:12px 14px;border-radius:16px;
+    background:var(--bg2,#fffdf9);color:var(--text,#2c2418);border:3px solid var(--gold,#e8b923);box-shadow:0 4px 0 var(--k-rand,#8a5a2b),0 10px 30px rgb(0 0 0 / .18);
+    transition:transform .32s cubic-bezier(.2,.9,.3,1.2)}
+  #kst-tipp.auf{transform:translate(-50%,0)}
+  #kst-tipp > i{font-size:26px;color:var(--gold-text,#a77b00);grid-column:1;grid-row:1 / span 2}
+  #kst-tipp > div:not(.kst-knoepfe){grid-column:2;grid-row:1;min-width:0}
+  #kst-tipp b{display:block;font-size:15px} #kst-tipp p{margin:2px 0 0;font-size:13.5px;line-height:1.4;color:var(--text2,#5c4a36)}
+  #kst-tipp .kst-zu{grid-column:3;grid-row:1;border:0;background:none;color:var(--text2,#6b5a43);font-size:18px;cursor:pointer;padding:0 2px}
+  #kst-tipp .kst-knoepfe{grid-column:2 / -1;grid-row:2;display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  #kst-tipp .kst-knoepfe button{font-size:13px;padding:6px 12px}
+  #kst-tipp small.kst-schritt{display:block;margin-bottom:2px;font-size:11.5px;font-weight:800;color:var(--text3,#846d52);letter-spacing:.06em;text-transform:uppercase}
+  body.pcu-an #kst-tipp{left:auto;right:24px;transform:translateY(-140%);top:auto;bottom:24px} body.pcu-an #kst-tipp.auf{transform:none}
+  .kst-ziel{position:relative;z-index:8999;outline:3px solid var(--gold,#e8b923)!important;outline-offset:3px;border-radius:12px;animation:kst-puls 1.4s ease-in-out infinite}
+  @keyframes kst-puls{50%{outline-offset:7px}}
+  @media (prefers-reduced-motion:reduce){#kst-tipp{transition:none}.kst-ziel{animation:none}}`;
+  function stil() { if (document.getElementById('kst-css')) return; const s = document.createElement('style'); s.id = 'kst-css'; s.textContent = CSS; document.head.appendChild(s); }
+  let EL = null, ZIEL = null, offen = null;
+  function zielWeg() { if (ZIEL) ZIEL.classList.remove('kst-ziel'); ZIEL = null; }
+  function schliessen() { if (EL) EL.classList.remove('auf'); zielWeg(); const o = offen; offen = null; if (o && o.danach) o.danach(); }
+  function karte(t, opt) {
+    stil(); opt = opt || {};
+    if (!EL) {
+      EL = document.createElement('div'); EL.id = 'kst-tipp'; EL.setAttribute('role', 'status');
+      EL.addEventListener('click', ev => {
+        const b = ev.target.closest('button'); if (!b) return;
+        if (b.classList.contains('kst-zu')) { if (offen && offen.abbruch) offen.abbruch(); schliessen(); return; }
+        const i = +b.dataset.k, k = offen && offen.knoepfe && offen.knoepfe[i];
+        const o = offen; schliessen();
+        if (k) try { k[1](); } catch (e) { console.warn('[Kickstil-Tipps] Knopf', e); }
+        if (o && o.weiter && b.dataset.weiter) o.weiter();
+      });
+      document.body.appendChild(EL);
+    }
+    offen = opt;
+    offen.knoepfe = opt.knoepfe || t.knoepfe || [];
+    const text = typeof t.text === 'function' ? t.text(opt.daten) : t.text;
+    EL.innerHTML = `<i class="ti ${t.icon}" aria-hidden="true"></i><div>${opt.schritt ? `<small class="kst-schritt">${esc(opt.schritt)}</small>` : ''}<b>${esc(t.titel)}</b><p>${esc(text)}</p></div>
+      <button type="button" class="kst-zu" aria-label="Schließen"><i class="ti ti-x" aria-hidden="true"></i></button>
+      ${offen.knoepfe.length || opt.weiterText ? `<div class="kst-knoepfe">${offen.knoepfe.map((k, i) => `<button type="button" class="app-knopf" data-k="${i}">${esc(k[0])}</button>`).join('')}${opt.weiterText ? `<button type="button" class="app-knopf" data-weiter="1">${esc(opt.weiterText)}</button>` : ''}</div>` : ''}`;
+    zielWeg();
+    if (opt.ziel) { ZIEL = opt.ziel; ZIEL.classList.add('kst-ziel'); }
+    requestAnimationFrame(() => EL.classList.add('auf'));
+  }
+  const auf = () => !!(EL && EL.classList.contains('auf'));
+
+  // Nie über Spiel, Ticker, Fenstern, Blättern, Tour oder einem anderen Tipp
+  function blockiert() {
+    if (auf() || sichtbar('#ks-tipp.auf') || sichtbar('#ks-neu.auf')) return true;
+    if (document.body.classList.contains('ts-offen') || document.body.classList.contains('app-gesperrt')) return true;
+    const sel = ['#onboarding-overlay', '#intro-overlay', '#ks-saisonende', '.exp-overlay', '.exp-gameover', '#ks-dl', '.dfl-draft-ov', '#kstr-gruss', '#kstr-ed',
+      '#pcsi-blatt', '#pkf-einst', '#pkf-suche', '#pkf-vergleich', '#pm-overlay', '#dfl-ts:not([hidden])', '#app-blatt.auf', '#app-sheet.auf', '.st-ov', '.tut-ov', '.tut-blase', '#dfl-sim:not([hidden])', '#ks-sim:not([hidden])'];
+    if (sel.some(sichtbar)) return true;
+    return [...document.body.children].some(e => e !== EL && !/^app-(nav|cta|kopf)$/.test(e.id) && getComputedStyle(e).position === 'fixed' && e.offsetWidth > 300 && e.offsetHeight > 300 && getComputedStyle(e).display !== 'none' && getComputedStyle(e).visibility !== 'hidden' && getComputedStyle(e).pointerEvents !== 'none' && +getComputedStyle(e).opacity > 0.1);
+  }
+  function aktiveAnsicht() { const v = document.querySelector('.app-view.active, [id^="view-"].active'); return v ? v.id.replace(/^view-/, '') : null; }
+
+  function pruefen() {
+    if (!an() || !da() || !LEAGUE.season || ERSTER.laeuft || blockiert()) return;
+    const z = zustand();
+    // erste Klicks: sofort
+    const v = aktiveAnsicht();
+    const k = TIPPS.find(t => t.art === 'klick' && t.ansicht === v && !gesehen(t.id));
+    if (k) { z.g[k.id] = wochenIndex(); karte(k); return; }
+    // sonst höchstens einer je Woche
+    if (z.w === wochenIndex()) return;
+    for (const t of TIPPS) {
+      if (t.art === 'klick') continue;
+      const id = t.schluessel ? t.schluessel() : t.id;
+      if (gesehen(id, t.art === 'schwelle')) continue;
+      let d = null; try { d = t.wenn(); } catch (e) { d = null; }
+      if (!d) continue;
+      z.g[id] = wochenIndex(); z.w = wochenIndex();
+      karte(t, { daten: d });
+      return;
+    }
+  }
+
+  // ── Erster Tag (nur Vereinskarriere) ─────────────────────────────────────
+  const ERSTER = { laeuft: false };
+  const STATIONEN = [
+    { icon: 'ti-users', titel: 'Dein Kader', text: 'Hier stellst du die Elf auf und steuerst das Training.', ziel: ['#app-nav [data-nav="squad"]', '#app-nav [data-nav="kader"]', '#nav-squad'] },
+    { icon: 'ti-player-play', titel: 'Weiter spielen', text: 'Dieser Knopf bringt dich Woche für Woche zum nächsten Spiel.', ziel: ['#app-cta', '.cal-next', '#calendar-widget button'] },
+    { icon: 'ti-mail', titel: 'Postfach', text: 'Angebote, Nachrichten und Entscheidungen landen hier.', ziel: ['.postfach-section', '#pf-filters', '.home-postfach'] },
+    { icon: 'ti-briefcase', titel: 'Front Office', text: 'Transfers, Scouting, Verein und Finanzen.', ziel: ['#app-nav [data-nav="fo"]', '#nav-transfer', '.appnav-btn[data-pcu="transfer"]'] }
+  ];
+  function zielFinden(l) { for (const s of l) { const e = document.querySelector(s); if (e && e.getClientRects().length) return e; } return null; }
+  function ersterTag(i) {
+    i = i || 0;
+    const s = STATIONEN[i]; if (!s) { ERSTER.laeuft = false; zustand().ersterTag = 1; return; }
+    // Fenster dazwischen (Philosophie, Sponsor, Trainer …): später an dieser Station weitermachen
+    if (blockiert()) { ERSTER.laeuft = false; zustand().ersterSchritt = i; return; }
+    ERSTER.laeuft = true;
+    if (i === 0) zeige('home');
+    const z = zielFinden(s.ziel);
+    if (z) try { z.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) { /* ohne */ }
+    karte(s, { ziel: z, schritt: `Erster Tag · ${i + 1} von ${STATIONEN.length}`, knoepfe: [], weiterText: i < STATIONEN.length - 1 ? 'Weiter' : 'Los geht\'s',
+      weiter: () => setTimeout(() => ersterTag(i + 1), 250), abbruch: () => { ERSTER.laeuft = false; zustand().ersterTag = 1; } });
+  }
+  function ersterTagPruefen() {
+    if (KD || !an() || !da() || ERSTER.laeuft) return;
+    if (blockiert()) { ERSTER.ruhig = 0; return; }
+    const z = zustand();
+    if (z.ersterTag || (LEAGUE.season || 1) > 1 || (LEAGUE.matchday || 0) > 0) { z.ersterTag = z.ersterTag || 1; return; }
+    if (blockiert() || aktiveAnsicht() !== 'home') return;
+    // erst wenn die Startfenster zwei Takte lang zu sind (sie öffnen nacheinander)
+    ERSTER.ruhig = (ERSTER.ruhig || 0) + 1; if (ERSTER.ruhig < 3) return;
+    ersterTag(z.ersterSchritt || 0);
+  }
+
+  // ── Takt ──────────────────────────────────────────────────────────────────
+  function takt() { try { ersterTagPruefen(); pruefen(); } catch (e) { console.warn('[Kickstil-Tipps]', e); } }
+  function start() { setInterval(takt, CFG.takt); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+
+  W.KSTipps = { liste: TIPPS, CFG, zeigen: id => { const t = TIPPS.find(x => x.id === id); if (t) { let d = null; try { d = t.wenn ? t.wenn() : null; } catch (e) { d = null; } karte(t, { daten: d || [] }); } },
+    ersterTag: () => ersterTag(0), an: v => { try { localStorage.setItem('gesamt-tipps', v ? 'an' : 'aus'); } catch (e) { /* ohne */ } }, zuruecksetzen: () => { if (da()) CLUB.ksTipps = { g: {}, w: -1 }; } };
+  console.log('[Kickstil-Tipps v1] aktiv — Tipps beim ersten Klick, bei Schwellen (Fitness, Moral …) und im Saisonverlauf' + (KD ? '' : ', Erster Tag'));
+})();
+
 ;/* ── js/kickstil_mehr_neu.js ── */
 /* ═══════════════════════════════════════════════════════════════════════════
    KICKSTIL · MEHR NEU  ·  v1   (Nutzer 2026-10-18: „Optionen machen und mehr zusammenfassen von so Darkmode“ –
@@ -23132,6 +23718,8 @@ window.KS_GEO = {
     // alte Einträge: alles, was jetzt woanders steht, bleibt unsichtbar
     eintraege().forEach(e => { if (!e.classList.contains('ksm-alt')) e.classList.add('ksm-alt'); });
   }
+  // Tipps zur richtigen Zeit (kickstil_tipps.js) an/aus – localStorage gesamt-tipps, gilt für beide Spiele
+  const tippsAn = () => { try { return localStorage.getItem('gesamt-tipps') !== 'aus'; } catch (e) { return true; } };
   function optionen() {
     const sh = window.DFLAppShell; if (!sh || !sh.einstellungenBlatt) return;
     const s = document.getElementById('app-sheet'); if (s) s.classList.remove('auf');
@@ -23147,7 +23735,9 @@ window.KS_GEO = {
       if (knopfSp && ns0) ns0.querySelector('h4').insertAdjacentHTML('afterend', knopfSp);
       const html = `${knopfSp && !ns0 ? `<section class="einst-gruppe ksm-hilfe" aria-label="Spielstand"><h4><i class="ti ti-device-floppy" aria-hidden="true"></i>Spielstand</h4>${knopfSp}</section>` : ''}
         ${hilfe.length ? `<section class="einst-gruppe ksm-hilfe" aria-label="Hilfe und Rechtliches"><h4><i class="ti ti-help-circle" aria-hidden="true"></i>Hilfe &amp; Rechtliches</h4>
-          <div class="ksm-knoepfe">${hilfe.map(e => `<button type="button" class="app-knopf" data-ksm-e="${esc('^' + titel(e).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))}">${esc(titel(e))}</button>`).join('')}</div></section>` : ''}`;
+          <div class="ksm-knoepfe">${hilfe.map(e => `<button type="button" class="app-knopf" data-ksm-e="${esc('^' + titel(e).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))}">${esc(titel(e))}</button>`).join('')}</div></section>` : ''}
+        ${window.KSTipps ? `<section class="einst-gruppe ksm-hilfe" aria-label="Tipps"><h4><i class="ti ti-bulb" aria-hidden="true"></i>Tipps</h4>
+          <div class="ksm-knoepfe"><button type="button" class="app-knopf${tippsAn() ? ' an' : ''}" data-ksm="tipps" aria-pressed="${tippsAn()}">${tippsAn() ? 'Tipps an' : 'Tipps aus'}</button></div></section>` : ''}`;
       const ns = box.querySelector('.einst-neustart');
       if (ns) ns.insertAdjacentHTML('beforebegin', html); else box.insertAdjacentHTML('beforeend', html);
     };
@@ -23169,6 +23759,7 @@ window.KS_GEO = {
     else if (k === 'tempo' && T && T.setzeTempo) T.setzeTempo((T.tempo ? T.tempo() : 1) > 1 ? 1 : 4);
     else if (k === 'ton' && window.DFLTon) { DFLTon.setzen(!DFLTon.an()); if (DFLTon.an()) DFLTon.spiele('pfiff'); }
     else if (k === 'optionen') { optionen(); return; }
+    else if (k === 'tipps' && window.KSTipps) { KSTipps.an(!tippsAn()); b.classList.toggle('an', tippsAn()); b.setAttribute('aria-pressed', tippsAn()); b.textContent = tippsAn() ? 'Tipps an' : 'Tipps aus'; return; }
     else if (b.hasAttribute('data-ksm-e')) { eintragTippen(b.getAttribute('data-ksm-e')); return; }
     zeichne();
   }, true);

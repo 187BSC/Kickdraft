@@ -120,6 +120,16 @@ body.ks-v3 #view-match #tactics-col { display: none !important; }
 .ks-ang-wappen { width: 22px; height: 24px; flex: none; display: inline-block; }
 .ks-pf-wappen { width: 30px; height: 32px; display: inline-block; }
 .ks-ang-fuss { display: flex; flex-wrap: wrap; gap: 6px; }
+/* Schmale Spalte (Postfach am PC, ~250 px): Spieler oben, Verein + Summe darunter statt drei Spalten nebeneinander –
+   vorher brach der Name Buchstabe für Buchstabe um (Nutzer 2026-10-24: „die Leisten sind nicht dafür gemacht“) */
+.ks-angebot { container-type: inline-size; }
+@container (max-width: 300px) {
+  .ks-ang-seiten { grid-template-columns: 1fr; gap: 6px; }
+  .ks-ang-pfeil { display: none; }
+  .ks-ang-seite.sie { align-items: flex-start; text-align: left; padding-top: 6px; border-top: 1px dashed var(--border); }
+  .ks-ang-seite.sie > small span { font-size: 12px; }
+  .ks-ang-wer b { overflow-wrap: normal; }
+}
 .bk-chip.gold { background: color-mix(in oklab, var(--gold, #f2c14e) 22%, var(--bg2)); color: var(--text);
   border-color: color-mix(in oklab, var(--gold, #f2c14e) 55%, transparent); }
 

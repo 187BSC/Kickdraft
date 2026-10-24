@@ -320,7 +320,7 @@
     const malen = () => {
       const T = CLUB.training || {}, r = alteRegler();
       const zu = b => !b || b.disabled || /🔒|gesperrt/.test(b.textContent) || b.classList.contains('zu');
-      const F = { leicht: '×0,57', normal: '×1,00', intensiv: '×1,57' };
+      const F = { leicht: '×0,57 · Fitness +5', normal: '×1,00 · Fitness ±0', intensiv: '×1,57 · Fitness −5' };   // Fitness je Woche (fitness_patch.js)
       box.innerHTML = `<div class="app-griff"></div><button class="app-blatt-zu" aria-label="Schließen"><i class="ti ti-x" aria-hidden="true"></i></button>
         <div class="ksk-bt"><i class="ti ti-barbell" aria-hidden="true"></i>Training</div>
         <h4 class="ksk-h4">Intensität</h4>

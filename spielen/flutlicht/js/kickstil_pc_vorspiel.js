@@ -139,6 +139,16 @@ body.pcv-an #pcv-vor { display: grid; grid-template-columns: minmax(0, 1fr) minm
     return `<section class="pcv-k" aria-label="Deine Elf"><h3>Deine Elf <small>${esc(CLUB.formation || '')}</small></h3><ul class="pcv-elf">${li}</ul>
       <div class="pcv-fuss"><small>${probleme.length ? `${probleme.length} Spieler nicht fit` : 'Alle fit'}</small><button type="button" class="app-knopf" data-pcv="aufstellung">Aufstellung ändern</button></div></section>`;
   }
+  // Gegner im Blick: die drei Stärksten seines Kaders mit Gesicht (ersetzt den Erklärsatz, wenn kein Live-Coaching möglich ist)
+  function gegnerHtml(f) {
+    let l = [];
+    try { const S = W.KSPcSpieltag; l = (S && S.gegnerKader ? S.gegnerKader() : []).find(x => Array.isArray(x) && x.length) || []; } catch (e) { l = []; }
+    const top = l.filter(p => p && (p.ovr || p.str)).slice().sort((a, b) => (b.ovr || b.str) - (a.ovr || a.str)).slice(0, 3);
+    if (!top.length) return '';
+    const g = p => { try { return W.KSVerein ? KSVerein.gesicht(p, f.opponentId) : ''; } catch (e) { return ''; } };
+    return `<div class="pcv-wahl pcv-gegner"><span class="pcv-et">Gegner im Blick</span><ul class="pcv-elf">${top.map(p => `<li><span class="pcv-pl">${esc(p.pos || '')}</span>
+      <span class="pcv-g" aria-hidden="true">${g(p)}</span><span class="pcv-n">${esc(p.name || '')}${p.age ? `<small>${esc(p.age)} J.</small>` : ''}</span><span></span><span class="pcv-o">${Math.round(p.ovr || p.str)}</span></li>`).join('')}</ul></div>`;
+  }
   function duellHtml(f) {
     const tab = tabelle(), heim = f.isHome !== false;
     let opp = null; try { opp = W.KSVerein ? KSVerein.daten(f.opponentId) : null; } catch (e) { opp = null; }
@@ -166,7 +176,7 @@ body.pcv-an #pcv-vor { display: grid; grid-template-columns: minmax(0, 1fr) minm
         <span class="pcv-et">Coaching</span>
         <div class="pcv-coach" role="group" aria-label="Coaching"><button type="button" data-pcv-c="selbst" class="${coach === 'selbst' ? 'an' : ''}">Selbst coachen</button><button type="button" data-pcv-c="co" class="${coach === 'co' ? 'an' : ''}">Co-Trainer übernimmt</button></div>${W.KSPcTaktik && KSPcTaktik.vorOeffnen ? `<span class="pcv-et">Mannschaftsanweisungen</span>
         <div class="pcv-anw"><p>${esc(KSPcTaktik.vorText())}</p><button type="button" class="app-knopf" data-pcv="taktik"><i class="ti ti-clipboard-list" aria-hidden="true"></i> Taktikbrett</button></div>` : ''}</div>`
-      : `<div class="pcv-wahl"><p>Live-Coaching gibt es, wenn „Spiel als Text“ an ist (rechts).</p></div>`;
+      : gegnerHtml(f);   // statt Erklärsatz (Nutzer 2026-10-24: „Live-Coaching gibt es, wenn …“ war Meta-Text)
     return `<section class="pcv-k" aria-label="Das Duell"><h3>Das Duell <small>${esc(wettbewerb(f))}</small></h3>
       <div class="pcv-duell">${team(wir, iw, heim ? 'Heim' : 'Auswärts')}
         <div class="pcv-mitte"><span class="pcv-wb">Stärke</span><span class="pcv-st">${wir.st ?? '–'}<span>:</span>${geg.st ?? '–'}</span><small>${heim ? 'im eigenen Stadion' : 'auswärts'}</small></div>

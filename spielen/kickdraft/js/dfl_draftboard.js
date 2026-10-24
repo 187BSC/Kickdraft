@@ -13,7 +13,7 @@
      und das Talent noch da ist (kiHaken in npcWahl), und will es mehr (wunschBonus in wunsch: Hochtraden, Fenster D94).
      Falsch: ändert nichts. Im ersten Draft der Tutorial-Mission ist kein Gerücht über den Wunschspieler wahr.
    API: DFLDraftboard = { CFG, GRUPPEN, gruppeVon, zustand, merk, schieben, istMerk, merkIds, filtern, luecken, vorschauHtml,
-     draftListeHtml, kiHaken, wunschBonus, geruechtVon, geruechtMachen, woche, draftTag, draftFertig }
+     draftListeHtml, draftTabelleHtml, kiHaken, wunschBonus, geruechtVon, geruechtMachen, woche, draftTag, draftFertig }
    ===================================================================== */
 (function () {
   'use strict';
@@ -226,6 +226,80 @@
       <div class="db-liste">${inhalt}</div></div>`;
   }
 
+  // Draft am PC (Nutzer 2026-10-24, Entwurf A): einfache Tabelle mit Stern, Reiter Alle / Merkliste / Nur meine Lücken,
+  // Spaltenköpfe sortieren. dfl_kader_patch.js draftPcHtml setzt sie rechts neben die nächsten 20 Picks.
+  const NOTE_WERT = n => { const m = /^([A-F])([+-]?)/.exec(n || ''); return m ? (6 - 'ABCDEF'.indexOf(m[1])) * 3 + (m[2] === '+' ? 1 : m[2] === '-' ? -1 : 0) : 0; };
+  function mitte(t, art) {
+    const K = window.DFLKader, s = K && K.schaetzung ? K.schaetzung(t, 0) : null;
+    return s ? (s[art][0] + s[art][1]) / 2 : 0;
+  }
+  const SORT = {
+    rang: t => (t.medien && t.medien.rang) || 999, name: t => voll(t), pos: t => GRUPPEN.findIndex(g => g[0] === gruppeVon(t.pos)),
+    alter: t => t.age, staerke: t => -mitte(t, 'ovr'), pot: t => -mitte(t, 'pot'), note: t => -NOTE_WERT(t.medien && t.medien.note)
+  };
+  function draftTabelleHtml(d, ich) {
+    const z = zustand(); if (!z || !d) return '';
+    const K = window.DFLKader;
+    const verf = K && K.verfuegbar ? K.verfuegbar() : talente().slice();
+    const frei = new Set(verf.map(t => String(t.id)));
+    const merkFrei = z.merk.filter(id => frei.has(id)).length;
+    // Am PC immer erst „Alle“ (am Handy springt der Draft auf die Merkliste, sobald sie etwas hat – hier würde der Stern sonst den Reiter wechseln)
+    const reiter = ['alle', 'merk', 'luecken'].indexOf(z.reiter) >= 0 ? z.reiter : 'alle';
+    const E = window.DFLEbenen && DFLEbenen.zeichenHtml ? window.DFLEbenen : null;
+    const stilAn = E && E.filter && E.filter('draftboard');
+    const stilN = E ? verf.filter(t => E.passtZuMir(t)).length : 0;
+    const basis = verf.filter(t => !stilAn || E.passtZuMir(t));
+    // „Nur meine Lücken“: Positionen, auf denen dir ein Stammspieler oder Backup fehlt (reine Talent-Plätze zählen nicht)
+    const lk = Object.fromEntries(Object.entries(luecken()).filter(([, v]) => v.art === 'Stammspieler' || v.art === 'Backup')), lkTop = Object.entries(lk).sort((a, b) => (ART_RANG[b[1].art] - ART_RANG[a[1].art]) || (b[1].bedarf - a[1].bedarf));
+    const nLuecken = basis.filter(t => lk[gruppeVon(t.pos)]).length;
+    const wId = M() && M().wunschId ? M().wunschId() : null;
+    const sort = ui.sortDraft || { feld: 'rang', ab: false };
+    const sortiert = liste => {
+      const f = SORT[sort.feld] || SORT.rang;
+      return liste.slice().sort((a, b) => { const x = f(a), y = f(b), r = typeof x === 'string' ? x.localeCompare(y, 'de') : x - y; return (sort.ab ? -r : r) || SORT.rang(a) - SORT.rang(b); });
+    };
+    const zelle = (t, opt) => {
+      opt = opt || {};
+      const id = String(t.id), an = istMerk(id), m = t.medien || {}, w = opt.weg ? null : werte(t);
+      const v = m.vorher, trend = v && v !== m.rang ? (v > m.rang ? `<span class="dfl-auf">▲${v - m.rang}</span>` : `<span class="dfl-ab">▼${m.rang - v}</span>`) : '';
+      const stern = opt.weg ? '' : `<button type="button" class="db-stern${an ? ' an' : ''}" data-db="merk:${esc(id)}" aria-pressed="${an}" aria-label="${esc(voll(t))} ${an ? 'von der Merkliste nehmen' : 'auf die Merkliste'}">${ico(an ? 'star-filled' : 'star')}</button>`;
+      const ordnung = opt.nr ? `<span class="db-ordnung"><button type="button" class="db-mini" data-db="hoch:${esc(id)}" aria-label="${esc(voll(t))} nach oben">${ico('chevron-up')}</button><button type="button" class="db-mini" data-db="runter:${esc(id)}" aria-label="${esc(voll(t))} nach unten">${ico('chevron-down')}</button></span>` : '';
+      const note = m.note ? `<span class="dfl-note ${/^A/.test(m.note) ? 'a' : /^B/.test(m.note) ? 'b' : 'c'}">${esc(m.note)}</span>` : '';
+      return `<tr class="${an ? 'gemerkt' : ''}${opt.weg ? ' weg' : ''}${opt.tipp ? ' tipp' : ''}" data-db-id="${esc(id)}">
+        <td class="dpc-st">${opt.nr ? `<span class="db-nr">${opt.nr}</span>` : ''}${stern}</td>
+        <td class="num">#${m.rang || '?'} ${trend}</td>
+        <td><span class="dpc-name" data-sc="blatt:${esc(id)}" role="button" tabindex="0" aria-label="${esc(voll(t))}: Talent-Blatt öffnen"><b>${esc(voll(t))}</b>${E ? E.zeichenHtml(t, { klein: true }) : ''}${opt.tipp ? `<span class="dpc-tipp">${ico('user-search')}Tipp des Chefscouts</span>` : ''}${geruechtMarke(t)}</span>${opt.weg ? `<small class="dpc-weg">${esc(opt.weg)}</small>` : ''}</td>
+        <td>${posBadge(t.pos)}</td><td class="num">${t.age}</td>
+        <td class="num"><b>${w ? esc(w.o) : ''}</b></td><td class="num">${w ? esc(w.p) : ''}</td><td>${note}</td>
+        <td class="dpc-akt">${ordnung}${ich && !opt.weg ? `<button type="button" class="dfl-draft-btn db-waehlen" data-db="waehle:${esc(id)}">Wählen</button>` : ''}</td></tr>`;
+    };
+    let zeilen, leer;
+    if (reiter === 'merk') {
+      zeilen = z.merk.map((id, i) => {
+        if (frei.has(id)) return zelle(talent(id), { nr: i + 1 });
+        const p = (d.picks || []).find(x => String(x.id) === id);
+        if (!p) return '';
+        const kurz = p.team === 'fcm' ? 'bei dir' : (franchise(D.dflIdVon(p.team)).kurz || p.team);
+        return zelle({ id, firstName: '', name: p.name, pos: p.pos, age: p.age, medien: { rang: p.medien } }, { weg: `weg an #${p.pick} ${kurz}` });
+      }).filter(Boolean);
+      leer = 'Deine Merkliste ist leer.';
+    } else {
+      const liste = sortiert(reiter === 'luecken' ? basis.filter(t => lk[gruppeVon(t.pos)]) : basis);
+      const tipp = wId && frei.has(wId) ? liste.find(t => String(t.id) === wId) : null;
+      zeilen = (tipp ? [zelle(tipp, { tipp: true })] : []).concat(liste.filter(t => t !== tipp).map(t => zelle(t)));
+      leer = reiter === 'luecken' ? 'Keine Lücken in deinem Kader.' : 'Kein Talent passt klar zu deinem Stil.';
+    }
+    const kopf = (feld, text, kl) => reiter === 'merk' ? `<th class="${kl || ''}">${text}</th>`
+      : `<th class="${kl || ''} dpc-sort${sort.feld === feld ? ' an' : ''}" data-db="sort:${feld}" role="button" tabindex="0">${text}${sort.feld === feld ? ico(sort.ab ? 'chevron-up' : 'chevron-down') : ''}</th>`;
+    const reiterKnopf = (r, icon, text, n) => `<button type="button" role="tab" aria-selected="${reiter === r}" class="${reiter === r ? 'an' : ''}" data-db="reiter:${r}">${ico(icon)}${text} <b>${n}</b></button>`;
+    return `<div class="dpc-spalte dpc-talente"><div class="dpc-kt">Talente
+        ${E ? `<span class="dpc-stil">${E.filterChipHtml('draftboard', stilN)}</span>` : ''}
+        <span class="dpc-reiter" role="tablist" aria-label="Talente">${reiterKnopf('alle', 'list', 'Alle', basis.length)}${reiterKnopf('merk', 'star-filled', 'Merkliste', merkFrei)}${reiterKnopf('luecken', 'puzzle', 'Nur meine Lücken', nLuecken)}</span></div>
+      ${reiter === 'luecken' && lkTop.length ? `<div class="dpc-luecken">${ico('puzzle')}${lkTop.map(([g, v]) => `<span class="db-lk ${lueckeKl(v.art)}"><b>${esc(g)}</b> ${esc(v.art)}</span>`).join('')}</div>` : ''}
+      <div class="dpc-scroll" data-scroll="talente-${reiter}-${sort.feld}-${sort.ab ? 1 : 0}"><table class="dpc-tab"><thead><tr><th class="dpc-st"></th>${kopf('rang', 'Rang', 'num')}${kopf('name', 'Name')}${kopf('pos', 'Pos')}${kopf('alter', 'Alter', 'num')}${kopf('staerke', 'Stärke', 'num')}${kopf('pot', 'Pot.', 'num')}${kopf('note', 'Note')}<th></th></tr></thead>
+        <tbody>${zeilen.join('') || `<tr><td colspan="9" class="dfl-draft-sub dpc-leer">${leer}</td></tr>`}</tbody></table></div></div>`;
+  }
+
   // ── Gerüchte ─────────────────────────────────────────────────────────────
   const rng = key => G.rngAus((((CLUB.dfl.seed || 1) * 977) ^ G.hashText('geruecht|' + key)) >>> 0);
   // Erste Picks je Verein (Welt-IDs, 1-basiert): am Draft-Tag die echten Slots, vorher die erwartete Reihenfolge
@@ -358,6 +432,7 @@
     } else if (was === 'hoch' || was === 'runter') { schieben(wert, was === 'hoch' ? -1 : 1); speichern(); }
     else if (was === 'pos') { z.pos = wert === 'alle' ? null : wert; ui.mehr = CFG.liste; ui.mehrDraft = CFG.liste; }
     else if (was === 'reiter') z.reiter = wert;
+    else if (was === 'sort') { const a = ui.sortDraft || { feld: 'rang', ab: false }; ui.sortDraft = { feld: wert, ab: a.feld === wert ? !a.ab : false }; }
     else if (was === 'mehr') ui.mehr += CFG.liste;
     else if (was === 'mehrDraft') ui.mehrDraft += CFG.liste;
     else if (was === 'waehle') { if (window.DFLKader) DFLKader.draftWahl(wert); return; }
@@ -431,7 +506,7 @@
     document.head.appendChild(css);
   }
 
-  window.DFLDraftboard = { CFG, GRUPPEN, gruppeVon, zustand, merk, schieben, istMerk, merkIds, filtern, luecken, vorschauHtml, draftListeHtml,
+  window.DFLDraftboard = { CFG, GRUPPEN, gruppeVon, zustand, merk, schieben, istMerk, merkIds, filtern, luecken, vorschauHtml, draftListeHtml, draftTabelleHtml,
     kiHaken, wunschBonus, geruechtVon, geruechtMachen, woche, draftTag, draftFertig };
   console.log('[DFL-Draftboard v1] aktiv — Draft-Jahrgang mit Positionsfilter, Kaderlücken und Merkliste, Merkliste/Alle im Draft, Draft-Gerüchte (D159 b/c)');
 })();

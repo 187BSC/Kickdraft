@@ -11,7 +11,8 @@
   'use strict';
   var CFG = {
     start: 95, recoverPerWeek: 12, matchDrop: [15, 22], friendlyFactor: 0.6,
-    strengthFloorFit: 55, strengthMinPct: 0.10
+    strengthFloorFit: 55, strengthMinPct: 0.10,
+    intensitaet: { leicht: 5, normal: 0, intensiv: -5 }
   };
   function clampF(v) { return Math.max(0, Math.min(100, Math.round(v))); }
   function rndInt(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
@@ -68,7 +69,10 @@
     var lvl = (typeof CLUB !== 'undefined' && CLUB.facilities && CLUB.facilities.training) ? CLUB.facilities.training : 1;
     var buf = (typeof CLUB !== 'undefined') ? CLUB._fitnessBuffer : null;
     var bonus = (buf && buf.weeks > 0) ? (buf.recoverBonus || 0) : 0;
-    var rec = CFG.recoverPerWeek + (lvl - 1) * 2 + bonus;
+    // Intensität wirkt auf die Erholung (2026-10-24, Nutzer: „Senkt die Intensität im Training die Fitness oder steigert sie, wenn
+    // man mehr chillt?“ – vorher gar nicht): leicht +5, intensiv −5 je Woche
+    var intens = (typeof CLUB !== 'undefined' && CLUB.training && CLUB.training.intensity) || 'normal';
+    var rec = CFG.recoverPerWeek + (lvl - 1) * 2 + bonus + (CFG.intensitaet[intens] || 0);
     SQUAD.forEach(function (p) { ensureFitness(p); p.fitness = clampF(p.fitness + rec); });
     // Puffer eine Woche altern lassen
     if (buf && buf.weeks > 0) { buf.weeks--; if (buf.weeks <= 0) CLUB._fitnessBuffer = null; }

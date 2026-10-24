@@ -532,16 +532,20 @@
   //   Passe hier ODER in der JSON-Datei an – beide müssen synchron bleiben.
   const CFG = {
     transfer: {
-      summer:      { overpayMin: 0.20, overpayMax: 0.30 },
-      winter:      { overpayMin: 0.30, overpayMax: 0.40 },
-      deadlineDay: { overpayExtraMin: 0.10, overpayExtraMax: 0.20 },
+      // Aufschläge kleiner und gedeckelt (2026-10-24, Nutzer: „Bayern hat 100 % overpayed … 75 Mille wenn der Spieler 81 hat und 19
+      // ist“ – vorher stapelten sich Fenster 20–40 %, Talent 15–35 %, Top-Klub 10–25 %, Ausland 12–28 %, Deadline 10–20 % bis +148 %)
+      summer:      { overpayMin: 0.05, overpayMax: 0.15 },
+      winter:      { overpayMin: 0.10, overpayMax: 0.20 },
+      deadlineDay: { overpayExtraMin: 0.05, overpayExtraMax: 0.10 },
+      auslandExtraMin: 0.03, auslandExtraMax: 0.08,
+      overpayDeckel: 0.40,                       // zusammen höchstens +40 % über Marktwert
       maxConcurrentBids: 5,
       bidChancePerWeek:  0.75,
       playerSellDiscount: 0.10,
       // Rivalen-Gebote: Top-Klubs jagen Talente
-      talentMagnet: { ovrThreshold: 74, potentialGap: 8, targetWeightTalent: 3.0, targetWeightNormal: 1.0 },
-      talentExtraMin: 0.15, talentExtraMax: 0.35,
-      topClubExtraMin: 0.10, topClubExtraMax: 0.25,
+      talentMagnet: { ovrThreshold: 74, potentialGap: 8, maxAlter: 23, targetWeightTalent: 3.0, targetWeightNormal: 1.0 },
+      talentExtraMin: 0.05, talentExtraMax: 0.10,
+      topClubExtraMin: 0.05, topClubExtraMax: 0.10,
       // maxFee = maximale Ablöse, die ein Klub dieses Tiers realistisch stemmen
       // kann (Transfermarkt-Größenordnungen). Verhindert, dass Kleinstvereine
       // Millionengebote abgeben — Tier wird nach OVR UND Finanzkraft gewählt,
@@ -568,8 +572,11 @@
   function rint(n) { return Math.floor(Math.random() * n); }
   function pick(arr) { return (typeof pickRnd === 'function') ? pickRnd(arr) : arr[rint(arr.length)]; }
   function potGap(p) { return ((p.truePotential != null ? p.truePotential : p.ovr) || 0) - (p.ovr || 0); }
+  // Talent nur bis tm.maxAlter (2026-10-24, Nutzer: „Top Club und Talent bei einem 29-Jährigen stimmt nicht“ – vorher galt jeder ab
+  // Stärke 74 als Talent, egal wie alt, samt Talent-Aufschlag und Marke „Talent“ auf der Angebotskarte)
   function isTalent(p) {
     const tm = CFG.transfer.talentMagnet;
+    if ((p.age || 25) > tm.maxAlter) return false;
     return (p.ovr >= tm.ovrThreshold) || (potGap(p) >= tm.potentialGap);
   }
   // Ab welchem Marktwert ist ein Spieler für andere Vereine interessant?
@@ -714,13 +721,14 @@
     // AUSLANDSZUSCHLAG: Ein Wechsel ins Ausland ist für den Spieler ein größerer
     // Schritt — und der Verein muss den abgebenden Klub überzeugen, obwohl er
     // ihn nicht in der eigenen Liga stärkt. Beides macht das Angebot höher.
-    if (bidder.ausland) overpayFactor += rnd(0.12, 0.28);
+    if (bidder.ausland) overpayFactor += rnd(CFG.transfer.auslandExtraMin, CFG.transfer.auslandExtraMax);
 
     // Deadline-Day-Aufschlag on top
     if (win.deadline) {
       overpayFactor += rnd(CFG.transfer.deadlineDay.overpayExtraMin, CFG.transfer.deadlineDay.overpayExtraMax);
     }
 
+    overpayFactor = Math.min(overpayFactor, 1 + CFG.transfer.overpayDeckel);
     // Finanzkraft-Deckel des Bieter-Tiers (Sicherheitsnetz gegen Mondgebote)
     let rawOffer = mv * overpayFactor;
     if (bidder.maxFee && isFinite(bidder.maxFee) && rawOffer > bidder.maxFee) rawOffer = bidder.maxFee;

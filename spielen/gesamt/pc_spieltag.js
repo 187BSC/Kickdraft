@@ -43,47 +43,51 @@
   const CSS = `
   #dfl-ts.pcs-an{padding:0 24px}
   #dfl-ts.pcs-an .ts-box{max-width:1500px;display:grid;
-    grid-template-columns:clamp(250px,19vw,310px) minmax(0,1.2fr) minmax(300px,.8fr) clamp(250px,19vw,310px);
+    grid-template-columns:clamp(250px,18vw,300px) minmax(0,1fr) clamp(360px,26vw,430px) clamp(250px,18vw,300px);
     grid-template-rows:auto auto auto auto minmax(0,1fr) auto auto;
-    grid-template-areas:"kopf kopf kopf kopf" "anz anz anz anz" "links druck druck rechts" "links hinweis lage rechts" "links ticker lage rechts" "ansagen ansagen ansagen ansagen" "steuer steuer steuer steuer"}
-  #dfl-ts.pcs-an .ts-kopf{grid-area:kopf} #dfl-ts.pcs-an .ts-anzeige{grid-area:anz;padding:14px 24px 12px}
-  #dfl-ts.pcs-an .ts-druck{grid-area:druck;border-bottom:none;padding:10px 16px 6px}
-  #dfl-ts.pcs-an .ts-druck svg{height:46px}
+    /* Steuerpult rechts unter Feld und Zahlen statt drei Leisten unten (2026-10-24, Nutzer: „die Leisten sind nicht dafür gemacht“) */
+    grid-template-areas:"kopf kopf kopf kopf" "anz anz anz anz" "links druck druck rechts" "links hinweis lage rechts" "links ticker lage rechts" "links ticker ansagen rechts" "links ticker steuer rechts"}
+  #dfl-ts.pcs-an .ts-kopf{padding-top:6px;padding-bottom:6px;min-height:0}
+  #dfl-ts.pcs-an .ts-kopf .ts-wappen{width:24px;height:26px}
+  #dfl-ts.pcs-an .ts-kopf-txt b{font-size:14px} #dfl-ts.pcs-an .ts-kopf-txt small{font-size:11px}
+  #dfl-ts.pcs-an .ts-kopf{grid-area:kopf} #dfl-ts.pcs-an .ts-anzeige{grid-area:anz;padding:6px 24px}
+  #dfl-ts.pcs-an .ts-druck{grid-area:druck;border-bottom:none;padding:6px 16px 2px}
+  #dfl-ts.pcs-an .ts-druck svg{height:36px}
   #dfl-ts.pcs-an .ts-hinweis{grid-area:hinweis;margin:8px 8px 0 16px}
   #dfl-ts.pcs-an .ts-ticker{grid-area:ticker;padding:10px 8px 16px 16px}
-  #dfl-ts.pcs-an .ts-lagebild{grid-area:lage;display:flex;flex-direction:column;align-items:stretch;gap:12px;padding:10px 16px 16px 8px;overflow-y:auto;min-height:0}
+  #dfl-ts.pcs-an .ts-lagebild{grid-area:lage;display:flex;flex-direction:column;align-items:stretch;gap:12px;padding:10px 16px 6px 8px;overflow-y:auto;min-height:0}
   #dfl-ts.pcs-an .ts-live{gap:5px;font-size:13px}
-  #dfl-ts.pcs-an .ts-steuer{grid-area:steuer;justify-content:center;padding:10px 16px 14px;border-top:none}
-  #dfl-ts.pcs-an .ts-tempo{flex:0 1 460px}
+  #dfl-ts.pcs-an .ts-steuer{grid-area:steuer;justify-content:stretch;padding:0 16px 14px 8px;border-top:none}
+  #dfl-ts.pcs-an .ts-tempo{flex:1 1 auto}
   #dfl-ts.pcs-an .ts-bericht{inset:0;align-items:center}
   #dfl-ts.pcs-an .ts-bericht > *{width:min(560px,100%)}
-  #dfl-ts.pcs-an .ts-team{font-size:22px;gap:12px}
-  #dfl-ts.pcs-an .ts-team .ts-wappen-k{width:38px!important;height:44px!important}
+  #dfl-ts.pcs-an .ts-team{font-size:19px;gap:12px}
+  #dfl-ts.pcs-an .ts-team .ts-wappen-k{width:32px!important;height:37px!important}
   #dfl-ts.pcs-an .ts-team .pcs-voll{display:block;font:700 12px/1.2 var(--font-text,inherit);color:var(--text2,#5c4a36);letter-spacing:0}
   #dfl-ts.pcs-an .ts-team.g .pcs-teamtxt{text-align:right}
-  #dfl-ts.pcs-an .ts-stand{font-size:44px;padding:6px 20px;min-width:140px}
+  #dfl-ts.pcs-an .ts-stand{font-size:34px;padding:2px 18px;min-width:120px}
   #dfl-ts.pcs-an .ts-uhr{font-size:13px;padding:2px 12px}
   #dfl-ts.pcs-an .ts-tore{font-size:13px}
   /* Mannschaften */
-  .pcs-team{display:none;min-height:0;overflow-y:auto;background:var(--bg2,#fffdf9);padding:12px 12px 16px;scrollbar-width:thin}
+  .pcs-team{display:none;min-height:0;overflow-y:auto;background:var(--bg2,#fffdf9);padding:8px 10px 12px;scrollbar-width:thin}
   #dfl-ts.pcs-an .pcs-team{display:block}
   .pcs-team.links{grid-area:links;border-right:3px solid var(--ts-linie)} .pcs-team.rechts{grid-area:rechts;border-left:3px solid var(--ts-linie)}
-  .pcs-tk{display:flex;align-items:center;gap:10px;padding-bottom:10px;margin-bottom:6px;border-bottom:3px solid var(--pcs-farbe)}
+  .pcs-tk{display:flex;align-items:center;gap:10px;padding-bottom:6px;margin-bottom:2px;border-bottom:3px solid var(--pcs-farbe)}
   .pcs-tk .ts-wappen-k{width:30px!important;height:34px!important;flex:none}
   .pcs-tk-txt{min-width:0;flex:1}
   .pcs-tk-txt b{display:block;font:800 15px/1.15 var(--font-display,inherit);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .pcs-tk-txt small{font-size:11.5px;font-weight:700;color:var(--text2,#5c4a36)}
-  .pcs-teil{font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--text3,#846d52);margin:10px 0 4px;display:flex;justify-content:space-between}
-  .pcs-sp{display:grid;grid-template-columns:28px minmax(0,1fr) auto 24px;align-items:center;gap:4px 8px;padding:4px;border-radius:9px;min-height:36px;border:2px solid transparent}
+  .pcs-teil{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--text3,#846d52);margin:6px 0 2px;display:flex;justify-content:space-between}
+  .pcs-sp{display:grid;grid-template-columns:24px minmax(0,1fr) auto 24px;align-items:center;gap:4px 8px;padding:2px 4px;border-radius:9px;min-height:30px;border:2px solid transparent}
   .pcs-sp:nth-of-type(odd){background:color-mix(in srgb,var(--bg3,#f6ead2) 55%,transparent)}
   .pcs-sp.raus{opacity:.5}
   .pcs-klickbar .pcs-sp[data-wahl]{cursor:pointer} .pcs-klickbar .pcs-sp[data-wahl]:hover{border-color:var(--ts-linie)}
   .pcs-sp.gewaehlt{border-color:var(--ts-blau,#2c7cb5)!important;background:color-mix(in srgb,var(--ts-blau,#2c7cb5) 14%,transparent)!important}
   .pcs-sp.geplant{border-style:dashed;border-color:var(--ts-blau,#2c7cb5)}
-  .pcs-gs{width:28px;height:28px;border-radius:50%;overflow:hidden;background:var(--bg3,#f6ead2);border:2px solid var(--pcs-farbe);display:grid;place-items:center}
+  .pcs-gs{width:24px;height:24px;border-radius:50%;overflow:hidden;background:var(--bg3,#f6ead2);border:2px solid var(--pcs-farbe);display:grid;place-items:center}
   .pcs-gs svg{width:100%;height:100%;display:block}
   .pcs-nm{min-width:0;line-height:1.15}
-  .pcs-nm b{display:block;font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pcs-nm b{display:block;font-size:12.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .pcs-nm small{font-size:10.5px;font-weight:700;color:var(--text3,#846d52)}
   .pcs-ev{display:flex;gap:3px;align-items:center;justify-content:flex-end;flex-wrap:wrap;max-width:96px}
   .pcs-e{display:inline-flex;align-items:center;gap:2px;font-size:10.5px;font-weight:800;font-variant-numeric:tabular-nums;border-radius:6px;padding:1px 4px;line-height:1.4;white-space:nowrap}
@@ -102,9 +106,17 @@
   .pcs-wechselinfo{font-size:12px;line-height:1.4;margin:8px 0 2px;padding:8px 10px;border-radius:10px;background:var(--bg3,#f6ead2);border:2px dashed var(--ts-linie)}
   .pcs-wechselinfo button{margin-left:6px}
   /* Ansagen */
-  .pcs-ansagen{grid-area:ansagen;display:none;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 16px;background:var(--bg2,#fffdf9);border-top:3px solid var(--ts-rand)}
+  .pcs-ansagen{grid-area:ansagen;display:none;flex-wrap:wrap;gap:6px;align-content:flex-start;margin:0 16px 8px 8px;padding:10px;background:var(--bg2,#fffdf9);border:3px solid var(--ts-rand);border-radius:14px;box-shadow:0 3px 0 var(--ts-rand)}
   #dfl-ts.pcs-an .pcs-ansagen.an{display:flex}
-  .pcs-ansagen .pcs-t{font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--text3,#846d52);margin-right:2px}
+  .pcs-ansagen .pcs-t{flex:1 0 100%;margin:4px 0 0;font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--text3,#846d52)}
+  .pcs-ansagen .pcs-trenn,.pcs-ansagen .pct-umbruch{display:none!important}
+  .pcs-ansagen .pct-auf{flex:1 0 100%;justify-content:center}
+  .pcs-ansagen .pct-zurufe{flex:1 0 100%;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .pcs-ansagen .pcs-knopf{padding:6px 8px;font-size:12px;justify-content:center}
+  .pcs-ansagen .pcs-status{flex:1 0 100%;font-size:11.5px} .pcs-ansagen .pcs-status:empty{display:none}
+  .pcs-ansagen .pcs-stufen{flex:1 0 100%;display:grid;grid-template-columns:repeat(5,1fr)}
+  .pcs-ansagen .pcs-stufen .pcs-stufe{padding:6px 2px;font-size:11px}
+  .pcs-ansagen [data-coach]{flex:1 1 0}
   .pcs-knopf{font:800 13px var(--font-text,inherit);color:var(--text,#2c3e50);background:var(--bg3,#f6ead2);border:3px solid var(--ts-rand);border-radius:12px;box-shadow:0 3px 0 var(--ts-rand);padding:7px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
   .pcs-knopf:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ts-rand)}
   .pcs-knopf:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:0 3px 0 var(--ts-rand)}
@@ -567,6 +579,6 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(start, 0)); else setTimeout(start, 0);
 
-  W.KSPcSpieltag = { CFG, zeichnen, live: () => LIVE, neu: () => { zuletzt = ''; zeichnen(); }, tsUi, AUSRICHTUNG_ANZ: () => AUSRICHTUNG, ansagen, ausrichtungSetzen, coachSetzen, AUSRICHTUNG, vorAusrichtung, liveMoeglich, coachModus: () => coachModus() };
+  W.KSPcSpieltag = { CFG, zeichnen, live: () => LIVE, neu: () => { zuletzt = ''; zeichnen(); }, tsUi, AUSRICHTUNG_ANZ: () => AUSRICHTUNG, ansagen, ausrichtungSetzen, coachSetzen, AUSRICHTUNG, vorAusrichtung, liveMoeglich, coachModus: () => coachModus(), gegnerKader };
   console.log('[Kickstil-PC-Spieltag v3] aktiv — nur PC-Version: Spieltag auf voller Breite, Live-Coaching mit Wechseln, Kraft und Ansagen');
 })();

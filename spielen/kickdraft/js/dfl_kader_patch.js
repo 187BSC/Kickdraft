@@ -804,6 +804,46 @@
     return `<details class="dfl-analyse dfl-dz-mehr"><summary><i class="ti ti-clipboard-list" aria-hidden="true"></i><b>Kaderanalyse</b><span class="dfl-draft-sub">Scouting Stufe ${sc}${sc <= 4 ? ' – ungenau' : sc >= 8 ? ' – sehr genau' : ''}</span></summary>
       ${top.map(([pos, v]) => `<div class="dfl-analyse-zeile"><b>${pos}</b> · ${v.art} <span class="dfl-draft-sub">${v.gruende.slice(0, 2).join(' · ')}</span></div>`).join('')}</details>`;
   }
+  // ── Draft am PC (Nutzer 2026-10-24, Entwurf A): Kopf mit Uhr und Knöpfen, links die nächsten 20 Picks, rechts die Talente als Tabelle
+  const pcAn = () => typeof document !== 'undefined' && document.body && document.body.classList.contains('pcu-an');
+  function draftPcHtml(d, o) {
+    const { zug, ich, wappen, kurzName } = o, runde = Math.floor(d.nr / 32) + 1;
+    const status = ich
+      ? `<div class="dpc-zug ich">${uhrRing()}<span><small>Runde ${runde}</small><b>Pick #${d.nr + 1} · du bist dran</b></span>
+          <button type="button" class="dfl-uhr-knopf" onclick="DFLKader.uhrPause()" aria-label="${uhr.pause ? 'Uhr weiterlaufen lassen' : 'Uhr anhalten'}"><i class="ti ${uhr.pause ? 'ti-player-play' : 'ti-player-pause'}" aria-hidden="true"></i></button></div>
+        <div class="dpc-knoepfe"><button class="dfl-draft-btn" onclick="DFLKader.draftAutoWahl()">Für mich wählen</button>
+          <button class="dfl-draft-btn leise" onclick="DFLKader.draftAuto()">Rest automatisch</button></div>`
+      : `<div class="dpc-zug"><span class="dfl-dz-wappen">${wappen(zug)}</span><span><small>Am Zug · Runde ${runde} · Pick #${d.nr + 1}</small><b>${teamName(zug)}</b></span>
+          ${o.rest != null ? `<span class="dpc-rest"><b>${o.rest}</b><small>${o.rest === 1 ? 'Pick' : 'Picks'} bis zu dir</small></span>` : ''}</div>
+        <div class="dpc-knoepfe"><button class="dfl-draft-btn leise" onclick="DFLKader.draftWeiter('eins')">Nächster Pick</button>
+          ${o.rest != null ? `<button class="dfl-draft-btn" onclick="DFLKader.draftWeiter('bisIch')">Bis zu Pick #${o.naechsterEigener + 1}</button>` : ''}
+          <button class="dfl-draft-btn leise" onclick="DFLKader.draftAuto()">Rest automatisch</button></div>`;
+    // Die letzten drei Picks und ab dem aktuellen so viele, dass es 20 Zeilen sind
+    const von = Math.max(0, d.nr - 3), bis = Math.min(d.slots.length, von + 20);
+    const zeilen = [];
+    for (let i = von; i < bis; i++) {
+      const s = d.slots[i], n = i + 1, p = d.picks.find(x => x.pick === n), mein = s.besitzer === 'fcm';
+      const wer = p ? `<span class="dpc-wahl"><span class="pos-badge-sm pos-${p.pos}">${p.pos}</span><span>${p.name}</span></span>`
+        : `<span class="dpc-offen">${i === d.nr ? (mein ? 'dein Pick · jetzt' : 'wählt gerade') : mein ? 'dein Pick' : 'offen'}</span>`;
+      zeilen.push(`<div class="dpc-pick${mein ? ' ich' : ''}${i === d.nr ? ' jetzt' : ''}${p ? ' fertig' : ''}"><b>#${n}</b>
+        <span class="dpc-team">${wappen(s.besitzer)}<span>${mein ? 'Du' : kurzName(s.besitzer)}</span></span>${wer}</div>`);
+    }
+    return `<div class="dfl-draft-karte dpc">
+        <div class="dfl-draft-kopf dpc-kopf"><div class="dpc-titel"><div class="dfl-draft-titel">DKL-Draft ${d.jahr}</div>
+          <div class="dfl-draft-sub">4 Runden · 128 Picks · Cap ${mio(capBelegt())} / ${mio(capLimit())}</div>
+          <div class="dfl-draft-chips">${o.chips}</div></div>
+          ${status}</div>
+        ${o.angebotHtml}
+        <div class="dpc-raster">
+          <div class="dpc-spalte"><div class="dpc-kt">Die nächsten 20 Picks</div>
+            <div class="dpc-scroll" data-scroll="picks">${zeilen.join('')}
+              <div class="dpc-mehr">${o.hochHtml}${analyseHtml()}</div>
+              ${o.letzte ? `<ul class="dfl-draft-letzte">${o.letzte}</ul>` : ''}</div></div>
+          ${DFLDraftboard.draftTabelleHtml(d, ich)}
+        </div>
+        ${fensterOffen(d) ? fensterHtml(d) : ''}
+      </div>`;
+  }
   function draftHtml(d) {
     const zug = amZug(d), ich = zug === 'fcm' && !d.fertig;
     const chips = d.slots.map((s, i) => ({ s, n: i + 1 })).filter(x => x.s.besitzer === 'fcm').map(({ s, n }) => {
@@ -850,6 +890,16 @@
       let vorEigener = -1; for (let i = d.nr - 1; i >= 0; i--) if (d.slots[i].besitzer === 'fcm') { vorEigener = i; break; }
       const rest = naechsterEigener >= 0 ? naechsterEigener - d.nr : null;
       const anteil = rest != null ? Math.max(0.04, Math.min(1, (d.nr - vorEigener) / Math.max(1, naechsterEigener - vorEigener))) : 0;
+      const angebotHtml = angebote.length ? `<div class="dfl-draft-angebot"><b>Nach unten tauschen?</b> <span class="dfl-draft-sub">Für deinen Pick #${d.nr + 1} (Rookie-Cap ${mio(angebote[0].rookie.vorher)}) bieten:</span>
+            ${angebote.map((a, ix) => `<div class="dfl-draft-hoch"><span><b>${teamName(a.b)}</b>: ${a.texte.join(' + ')}
+              ${csChip(a.wert / a.mein, 'draft|' + d.nr + '|' + a.b + '|' + (a.picks || []).join(','))}<span class="dfl-draft-sub">Rookie-Cap danach ${mio(a.rookie.nachher)}</span></span>
+              <button class="dfl-draft-btn" onclick="DFLKader.angebot(true, ${ix})">Annehmen</button></div>`).join('')}
+            <span class="dfl-draft-aktionen"><button class="dfl-draft-btn leise" onclick="DFLKader.angebot(false)">Selbst wählen</button></span></div>` : '';
+      const hochHtml = hoch.length ? `<details class="dfl-dz-mehr"><summary><i class="ti ti-arrow-big-up-lines" aria-hidden="true"></i><b>Hochtraden</b><span class="dfl-dz-zahl">${hoch.length}</span></summary>
+            ${hoch.map(o => `<div class="dfl-dz-hoch"><span class="dfl-dz-w">${wappen(o.b)}</span><span class="dfl-dz-pt"><b>Pick #${o.i + 1} · ${kurzName(o.b)}</b><small>für ${o.paket.texte.join(' + ')}</small></span>
+              <button class="dfl-draft-btn leise" onclick="DFLKader.hochtraden(${o.i})">Tauschen</button></div>`).join('')}</details>` : '';
+      // Nutzer 2026-10-24 (Entwurf A): am PC zwei Spalten – die nächsten 20 Picks links, die Talente als Tabelle rechts
+      if (pcAn() && window.DFLDraftboard && DFLDraftboard.draftTabelleHtml) return draftPcHtml(d, { zug, ich, chips, wappen, kurzName, angebotHtml, hochHtml, rest, naechsterEigener, letzte });
       mitte = (ich ? `<div class="dfl-draft-status"><b>Du bist am Zug:</b> Runde ${Math.floor(d.nr / 32) + 1}, Pick #${d.nr + 1}
           <span class="dfl-draft-aktionen"><button class="dfl-draft-btn" onclick="DFLKader.draftAutoWahl()">Für mich wählen</button>
           <button class="dfl-draft-btn leise" onclick="DFLKader.draftAuto()">Rest automatisch</button></span></div>`
@@ -864,14 +914,8 @@
             <button class="dfl-draft-btn leise" onclick="DFLKader.draftAuto()">Rest automatisch</button></div>`) + `
         ${leiste}
         ${board}
-        ${angebote.length ? `<div class="dfl-draft-angebot"><b>Nach unten tauschen?</b> <span class="dfl-draft-sub">Für deinen Pick #${d.nr + 1} (Rookie-Cap ${mio(angebote[0].rookie.vorher)}) bieten:</span>
-            ${angebote.map((a, ix) => `<div class="dfl-draft-hoch"><span><b>${teamName(a.b)}</b>: ${a.texte.join(' + ')}
-              ${csChip(a.wert / a.mein, 'draft|' + d.nr + '|' + a.b + '|' + (a.picks || []).join(','))}<span class="dfl-draft-sub">Rookie-Cap danach ${mio(a.rookie.nachher)}</span></span>
-              <button class="dfl-draft-btn" onclick="DFLKader.angebot(true, ${ix})">Annehmen</button></div>`).join('')}
-            <span class="dfl-draft-aktionen"><button class="dfl-draft-btn leise" onclick="DFLKader.angebot(false)">Selbst wählen</button></span></div>` : ''}
-        ${hoch.length ? `<details class="dfl-dz-mehr"><summary><i class="ti ti-arrow-big-up-lines" aria-hidden="true"></i><b>Hochtraden</b><span class="dfl-dz-zahl">${hoch.length}</span></summary>
-            ${hoch.map(o => `<div class="dfl-dz-hoch"><span class="dfl-dz-w">${wappen(o.b)}</span><span class="dfl-dz-pt"><b>Pick #${o.i + 1} · ${kurzName(o.b)}</b><small>für ${o.paket.texte.join(' + ')}</small></span>
-              <button class="dfl-draft-btn leise" onclick="DFLKader.hochtraden(${o.i})">Tauschen</button></div>`).join('')}</details>` : ''}
+        ${angebotHtml}
+        ${hochHtml}
         ${analyseHtml()}
         ${DBL ? DBL : `${E ? `<div class="dfl-draft-filter">${E.filterChipHtml('draftboard', stilN)}</div>` : ''}
         <div class="dfl-draft-tabelle"><table><thead><tr><th>Rang</th><th>Talent</th><th>Pos</th><th>Alter</th><th>Stärke</th><th>Potenzial</th><th>Note</th><th></th></tr></thead>
@@ -958,7 +1002,10 @@
     const d = LEAGUE.dflDraft, ov = document.getElementById('dfl-draft-ov');
     if (d && amZug(d) === 'fcm' && uhr.nr !== d.nr) { uhr.nr = d.nr; uhr.rest = UHR; uhr.karte = null; }
     if (ov && d) {
+      // PC (Entwurf A): Listen behalten beim Neuzeichnen (Stern, Reiter, Pick) ihren Scrollstand
+      const scroll = {}; ov.querySelectorAll('[data-scroll]').forEach(e => { scroll[e.getAttribute('data-scroll')] = e.scrollTop; });
       ov.innerHTML = draftHtml(d); uhrStarten(d);
+      ov.querySelectorAll('[data-scroll]').forEach(e => { const v = scroll[e.getAttribute('data-scroll')]; if (v) e.scrollTop = v; });
       // Rookie-Pack einmal je Draft, sobald er fertig ist (Nutzer 2026-10-18)
       if (d.fertig && !d.packGezeigt && window.KSDraftPack) {
         d.packGezeigt = true;

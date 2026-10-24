@@ -13658,16 +13658,20 @@ async function expRestartAfterGameOver() {
   //   Passe hier ODER in der JSON-Datei an – beide müssen synchron bleiben.
   const CFG = {
     transfer: {
-      summer:      { overpayMin: 0.20, overpayMax: 0.30 },
-      winter:      { overpayMin: 0.30, overpayMax: 0.40 },
-      deadlineDay: { overpayExtraMin: 0.10, overpayExtraMax: 0.20 },
+      // Aufschläge kleiner und gedeckelt (2026-10-24, Nutzer: „Bayern hat 100 % overpayed … 75 Mille wenn der Spieler 81 hat und 19
+      // ist“ – vorher stapelten sich Fenster 20–40 %, Talent 15–35 %, Top-Klub 10–25 %, Ausland 12–28 %, Deadline 10–20 % bis +148 %)
+      summer:      { overpayMin: 0.05, overpayMax: 0.15 },
+      winter:      { overpayMin: 0.10, overpayMax: 0.20 },
+      deadlineDay: { overpayExtraMin: 0.05, overpayExtraMax: 0.10 },
+      auslandExtraMin: 0.03, auslandExtraMax: 0.08,
+      overpayDeckel: 0.40,                       // zusammen höchstens +40 % über Marktwert
       maxConcurrentBids: 5,
       bidChancePerWeek:  0.75,
       playerSellDiscount: 0.10,
       // Rivalen-Gebote: Top-Klubs jagen Talente
-      talentMagnet: { ovrThreshold: 74, potentialGap: 8, targetWeightTalent: 3.0, targetWeightNormal: 1.0 },
-      talentExtraMin: 0.15, talentExtraMax: 0.35,
-      topClubExtraMin: 0.10, topClubExtraMax: 0.25,
+      talentMagnet: { ovrThreshold: 74, potentialGap: 8, maxAlter: 23, targetWeightTalent: 3.0, targetWeightNormal: 1.0 },
+      talentExtraMin: 0.05, talentExtraMax: 0.10,
+      topClubExtraMin: 0.05, topClubExtraMax: 0.10,
       // maxFee = maximale Ablöse, die ein Klub dieses Tiers realistisch stemmen
       // kann (Transfermarkt-Größenordnungen). Verhindert, dass Kleinstvereine
       // Millionengebote abgeben — Tier wird nach OVR UND Finanzkraft gewählt,
@@ -13694,8 +13698,11 @@ async function expRestartAfterGameOver() {
   function rint(n) { return Math.floor(Math.random() * n); }
   function pick(arr) { return (typeof pickRnd === 'function') ? pickRnd(arr) : arr[rint(arr.length)]; }
   function potGap(p) { return ((p.truePotential != null ? p.truePotential : p.ovr) || 0) - (p.ovr || 0); }
+  // Talent nur bis tm.maxAlter (2026-10-24, Nutzer: „Top Club und Talent bei einem 29-Jährigen stimmt nicht“ – vorher galt jeder ab
+  // Stärke 74 als Talent, egal wie alt, samt Talent-Aufschlag und Marke „Talent“ auf der Angebotskarte)
   function isTalent(p) {
     const tm = CFG.transfer.talentMagnet;
+    if ((p.age || 25) > tm.maxAlter) return false;
     return (p.ovr >= tm.ovrThreshold) || (potGap(p) >= tm.potentialGap);
   }
   // Ab welchem Marktwert ist ein Spieler für andere Vereine interessant?
@@ -13840,13 +13847,14 @@ async function expRestartAfterGameOver() {
     // AUSLANDSZUSCHLAG: Ein Wechsel ins Ausland ist für den Spieler ein größerer
     // Schritt — und der Verein muss den abgebenden Klub überzeugen, obwohl er
     // ihn nicht in der eigenen Liga stärkt. Beides macht das Angebot höher.
-    if (bidder.ausland) overpayFactor += rnd(0.12, 0.28);
+    if (bidder.ausland) overpayFactor += rnd(CFG.transfer.auslandExtraMin, CFG.transfer.auslandExtraMax);
 
     // Deadline-Day-Aufschlag on top
     if (win.deadline) {
       overpayFactor += rnd(CFG.transfer.deadlineDay.overpayExtraMin, CFG.transfer.deadlineDay.overpayExtraMax);
     }
 
+    overpayFactor = Math.min(overpayFactor, 1 + CFG.transfer.overpayDeckel);
     // Finanzkraft-Deckel des Bieter-Tiers (Sicherheitsnetz gegen Mondgebote)
     let rawOffer = mv * overpayFactor;
     if (bidder.maxFee && isFinite(bidder.maxFee) && rawOffer > bidder.maxFee) rawOffer = bidder.maxFee;
@@ -20739,7 +20747,8 @@ async function expRestartAfterGameOver() {
   'use strict';
   var CFG = {
     start: 95, recoverPerWeek: 12, matchDrop: [15, 22], friendlyFactor: 0.6,
-    strengthFloorFit: 55, strengthMinPct: 0.10
+    strengthFloorFit: 55, strengthMinPct: 0.10,
+    intensitaet: { leicht: 5, normal: 0, intensiv: -5 }
   };
   function clampF(v) { return Math.max(0, Math.min(100, Math.round(v))); }
   function rndInt(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
@@ -20796,7 +20805,10 @@ async function expRestartAfterGameOver() {
     var lvl = (typeof CLUB !== 'undefined' && CLUB.facilities && CLUB.facilities.training) ? CLUB.facilities.training : 1;
     var buf = (typeof CLUB !== 'undefined') ? CLUB._fitnessBuffer : null;
     var bonus = (buf && buf.weeks > 0) ? (buf.recoverBonus || 0) : 0;
-    var rec = CFG.recoverPerWeek + (lvl - 1) * 2 + bonus;
+    // Intensität wirkt auf die Erholung (2026-10-24, Nutzer: „Senkt die Intensität im Training die Fitness oder steigert sie, wenn
+    // man mehr chillt?“ – vorher gar nicht): leicht +5, intensiv −5 je Woche
+    var intens = (typeof CLUB !== 'undefined' && CLUB.training && CLUB.training.intensity) || 'normal';
+    var rec = CFG.recoverPerWeek + (lvl - 1) * 2 + bonus + (CFG.intensitaet[intens] || 0);
     SQUAD.forEach(function (p) { ensureFitness(p); p.fitness = clampF(p.fitness + rec); });
     // Puffer eine Woche altern lassen
     if (buf && buf.weeks > 0) { buf.weeks--; if (buf.weeks <= 0) CLUB._fitnessBuffer = null; }
