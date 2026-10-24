@@ -19,7 +19,7 @@ html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--bg); color: var(--text); font: 17px/1.55 'Rubik', system-ui, sans-serif; }
 img { max-width: 100%; display: block; }
 a { color: inherit; }
-.rahmen { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+.rahmen { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
 h1, h2, h3, .marke { font-family: 'Fredoka', 'Rubik', system-ui, sans-serif; line-height: 1.15; }
 
 /* Kopf */
@@ -88,3 +88,80 @@ h2 { font-size: 30px; margin: 0 0 16px; }
 .pc-bild { margin: 0 0 28px; }
 .pc-bild img { width: 100%; height: auto; border-radius: 18px; border: 3px solid var(--rand); box-shadow: 0 5px 0 var(--rand); background: var(--karte); }
 .pc-bild figcaption { font-size: 15px; color: var(--text2); text-align: center; margin-top: 12px; }
+
+/* ── Neugestaltung 2026-10-24 (Nutzer: „die Bilder überarbeiten und die Seite etwas schöner machen“) ─────────────────── */
+body { background:
+  radial-gradient(1200px 520px at 78% -120px, color-mix(in srgb, #fff8e2 70%, transparent), transparent 70%),
+  radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--rand) 14%, transparent) 1.2px, transparent 1.4px) 0 0 / 22px 22px,
+  var(--bg); }
+@media (prefers-color-scheme: dark) { body { background:
+  radial-gradient(1200px 520px at 78% -120px, rgb(120 160 255 / .14), transparent 70%),
+  radial-gradient(circle at 1px 1px, rgb(255 255 255 / .05) 1.2px, transparent 1.4px) 0 0 / 22px 22px, var(--bg); } }
+.kopf { justify-content: space-between; flex-wrap: wrap; }
+.kopf-nav { display: flex; align-items: center; gap: 4px 18px; flex-wrap: wrap; font-weight: 500; }
+.kopf-nav a:not(.knopf) { text-decoration: none; color: var(--text2); padding: 6px 2px; }
+.kopf-nav a:not(.knopf):hover { color: var(--text); text-decoration: underline; text-underline-offset: 4px; }
+.knopf-klein { padding: 8px 14px; font-size: 16px; border-radius: 12px; box-shadow: 0 4px 0 var(--gruen-rand); }
+@media (max-width: 640px) { .kopf-nav a:not(.knopf) { display: none; } }
+.knopf { transition: transform .12s ease, box-shadow .12s ease; }
+.knopf:hover { transform: translateY(-2px); }
+.knopf:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--gruen-rand); }
+.knopf-blau:active { box-shadow: 0 2px 0 var(--blau-rand); }
+
+/* Bühne: PC und Handy */
+.buehne { grid-template-columns: 1fr; padding-top: 12px; }
+.buehne h1 .hervor { display: block; color: var(--gruen-rand); }
+@media (prefers-color-scheme: dark) { .buehne h1 .hervor { color: var(--gruen); } }
+.merkmale { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 20px 0 0; }
+.merkmale li { font-size: 14px; font-weight: 500; color: var(--text2); background: var(--karte); border: 2px solid var(--rand-hell); border-radius: 999px; padding: 4px 12px; }
+.buehne-geraete { position: relative; padding: 0 0 40px 40px; max-width: 640px; justify-self: center; width: 100%; }
+.browser { background: var(--karte); border: 3px solid var(--rand); border-radius: 18px; box-shadow: 0 6px 0 var(--rand), 0 24px 50px rgb(0 0 0 / .14); overflow: hidden; }
+.browser-leiste { display: flex; gap: 6px; padding: 8px 12px; background: var(--karte2); border-bottom: 2px solid var(--rand-hell); }
+.browser-leiste i { width: 10px; height: 10px; border-radius: 50%; background: var(--rand-hell); }
+.browser-leiste i:first-child { background: #e0705f; } .browser-leiste i:nth-child(2) { background: #f1c40f; } .browser-leiste i:nth-child(3) { background: #74bb5d; }
+.browser img { width: 100%; height: auto; }
+.handy { border-radius: 30px; padding: 7px; background: #2c2418; box-shadow: 0 6px 0 var(--rand), 0 18px 40px rgb(0 0 0 / .18); position: relative; }
+.handy img { border-radius: 24px; width: 100%; height: auto; }
+.handy::before { content: ''; position: absolute; top: 13px; left: 50%; width: 56px; height: 6px; margin-left: -28px; border-radius: 6px; background: #2c2418; z-index: 1; opacity: .85; }
+.handy-vorn { position: absolute; left: 0; bottom: 0; width: clamp(110px, 24%, 160px); transform: rotate(-3deg); }
+@media (min-width: 980px) { .buehne { grid-template-columns: .85fr 1.15fr; gap: 36px; padding: 30px 0 60px; } .buehne-geraete { padding: 10px 0 50px 70px; margin-right: -40px; } }
+
+/* Zwei Spielarten als Kacheln */
+.zwei { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin: 0 0 56px; }
+.spielart { display: block; text-decoration: none; padding: 22px 22px 18px; border-radius: 22px; border: 3px solid var(--rand); box-shadow: 0 6px 0 var(--rand);
+  background: var(--karte); transition: transform .15s ease; position: relative; overflow: hidden; }
+.spielart:hover { transform: translateY(-3px); }
+.spielart::after { content: ''; position: absolute; right: -40px; top: -40px; width: 140px; height: 140px; border-radius: 50%; opacity: .18; }
+.spielart.gruen::after { background: var(--gruen); } .spielart.blau::after { background: var(--blau); }
+.spielart h2 { margin: 6px 0 8px; font-size: 30px; }
+.spielart p { margin: 0 0 12px; color: var(--text2); }
+.spielart .mehr { font-weight: 700; font-family: 'Fredoka', sans-serif; color: var(--gruen-rand); }
+.spielart.blau .mehr { color: var(--blau); }
+@media (prefers-color-scheme: dark) { .spielart .mehr { color: var(--gruen); } .spielart.blau .mehr { color: #7fb8e6; } }
+
+/* Abschnitte der Spielarten */
+.spiel { padding: 28px 0 56px; scroll-margin-top: 16px; }
+.spiel-kopf { max-width: 44em; }
+.spiel .vorzeile { color: var(--gruen-rand); }
+.spiel.blau .vorzeile { color: var(--blau); }
+@media (prefers-color-scheme: dark) { .spiel .vorzeile { color: var(--gruen); } .spiel.blau .vorzeile { color: #7fb8e6; } }
+.spiel .karte { border-top-width: 6px; }
+.spiel .karte { border-top-color: var(--gruen-rand); } .spiel.blau .karte { border-top-color: var(--blau); }
+.galerie { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(200px, 230px); gap: 26px; overflow-x: auto; scroll-snap-type: x mandatory;
+  padding: 8px 6px 26px; margin: 0 -6px 18px; justify-content: start; }
+@media (min-width: 1000px) { .galerie { justify-content: center; } }
+.galerie figure { margin: 0; scroll-snap-align: start; }
+.galerie figcaption { font-size: 15px; font-weight: 500; color: var(--text2); text-align: center; margin-top: 14px; }
+.aktion { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
+.aktion .klein { margin: 0; }
+.pc-bild { margin: 8px 0 40px; }
+.pc-bild .browser img { border: 0; border-radius: 0; box-shadow: none; }
+
+/* Schluss */
+.schluss { text-align: center; padding: 40px 22px 44px; margin: 0 0 40px; border-radius: 26px; border: 3px solid var(--rand); box-shadow: 0 6px 0 var(--rand);
+  background: radial-gradient(500px 220px at 50% 0, color-mix(in srgb, var(--gold) 28%, transparent), transparent 70%), var(--karte); }
+.schluss h2 { font-size: clamp(28px, 5vw, 40px); margin: 0 0 8px; }
+.schluss .leit { color: var(--text2); margin: 0 0 22px; }
+.knoepfe.mitte { justify-content: center; }
+@media (max-width: 520px) { .aktion .knopf { width: 100%; justify-content: center; } }
+@media (prefers-reduced-motion: reduce) { .knopf, .spielart { transition: none; } }

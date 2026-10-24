@@ -25,89 +25,127 @@
         <img class="studio-logo" src="bilder/studio-logo.webp" alt="Langer Hafer Studios" width="520" height="178">
       </picture>
     </a>
+    <nav class="kopf-nav" aria-label="Seite">
+      <a href="#vereinskarriere">Vereinskarriere</a><a href="#kickdraft">Kickdraft</a><a href="#pc">Am PC</a>
+      <a class="knopf knopf-klein" href="spielen/">Demo spielen</a>
+    </nav>
   </header>
 
   <main>
     <section class="buehne">
-      <div>
+      <div class="buehne-text">
         <p class="vorzeile">Unter Flutlicht</p>
-        <h1>Ein Fußball-Manager. Zwei Spielarten.</h1>
-        <p class="leit">Führ deinen Verein von der Dritten Liga nach oben – oder bau in Kickdraft deine Franchise über Draft, Salary Cap
-          und Playoffs. Beide Spielarten stecken in einem Spiel, und die Demo läuft direkt hier im Browser.</p>
+        <h1>Ein Fußball-Manager. <span class="hervor">Zwei Spielarten.</span></h1>
+        <p class="leit">Führ deinen Verein von der Dritten Liga in den Europapokal – oder bau in Kickdraft deine Franchise über Draft,
+          Salary Cap und Playoffs. Beides steckt in einem Spiel, und die Demo läuft direkt hier im Browser.</p>
         <div class="knoepfe">
           <a class="knopf" href="spielen/">▶ Demo im Browser spielen</a>
         </div>
-        <p class="direkt">Direkt starten: <a href="spielen/flutlicht/">Vereinskarriere</a> · <a href="spielen/kickdraft/">Kickdraft</a></p>
-        <p class="klein">Kostenlos · ohne Konto · ohne Werbung · am Handy und am PC</p>
+        <ul class="merkmale">
+          <li>Kostenlos</li><li>Ohne Konto</li><li>Ohne Werbung</li><li>Handy und PC</li>
+        </ul>
       </div>
-      <div class="buehne-bild">
-        <picture>
-          <img src="bilder/fl-wahl-390.webp" srcset="bilder/fl-wahl-390.webp 390w, bilder/fl-wahl-780.webp 780w"
-            sizes="(min-width: 820px) 300px, 80vw" alt="Vereinswahl in der Vereinskarriere" width="390" height="844">
-        </picture>
+      <div class="buehne-geraete" aria-hidden="true">
+        <div class="browser">
+          <div class="browser-leiste"><i></i><i></i><i></i></div>
+          <img src="bilder/pc-uebersicht-960.webp" srcset="bilder/pc-uebersicht-960.webp 960w, bilder/pc-uebersicht-1440.webp 1440w"
+            sizes="(min-width: 980px) 600px, 92vw" alt="" width="1440" height="900">
+        </div>
+        <div class="handy handy-vorn">
+          <img src="bilder/fl-office-390.webp" srcset="bilder/fl-office-390.webp 390w, bilder/fl-office-780.webp 780w" sizes="190px" alt="" width="390" height="844">
+        </div>
       </div>
+    </section>
+
+    <section class="zwei" aria-label="Die zwei Spielarten">
+      <a class="spielart gruen" href="#vereinskarriere">
+        <span class="vorzeile">Spielart 1</span><h2>Vereinskarriere</h2>
+        <p>Auf- und Abstieg, Pokal und Europapokal. Verträge, Ausbau, Akademie – und ein Vorstand, der dich misst.</p>
+        <span class="mehr">Mehr erfahren →</span>
+      </a>
+      <a class="spielart blau" href="#kickdraft">
+        <span class="vorzeile">Spielart 2</span><h2>Kickdraft</h2>
+        <p>32 Franchises, kein Abstieg, harter Salary Cap. Talente nur über den Draft, am Ende Playoffs um den Titel.</p>
+        <span class="mehr">Mehr erfahren →</span>
+      </a>
     </section>
 
     <section class="spiel" id="vereinskarriere">
-      <p class="vorzeile">Spielart 1</p>
-      <h2>Vereinskarriere</h2>
-      <p class="leit">Der klassische Manager mit Auf- und Abstieg. Übernimm einen Verein aus der Ersten, Zweiten oder Dritten Liga,
-        verhandle Verträge, bau Stadion und Akademie aus und kämpf dich hoch – bis in den Europapokal.</p>
+      <div class="spiel-kopf">
+        <p class="vorzeile">Spielart 1</p>
+        <h2>Vereinskarriere</h2>
+        <p class="leit">Der klassische Manager mit Auf- und Abstieg. Übernimm einen Verein aus der Ersten, Zweiten oder Dritten Liga,
+          verhandle Verträge, bau Stadion und Akademie aus und kämpf dich hoch – bis in den Europapokal.</p>
+      </div>
       <div class="karten">
         <div class="karte"><span class="zahl">4 Ligen</span><h3>Auf- und Abstieg</h3><p>Vom Abstiegskampf bis zur Meisterschaft – jede Saison zählt.</p></div>
         <div class="karte"><span class="zahl">Live</span><h3>Spieltag im Ticker</h3><p>Derbys, Pokal und Finale mit eigener Stimmung, Zurufe von der Seitenlinie.</p></div>
-        <div class="karte"><span class="zahl">Vorstand</span><h3>Ziele und Vertrauen</h3><p>Tabelle, Finanzen, Ausbau – wer die Ziele verfehlt, fliegt.</p></div>
+        <div class="karte"><span class="zahl">Welt</span><h3>Eine lebende Liga</h3><p>Die anderen Vereine kaufen, verkaufen und bauen aus – mit guten und schlechten Transfers.</p></div>
       </div>
-      <div class="bilder">
-        <figure><img src="bilder/fl-wahl-390.webp" srcset="bilder/fl-wahl-390.webp 390w, bilder/fl-wahl-780.webp 780w" sizes="240px"
-          alt="Vereinswahl" width="390" height="844" loading="lazy"><figcaption>Verein wählen</figcaption></figure>
-        <figure><img src="bilder/fl-start-390.webp" srcset="bilder/fl-start-390.webp 390w, bilder/fl-start-780.webp 780w" sizes="240px"
-          alt="Der Vorstand erklärt die Ziele" width="390" height="844" loading="lazy"><figcaption>Der Vorstand misst dich</figcaption></figure>
+      <div class="galerie">
+        <figure><div class="handy"><img src="bilder/fl-office-390.webp" srcset="bilder/fl-office-390.webp 390w, bilder/fl-office-780.webp 780w" sizes="230px"
+          alt="Office mit Vereinsgelände, Kader, Budget und nächstem Spiel" width="390" height="844" loading="lazy"></div><figcaption>Dein Office</figcaption></figure>
+        <figure><div class="handy"><img src="bilder/fl-kader-390.webp" srcset="bilder/fl-kader-390.webp 390w, bilder/fl-kader-780.webp 780w" sizes="230px"
+          alt="Aufstellung auf dem Spielfeld mit Bank und Hinweisen auf müde Spieler" width="390" height="844" loading="lazy"></div><figcaption>Aufstellung und Taktik</figcaption></figure>
+        <figure><div class="handy"><img src="bilder/fl-liga-390.webp" srcset="bilder/fl-liga-390.webp 390w, bilder/fl-liga-780.webp 780w" sizes="230px"
+          alt="Tabelle der Dritten Liga" width="390" height="844" loading="lazy"></div><figcaption>Tabelle und Pokal</figcaption></figure>
       </div>
-      <a class="knopf" href="spielen/flutlicht/">▶ Vereinskarriere im Browser spielen</a>
-      <p class="klein">Demo: zwei Saisons</p>
+      <div class="aktion"><a class="knopf" href="spielen/flutlicht/">▶ Vereinskarriere spielen</a><span class="klein">Demo: zwei Saisons</span></div>
     </section>
 
-    <section class="spiel" id="kickdraft">
-      <p class="vorzeile">Spielart 2</p>
-      <h2>Kickdraft</h2>
-      <p class="leit">Fußball mit den Regeln der großen US-Ligen: 32 Franchises, kein Abstieg, ein harter Salary Cap, Talente nur über den
-        Draft und am Ende Playoffs um die Meisterschaft.</p>
+    <section class="spiel blau" id="kickdraft">
+      <div class="spiel-kopf">
+        <p class="vorzeile">Spielart 2</p>
+        <h2>Kickdraft</h2>
+        <p class="leit">Fußball mit den Regeln der großen US-Ligen: 32 Franchises, kein Abstieg, ein harter Salary Cap, Talente nur über den
+          Draft und am Ende Playoffs um die Meisterschaft.</p>
+      </div>
       <div class="karten">
-        <div class="karte"><span class="zahl">32</span><h3>Franchises, kein Abstieg</h3><p>Zwei Conferences, acht Divisions. Jeder Verein kann jedes Jahr oben angreifen.</p></div>
+        <div class="karte"><span class="zahl">32</span><h3>Franchises, kein Abstieg</h3><p>Zwei Conferences, acht Divisions. Jeder kann jedes Jahr oben angreifen.</p></div>
         <div class="karte"><span class="zahl">120 Mio €</span><h3>Harter Salary Cap</h3><p>Verträge, Handgeld und Dead Cap. Wer zu viel ausgibt, zahlt Jahre später dafür.</p></div>
         <div class="karte"><span class="zahl">4 Runden</span><h3>Draft statt Nachwuchs</h3><p>Die Schwächsten wählen zuerst, Picks lassen sich tauschen.</p></div>
         <div class="karte"><span class="zahl">14 Teams</span><h3>Playoffs</h3><p>Division-Sieger und Wildcards spielen um den Titel.</p></div>
       </div>
-      <div class="bilder">
-        <figure><img src="bilder/kd-wahl-390.webp" srcset="bilder/kd-wahl-390.webp 390w, bilder/kd-wahl-780.webp 780w" sizes="240px"
-          alt="Auswahl der Franchise mit Wappen und Stärke" width="390" height="844" loading="lazy"><figcaption>Franchise wählen</figcaption></figure>
-        <figure><img src="bilder/kd-kader-390.webp" srcset="bilder/kd-kader-390.webp 390w, bilder/kd-kader-780.webp 780w" sizes="240px"
-          alt="Aufstellung auf dem Spielfeld" width="390" height="844" loading="lazy"><figcaption>Aufstellung und Taktik</figcaption></figure>
-        <figure><img src="bilder/kd-liga-390.webp" srcset="bilder/kd-liga-390.webp 390w, bilder/kd-liga-780.webp 780w" sizes="240px"
-          alt="Tabelle der Division und Playoff-Bild" width="390" height="844" loading="lazy"><figcaption>Tabelle und Playoff-Rennen</figcaption></figure>
-        <figure><img src="bilder/kd-office-390.webp" srcset="bilder/kd-office-390.webp 390w, bilder/kd-office-780.webp 780w" sizes="240px"
-          alt="Office mit Vereinsgelände" width="390" height="844" loading="lazy"><figcaption>Dein Office</figcaption></figure>
+      <div class="galerie">
+        <figure><div class="handy"><img src="bilder/kd-office-390.webp" srcset="bilder/kd-office-390.webp 390w, bilder/kd-office-780.webp 780w" sizes="230px"
+          alt="Office mit Stadion, Cap und Kasse" width="390" height="844" loading="lazy"></div><figcaption>Deine Franchise</figcaption></figure>
+        <figure><div class="handy"><img src="bilder/kd-fo-390.webp" srcset="bilder/kd-fo-390.webp 390w, bilder/kd-fo-780.webp 780w" sizes="230px"
+          alt="Front Office mit Cap, Trades, Free Agency und Scouting" width="390" height="844" loading="lazy"></div><figcaption>Front Office und Cap</figcaption></figure>
+        <figure><div class="handy"><img src="bilder/kd-kader-390.webp" srcset="bilder/kd-kader-390.webp 390w, bilder/kd-kader-780.webp 780w" sizes="230px"
+          alt="Aufstellung gegen den nächsten Gegner" width="390" height="844" loading="lazy"></div><figcaption>Aufstellung</figcaption></figure>
+        <figure><div class="handy"><img src="bilder/kd-liga-390.webp" srcset="bilder/kd-liga-390.webp 390w, bilder/kd-liga-780.webp 780w" sizes="230px"
+          alt="Division und Playoff-Bild mit Chancen" width="390" height="844" loading="lazy"></div><figcaption>Playoff-Rennen</figcaption></figure>
       </div>
-      <a class="knopf knopf-blau" href="spielen/kickdraft/">▶ Kickdraft im Browser spielen</a>
-      <p class="klein">Demo: eine Saison</p>
+      <div class="aktion"><a class="knopf knopf-blau" href="spielen/kickdraft/">▶ Kickdraft spielen</a><span class="klein">Demo: eine Saison</span></div>
     </section>
 
-    <section class="spiel" id="wo">
-      <h2>Am Handy oder am PC</h2>
-      <p class="leit">Die Demo passt sich an: Am Handy spielst du wie in der App, am großen Bildschirm mit der PC-Bedienung – Navigation links,
-        Tabellen statt Listen, Tastenkürzel und Live-Coaching am Spieltag.</p>
+    <section class="spiel" id="pc">
+      <div class="spiel-kopf">
+        <p class="vorzeile">Am großen Bildschirm</p>
+        <h2>Am Handy oder am PC</h2>
+        <p class="leit">Die Demo passt sich an. Am Handy spielst du wie in der App, am PC mit eigener Bedienung: Navigation links, Tabellen statt
+          Listen, Tastenkürzel – und am Spieltag coachst du live mit Zurufen, Ausrichtung und Wechseln.</p>
+      </div>
       <figure class="pc-bild">
-        <img src="bilder/pc-uebersicht-960.webp" srcset="bilder/pc-uebersicht-960.webp 960w, bilder/pc-uebersicht-1440.webp 1440w"
-          sizes="(min-width: 1072px) 1040px, 100vw" alt="Die Übersicht der Vereinskarriere am PC mit Navigation, Gelände, Tabelle und Postfach"
-          width="1440" height="900" loading="lazy">
-        <figcaption>Vereinskarriere am PC</figcaption>
+        <div class="browser">
+          <div class="browser-leiste"><i></i><i></i><i></i></div>
+          <img src="bilder/pc-spieltag-960.webp" srcset="bilder/pc-spieltag-960.webp 960w, bilder/pc-spieltag-1440.webp 1440w"
+            sizes="(min-width: 1072px) 1040px, 100vw" alt="Spieltag am PC: beide Aufstellungen, Live-Ticker, Spielfeld, Zahlen und das Steuerpult für Zurufe und Ausrichtung"
+            width="1440" height="900" loading="lazy">
+        </div>
+        <figcaption>Live-Coaching am Spieltag</figcaption>
       </figure>
       <div class="karten">
-        <div class="karte"><span class="zahl">Jetzt</span><h3>Im Browser</h3><p>Beide Spielarten als Demo: Vereinskarriere zwei Saisons, Kickdraft eine Saison. Dein Spielstand bleibt in deinem Browser.</p></div>
+        <div class="karte"><span class="zahl">Jetzt</span><h3>Im Browser</h3><p>Beide Spielarten als Demo. Dein Spielstand bleibt in deinem Browser.</p></div>
         <div class="karte"><span class="zahl">Bald</span><h3>Android-App</h3><p>Das ganze Spiel, kostenlos bei Google Play. Läuft auch ohne Internet.</p></div>
-        <div class="karte"><span class="zahl">Bald</span><h3>PC-Version</h3><p>Für Windows mit eigener PC-Bedienung und Streamer-Modus – zuerst bei itch.io, später bei Steam.</p></div>
+        <div class="karte"><span class="zahl">Bald</span><h3>PC-Version</h3><p>Für Windows mit PC-Bedienung und Streamer-Modus – zuerst bei itch.io, später bei Steam.</p></div>
       </div>
+    </section>
+
+    <section class="schluss">
+      <h2>Anpfiff in Sekunden</h2>
+      <p class="leit">Kein Download, kein Konto. Wähl deinen Verein und leg los.</p>
+      <div class="knoepfe mitte"><a class="knopf" href="spielen/flutlicht/">▶ Vereinskarriere</a><a class="knopf knopf-blau" href="spielen/kickdraft/">▶ Kickdraft</a></div>
     </section>
   </main>
 
