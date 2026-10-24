@@ -14,6 +14,15 @@
 (function () {
   'use strict';
   window.KS_WEB = true;
+  // Kein Service Worker in der Website-Demo (alte Fassungen aus dem Cache mischten sich mit neuen Dateien): keine neue Anmeldung,
+  // vorhandene abmelden und den Cache leeren (der Aufräumer in sw.js erledigt das auch für Seiten, die noch der alte steuert)
+  if ('serviceWorker' in navigator) {
+    try { navigator.serviceWorker.register = () => Promise.resolve(null); } catch (e) { /* ohne */ }
+    try {
+      navigator.serviceWorker.getRegistrations().then(rs => Promise.all(rs.map(r => r.unregister())))
+        .then(() => (window.caches ? caches.keys().then(ks => Promise.all(ks.map(k => caches.delete(k)))) : null)).catch(() => {});
+    } catch (e) { /* ohne */ }
+  }
   try {
     const pc = window.matchMedia && matchMedia('(min-width: 1200px) and (hover: hover) and (pointer: fine)').matches;
     if (pc) localStorage.setItem('pcs-test', 'an'); else localStorage.removeItem('pcs-test');
@@ -47,7 +56,19 @@
   function huellen(name) {
     const orig = window[name];
     if (typeof orig !== 'function' || orig.__web) return;
-    const h = async function () { ladebildZeigen(); await naechstesBild(); try { return await orig.apply(this, arguments); } finally { setTimeout(ladebildWeg, 600); } };
+    // Weg, sobald fertig gerechnet ist ODER spätestens nach 2,5 s: Kickdrafts „Neues Spiel“ wartet im Start auf die Wahl Lite/Voll –
+    // vorher lag das Ladebild darüber, bis die Wahl getroffen war (Nutzer 2026-10-24: „nach der Teamwahl lädt es, geht aber nicht weiter“).
+    // Timer laufen erst, wenn das Rechnen den Ablauf freigibt – während der Rechnung bleibt das Bild also stehen.
+    // Öffnet der Start ein Fenster, das auf eine Eingabe wartet (Trainer-Editor, Wahl Lite/Voll – beide role="dialog"), sofort weg.
+    const h = async function () {
+      ladebildZeigen(); await naechstesBild();
+      const notfall = setTimeout(ladebildWeg, 2500);
+      const fenster = new MutationObserver(ms => {
+        if (ms.some(m => [...m.addedNodes].some(n => n.nodeType === 1 && n.id !== 'web-lade' && n.getAttribute('role') === 'dialog'))) { fenster.disconnect(); ladebildWeg(); }
+      });
+      fenster.observe(document.body, { childList: true });
+      try { return await orig.apply(this, arguments); } finally { clearTimeout(notfall); fenster.disconnect(); setTimeout(ladebildWeg, 600); }
+    };
     h.__web = true; window[name] = h;
   }
   // „Woche weiter“: echter Tipp → Knopf zeigt sofort „rechnet“, zwei Bilder später läuft die Woche wie gehabt
