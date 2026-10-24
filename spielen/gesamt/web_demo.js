@@ -66,5 +66,47 @@
     if (window.KSWerbung && KSWerbung.anbieterSetzen) KSWerbung.anbieterSetzen(fertig => fertig(true, true));
     ['_beginNewGame', '_beginGame'].forEach(huellen);
   });
+  // „Zur Website“ (2026-10-24, Nutzer: „einen Zurück-zum-Hauptmenü-Button, also zur Startseite der Website – das fehlt“):
+  // überall, wo man das Spiel verlässt – Mehr-Blatt (Handy, beide Spiele), Navigation links (PC), Kickdraft-Hauptmenü,
+  // Startbildschirm der Vereinskarriere; vorher wird gespeichert. Die Moduswahl bekommt einen sichtbaren Knopf statt des Links.
+  const MODUSWAHL = !!(tag && tag.dataset && tag.dataset.fl != null);   // Skript-Tag der Moduswahl trägt data-fl (website_bauen.sh)
+  const WEBSITE = MODUSWAHL ? '../' : '../../';
+  async function zurWebsite() {
+    try { if (typeof saveGameState === 'function' && typeof LEAGUE !== 'undefined' && LEAGUE) await saveGameState(); } catch (e) { /* trotzdem */ }
+    location.href = WEBSITE;
+  }
+  const ICON_W = '<i class="ti ti-world" aria-hidden="true"></i>';
+  function websiteKnoepfe() {
+    const mehr = document.querySelector('#app-sheet .ksm-unten');
+    if (mehr && !mehr.querySelector('[data-web-zu]')) mehr.insertAdjacentHTML('beforeend', `<button type="button" class="app-knopf" data-web-zu="1">${ICON_W}Zur Website</button>`);
+    const box = document.querySelector('#app-sheet .app-sheet-box');
+    if (box && !mehr && !box.querySelector('[data-web-zu]')) box.insertAdjacentHTML('beforeend', `<button type="button" class="app-eintrag" data-web-zu="1">${ICON_W}<span class="app-eintrag-txt"><b>Zur Website</b><small>langerhafer.com</small></span></button>`);
+    const pc = document.querySelector('.appnav-btn[data-pcu="verwaltung"]');
+    if (pc && !pc.parentElement.querySelector('[data-web-zu]')) pc.insertAdjacentHTML('afterend', `<button type="button" class="appnav-btn pcu-extra" data-web-zu="1">${ICON_W}Zur Website</button>`);
+    document.querySelectorAll('.st-liste').forEach(l => { if (!l.querySelector('[data-web-zu]')) l.insertAdjacentHTML('beforeend', `<button type="button" class="st-eintrag" data-web-zu="1">${ICON_W}<span><b>Zur Website</b><small>langerhafer.com</small></span><i class="ti ti-chevron-right" aria-hidden="true"></i></button>`); });
+    const ob = document.getElementById('onboarding-overlay');
+    if (ob && !ob.querySelector('[data-web-zu]')) {
+      const b = document.createElement('button');
+      b.type = 'button'; b.setAttribute('data-web-zu', '1');
+      b.style.cssText = 'display:block;margin:10px auto 0;padding:8px 14px;border-radius:10px;border:2px solid currentColor;background:transparent;color:inherit;font:inherit;font-size:13px;cursor:pointer;opacity:.8';
+      b.innerHTML = ICON_W + ' Zur Website';
+      (ob.firstElementChild || ob).appendChild(b);
+    }
+  }
+  document.addEventListener('click', ev => {
+    const b = ev.target.closest && ev.target.closest('[data-web-zu]'); if (!b) return;
+    ev.preventDefault(); ev.stopPropagation(); zurWebsite();
+  }, true);
+  document.addEventListener('DOMContentLoaded', () => {
+    if (MODUSWAHL) {   // Moduswahl: sichtbarer Knopf oben statt nur Link im Fuß
+      const k = document.createElement('a');
+      k.href = '../'; k.textContent = '← Zur Website';
+      k.style.cssText = 'position:fixed;top:12px;left:12px;z-index:5;padding:7px 12px;border-radius:10px;font:600 14px system-ui,sans-serif;text-decoration:none;background:rgb(255 255 255 / .85);color:#2c2418;border:2px solid #8a5a2b';
+      document.body.appendChild(k);
+      return;
+    }
+    websiteKnoepfe();
+    let w = 0; new MutationObserver(() => { if (w) return; w = requestAnimationFrame(() => { w = 0; websiteKnoepfe(); }); }).observe(document.body, { childList: true, subtree: true });
+  });
   console.log('[Website-Demo v2] aktiv — Ladebild, Woche-weiter-Rückmeldung, PC-Bedienung ab 1200 px mit Maus, Joker ohne Video, keine Bewertungsfrage');
 })();

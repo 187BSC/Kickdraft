@@ -88,6 +88,21 @@ body.pcu-an #view-home .cal-head #dfl-sim-pc[hidden] { display: none; }
 body.pcu-an #view-home .cal-head #dfl-sim-pc .ti { font-size: 19px; }
 body.pcu-an #view-home .cal-head #dfl-sim-pc:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--k-rand, #c99a62); }
 @media (max-width: 1450px) { #pcu-weiter kbd { display: none; } #pcu-weiter .pcu-w-txt b { font-size: 15px; } }
+/* Münze des Ladens (Erfolge, „W 0“): steht ohne Vereinsgelände (Kickdraft am PC) oben rechts auf der Übersicht und lag über dem
+   Vorspul-Knopf – am PC in die Wochen-Karte vor den Weiter-Knopf (weiterKnopf hängt sie um) */
+body.pcu-an #view-home .cal-head .ef-chip { position: static; margin-left: auto; flex: none; }
+body.pcu-an #view-home .cal-head .ef-chip + #pcu-weiter { margin-left: 4px; }
+/* Postfach-Karten (Angebot, Trade-Anfrage): ihr Raster hat drei Spalten (Zeichen, Titel, Knopf); in der schmalen PC-Spalte
+   stand „Ansehen“ dadurch über dem Titel – hier Zeichen + Titel, Karte, Zeile darunter, Knöpfe ganz unten */
+body.pcu-an #view-home .postfach-section .pf-item:has(.pfk), body.pcu-an #view-home .postfach-section .pf-item:has(.ks-angebot) {
+  grid-template-columns: 34px minmax(0, 1fr); grid-template-areas: "ico titel" "karte karte" "meta meta" "akt akt"; align-items: center; }
+body.pcu-an #view-home .postfach-section .pf-item:has(.pfk) .pf-actions, body.pcu-an #view-home .postfach-section .pf-item:has(.ks-angebot) .pf-actions { grid-area: akt; margin-top: 8px; }
+/* Transferangebot (Vereinskarriere): Karte nicht mehr unter das Zeichen ziehen (am Handy -51 px), sondern eigene Zeile über die ganze Breite */
+body.pcu-an #view-home .postfach-section .pf-item:has(.ks-angebot) .pf-ico { grid-area: ico; }
+body.pcu-an #view-home .postfach-section .pf-item:has(.ks-angebot) .pf-body { display: contents; }
+body.pcu-an #view-home .postfach-section .pf-item:has(.ks-angebot) .pf-title { grid-area: titel; min-width: 0; }
+body.pcu-an #view-home .postfach-section .pf-item:has(.ks-angebot) .pf-text { grid-area: karte; margin-left: 0; width: auto; overflow: visible; display: block; -webkit-line-clamp: unset; }
+body.pcu-an #view-home .postfach-section .pf-item:has(.ks-angebot) .pf-meta { grid-area: meta; }
 `;
 
   // Übersicht als Schreibtisch – Vereinskarriere
@@ -294,6 +309,8 @@ body.pcu-an #view-home .postfach-section .pf-actions { grid-column: 2; flex-dire
       const sim = $('dfl-sim-pc');
       if (sim && sim.parentNode === head) head.insertBefore(k, sim); else head.appendChild(k);
     }
+    const chip = document.querySelector('#view-home > .ef-chip');
+    if (chip) head.insertBefore(chip, k);
     const c = ctaJetzt() || { text: 'Woche weiter', sub: '', icon: 'ti-arrow-right' };
     // Unterzeile nicht doppelt: „KW1 · Juli 2026“ steht schon links in der Karte
     const kw = head.querySelector('.cal-week'), sub = c.sub && !(kw && kw.textContent.trim() === String(c.sub).trim()) ? c.sub : '';

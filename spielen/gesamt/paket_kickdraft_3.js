@@ -41603,6 +41603,9 @@ body:has(.zm-angebot) .toast-host,body:has(.zm-sprung) .toast-host{visibility:hi
   function stil() { if (document.getElementById('kst-css')) return; const s = document.createElement('style'); s.id = 'kst-css'; s.textContent = CSS; document.head.appendChild(s); }
   let EL = null, ZIEL = null, offen = null;
   function zielWeg() { if (ZIEL) ZIEL.classList.remove('kst-ziel'); ZIEL = null; }
+  // Nach dem X: diese Woche kein weiterer Tipp und ein paar Sekunden gar keiner – sonst wirkt es, als ginge das Fenster nicht weg
+  let ZU = 0;
+  function ruheNachZu() { ZU = Date.now(); try { if (da()) zustand().w = wochenIndex(); } catch (e) { /* ohne */ } }
   function schliessen() { if (EL) EL.classList.remove('auf'); zielWeg(); const o = offen; offen = null; if (o && o.danach) o.danach(); }
   function karte(t, opt) {
     stil(); opt = opt || {};
@@ -41610,7 +41613,7 @@ body:has(.zm-angebot) .toast-host,body:has(.zm-sprung) .toast-host{visibility:hi
       EL = document.createElement('div'); EL.id = 'kst-tipp'; EL.setAttribute('role', 'status');
       EL.addEventListener('click', ev => {
         const b = ev.target.closest('button'); if (!b) return;
-        if (b.classList.contains('kst-zu')) { if (offen && offen.abbruch) offen.abbruch(); schliessen(); return; }
+        if (b.classList.contains('kst-zu')) { if (offen && offen.abbruch) offen.abbruch(); schliessen(); ruheNachZu(); return; }
         const i = +b.dataset.k, k = offen && offen.knoepfe && offen.knoepfe[i];
         const o = offen; schliessen();
         if (k) try { k[1](); } catch (e) { console.warn('[Kickstil-Tipps] Knopf', e); }
@@ -41635,18 +41638,20 @@ body:has(.zm-angebot) .toast-host,body:has(.zm-sprung) .toast-host{visibility:hi
     if (auf() || sichtbar('#ks-tipp.auf') || sichtbar('#ks-neu.auf')) return true;
     if (document.body.classList.contains('ts-offen') || document.body.classList.contains('app-gesperrt')) return true;
     const sel = ['#onboarding-overlay', '#intro-overlay', '#ks-saisonende', '.exp-overlay', '.exp-gameover', '#ks-dl', '.dfl-draft-ov', '#kstr-gruss', '#kstr-ed',
-      '#pcsi-blatt', '#pkf-einst', '#pkf-suche', '#pkf-vergleich', '#pm-overlay', '#dfl-ts:not([hidden])', '#app-blatt.auf', '#app-sheet.auf', '.st-ov', '.tut-ov', '.tut-blase', '#dfl-sim:not([hidden])', '#ks-sim:not([hidden])'];
+      '#pcsi-blatt', '#pkf-einst', '#pkf-suche', '#pkf-vergleich', '#pm-overlay', '#dfl-ts:not([hidden])', '#app-blatt.auf', '#app-sheet.auf', '.st-ov', '.tut-ov', '.tut-blase', '.tut-loch', '.tut-blatt', '#dfl-sim:not([hidden])', '#ks-sim:not([hidden])'];
     if (sel.some(sichtbar)) return true;
     return [...document.body.children].some(e => e !== EL && !/^app-(nav|cta|kopf)$/.test(e.id) && getComputedStyle(e).position === 'fixed' && e.offsetWidth > 300 && e.offsetHeight > 300 && getComputedStyle(e).display !== 'none' && getComputedStyle(e).visibility !== 'hidden' && getComputedStyle(e).pointerEvents !== 'none' && +getComputedStyle(e).opacity > 0.1);
   }
   function aktiveAnsicht() { const v = document.querySelector('.app-view.active, [id^="view-"].active'); return v ? v.id.replace(/^view-/, '') : null; }
 
   function pruefen() {
-    if (!an() || !da() || !LEAGUE.season || ERSTER.laeuft || blockiert()) return;
+    if (!an() || !da() || !LEAGUE.season || ERSTER.laeuft || Date.now() - ZU < 6000 || blockiert()) return;
     const z = zustand();
     // erste Klicks: sofort
     const v = aktiveAnsicht();
-    const k = TIPPS.find(t => t.art === 'klick' && t.ansicht === v && !gesehen(t.id));
+    // Kickdraft erklärt die Bereiche schon in seiner Tour (dfl_tutorial.js) – dort keine Erklärung beim ersten Klick
+    // (2026-10-24: Tipp-Karte und Tour lagen gleichzeitig offen; X schloss nur die Karte, die Tour blieb stehen)
+    const k = KD ? null : TIPPS.find(t => t.art === 'klick' && t.ansicht === v && !gesehen(t.id));
     if (k) { z.g[k.id] = wochenIndex(); karte(k); return; }
     // sonst höchstens einer je Woche
     if (z.w === wochenIndex()) return;
@@ -41666,14 +41671,16 @@ body:has(.zm-angebot) .toast-host,body:has(.zm-sprung) .toast-host{visibility:hi
   const ERSTER = { laeuft: false };
   const STATIONEN = [
     { icon: 'ti-users', titel: 'Dein Kader', text: 'Hier stellst du die Elf auf und steuerst das Training.', ziel: ['#app-nav [data-nav="squad"]', '#app-nav [data-nav="kader"]', '#nav-squad'] },
-    { icon: 'ti-player-play', titel: 'Weiter spielen', text: 'Dieser Knopf bringt dich Woche für Woche zum nächsten Spiel.', ziel: ['#app-cta', '.cal-next', '#calendar-widget button'] },
+    { icon: 'ti-player-play', titel: 'Weiter spielen', text: 'Dieser Knopf bringt dich Woche für Woche zum nächsten Spiel.', ziel: ['#app-cta', '#pcu-weiter', '.cal-next', '#calendar-widget button'] },
     { icon: 'ti-mail', titel: 'Postfach', text: 'Angebote, Nachrichten und Entscheidungen landen hier.', ziel: ['.postfach-section', '#pf-filters', '.home-postfach'] },
     { icon: 'ti-briefcase', titel: 'Front Office', text: 'Transfers, Scouting, Verein und Finanzen.', ziel: ['#app-nav [data-nav="fo"]', '#nav-transfer', '.appnav-btn[data-pcu="transfer"]'] }
   ];
+  // Kader und Front Office hat der Erste Tag schon gezeigt – kein zweiter Tipp beim ersten Klick
+  function ersterTagFertig() { const z = zustand(); z.ersterTag = 1; ['k-kader', 'k-fo'].forEach(id => { if (z.g[id] == null) z.g[id] = wochenIndex(); }); z.w = wochenIndex(); }
   function zielFinden(l) { for (const s of l) { const e = document.querySelector(s); if (e && e.getClientRects().length) return e; } return null; }
   function ersterTag(i) {
     i = i || 0;
-    const s = STATIONEN[i]; if (!s) { ERSTER.laeuft = false; zustand().ersterTag = 1; return; }
+    const s = STATIONEN[i]; if (!s) { ERSTER.laeuft = false; ersterTagFertig(); return; }
     // Fenster dazwischen (Philosophie, Sponsor, Trainer …): später an dieser Station weitermachen
     if (blockiert()) { ERSTER.laeuft = false; zustand().ersterSchritt = i; return; }
     ERSTER.laeuft = true;
@@ -41681,7 +41688,7 @@ body:has(.zm-angebot) .toast-host,body:has(.zm-sprung) .toast-host{visibility:hi
     const z = zielFinden(s.ziel);
     if (z) try { z.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) { /* ohne */ }
     karte(s, { ziel: z, schritt: `Erster Tag · ${i + 1} von ${STATIONEN.length}`, knoepfe: [], weiterText: i < STATIONEN.length - 1 ? 'Weiter' : 'Los geht\'s',
-      weiter: () => setTimeout(() => ersterTag(i + 1), 250), abbruch: () => { ERSTER.laeuft = false; zustand().ersterTag = 1; } });
+      weiter: () => setTimeout(() => ersterTag(i + 1), 250), abbruch: () => { ERSTER.laeuft = false; ersterTagFertig(); } });
   }
   function ersterTagPruefen() {
     if (KD || !an() || !da() || ERSTER.laeuft) return;
@@ -42691,6 +42698,21 @@ body.pcu-an #view-home .cal-head #dfl-sim-pc[hidden] { display: none; }
 body.pcu-an #view-home .cal-head #dfl-sim-pc .ti { font-size: 19px; }
 body.pcu-an #view-home .cal-head #dfl-sim-pc:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--k-rand, #c99a62); }
 @media (max-width: 1450px) { #pcu-weiter kbd { display: none; } #pcu-weiter .pcu-w-txt b { font-size: 15px; } }
+/* Münze des Ladens (Erfolge, „W 0“): steht ohne Vereinsgelände (Kickdraft am PC) oben rechts auf der Übersicht und lag über dem
+   Vorspul-Knopf – am PC in die Wochen-Karte vor den Weiter-Knopf (weiterKnopf hängt sie um) */
+body.pcu-an #view-home .cal-head .ef-chip { position: static; margin-left: auto; flex: none; }
+body.pcu-an #view-home .cal-head .ef-chip + #pcu-weiter { margin-left: 4px; }
+/* Postfach-Karten (Angebot, Trade-Anfrage): ihr Raster hat drei Spalten (Zeichen, Titel, Knopf); in der schmalen PC-Spalte
+   stand „Ansehen“ dadurch über dem Titel – hier Zeichen + Titel, Karte, Zeile darunter, Knöpfe ganz unten */
+body.pcu-an #view-home .postfach-section .pf-item:has(.pfk), body.pcu-an #view-home .postfach-section .pf-item:has(.ks-angebot) {
+  grid-template-columns: 34px minmax(0, 1fr); grid-template-areas: "ico titel" "karte karte" "meta meta" "akt akt"; align-items: center; }
+body.pcu-an #view-home .postfach-section .pf-item:has(.pfk) .pf-actions, body.pcu-an #view-home .postfach-section .pf-item:has(.ks-angebot) .pf-actions { grid-area: akt; margin-top: 8px; }
+/* Transferangebot (Vereinskarriere): Karte nicht mehr unter das Zeichen ziehen (am Handy -51 px), sondern eigene Zeile über die ganze Breite */
+body.pcu-an #view-home .postfach-section .pf-item:has(.ks-angebot) .pf-ico { grid-area: ico; }
+body.pcu-an #view-home .postfach-section .pf-item:has(.ks-angebot) .pf-body { display: contents; }
+body.pcu-an #view-home .postfach-section .pf-item:has(.ks-angebot) .pf-title { grid-area: titel; min-width: 0; }
+body.pcu-an #view-home .postfach-section .pf-item:has(.ks-angebot) .pf-text { grid-area: karte; margin-left: 0; width: auto; overflow: visible; display: block; -webkit-line-clamp: unset; }
+body.pcu-an #view-home .postfach-section .pf-item:has(.ks-angebot) .pf-meta { grid-area: meta; }
 `;
 
   // Übersicht als Schreibtisch – Vereinskarriere
@@ -42897,6 +42919,8 @@ body.pcu-an #view-home .postfach-section .pf-actions { grid-column: 2; flex-dire
       const sim = $('dfl-sim-pc');
       if (sim && sim.parentNode === head) head.insertBefore(k, sim); else head.appendChild(k);
     }
+    const chip = document.querySelector('#view-home > .ef-chip');
+    if (chip) head.insertBefore(chip, k);
     const c = ctaJetzt() || { text: 'Woche weiter', sub: '', icon: 'ti-arrow-right' };
     // Unterzeile nicht doppelt: „KW1 · Juli 2026“ steht schon links in der Karte
     const kw = head.querySelector('.cal-week'), sub = c.sub && !(kw && kw.textContent.trim() === String(c.sub).trim()) ? c.sub : '';

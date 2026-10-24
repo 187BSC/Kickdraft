@@ -132,6 +132,9 @@
   function stil() { if (document.getElementById('kst-css')) return; const s = document.createElement('style'); s.id = 'kst-css'; s.textContent = CSS; document.head.appendChild(s); }
   let EL = null, ZIEL = null, offen = null;
   function zielWeg() { if (ZIEL) ZIEL.classList.remove('kst-ziel'); ZIEL = null; }
+  // Nach dem X: diese Woche kein weiterer Tipp und ein paar Sekunden gar keiner – sonst wirkt es, als ginge das Fenster nicht weg
+  let ZU = 0;
+  function ruheNachZu() { ZU = Date.now(); try { if (da()) zustand().w = wochenIndex(); } catch (e) { /* ohne */ } }
   function schliessen() { if (EL) EL.classList.remove('auf'); zielWeg(); const o = offen; offen = null; if (o && o.danach) o.danach(); }
   function karte(t, opt) {
     stil(); opt = opt || {};
@@ -139,7 +142,7 @@
       EL = document.createElement('div'); EL.id = 'kst-tipp'; EL.setAttribute('role', 'status');
       EL.addEventListener('click', ev => {
         const b = ev.target.closest('button'); if (!b) return;
-        if (b.classList.contains('kst-zu')) { if (offen && offen.abbruch) offen.abbruch(); schliessen(); return; }
+        if (b.classList.contains('kst-zu')) { if (offen && offen.abbruch) offen.abbruch(); schliessen(); ruheNachZu(); return; }
         const i = +b.dataset.k, k = offen && offen.knoepfe && offen.knoepfe[i];
         const o = offen; schliessen();
         if (k) try { k[1](); } catch (e) { console.warn('[Kickstil-Tipps] Knopf', e); }
@@ -164,18 +167,20 @@
     if (auf() || sichtbar('#ks-tipp.auf') || sichtbar('#ks-neu.auf')) return true;
     if (document.body.classList.contains('ts-offen') || document.body.classList.contains('app-gesperrt')) return true;
     const sel = ['#onboarding-overlay', '#intro-overlay', '#ks-saisonende', '.exp-overlay', '.exp-gameover', '#ks-dl', '.dfl-draft-ov', '#kstr-gruss', '#kstr-ed',
-      '#pcsi-blatt', '#pkf-einst', '#pkf-suche', '#pkf-vergleich', '#pm-overlay', '#dfl-ts:not([hidden])', '#app-blatt.auf', '#app-sheet.auf', '.st-ov', '.tut-ov', '.tut-blase', '#dfl-sim:not([hidden])', '#ks-sim:not([hidden])'];
+      '#pcsi-blatt', '#pkf-einst', '#pkf-suche', '#pkf-vergleich', '#pm-overlay', '#dfl-ts:not([hidden])', '#app-blatt.auf', '#app-sheet.auf', '.st-ov', '.tut-ov', '.tut-blase', '.tut-loch', '.tut-blatt', '#dfl-sim:not([hidden])', '#ks-sim:not([hidden])'];
     if (sel.some(sichtbar)) return true;
     return [...document.body.children].some(e => e !== EL && !/^app-(nav|cta|kopf)$/.test(e.id) && getComputedStyle(e).position === 'fixed' && e.offsetWidth > 300 && e.offsetHeight > 300 && getComputedStyle(e).display !== 'none' && getComputedStyle(e).visibility !== 'hidden' && getComputedStyle(e).pointerEvents !== 'none' && +getComputedStyle(e).opacity > 0.1);
   }
   function aktiveAnsicht() { const v = document.querySelector('.app-view.active, [id^="view-"].active'); return v ? v.id.replace(/^view-/, '') : null; }
 
   function pruefen() {
-    if (!an() || !da() || !LEAGUE.season || ERSTER.laeuft || blockiert()) return;
+    if (!an() || !da() || !LEAGUE.season || ERSTER.laeuft || Date.now() - ZU < 6000 || blockiert()) return;
     const z = zustand();
     // erste Klicks: sofort
     const v = aktiveAnsicht();
-    const k = TIPPS.find(t => t.art === 'klick' && t.ansicht === v && !gesehen(t.id));
+    // Kickdraft erklärt die Bereiche schon in seiner Tour (dfl_tutorial.js) – dort keine Erklärung beim ersten Klick
+    // (2026-10-24: Tipp-Karte und Tour lagen gleichzeitig offen; X schloss nur die Karte, die Tour blieb stehen)
+    const k = KD ? null : TIPPS.find(t => t.art === 'klick' && t.ansicht === v && !gesehen(t.id));
     if (k) { z.g[k.id] = wochenIndex(); karte(k); return; }
     // sonst höchstens einer je Woche
     if (z.w === wochenIndex()) return;
@@ -195,14 +200,16 @@
   const ERSTER = { laeuft: false };
   const STATIONEN = [
     { icon: 'ti-users', titel: 'Dein Kader', text: 'Hier stellst du die Elf auf und steuerst das Training.', ziel: ['#app-nav [data-nav="squad"]', '#app-nav [data-nav="kader"]', '#nav-squad'] },
-    { icon: 'ti-player-play', titel: 'Weiter spielen', text: 'Dieser Knopf bringt dich Woche für Woche zum nächsten Spiel.', ziel: ['#app-cta', '.cal-next', '#calendar-widget button'] },
+    { icon: 'ti-player-play', titel: 'Weiter spielen', text: 'Dieser Knopf bringt dich Woche für Woche zum nächsten Spiel.', ziel: ['#app-cta', '#pcu-weiter', '.cal-next', '#calendar-widget button'] },
     { icon: 'ti-mail', titel: 'Postfach', text: 'Angebote, Nachrichten und Entscheidungen landen hier.', ziel: ['.postfach-section', '#pf-filters', '.home-postfach'] },
     { icon: 'ti-briefcase', titel: 'Front Office', text: 'Transfers, Scouting, Verein und Finanzen.', ziel: ['#app-nav [data-nav="fo"]', '#nav-transfer', '.appnav-btn[data-pcu="transfer"]'] }
   ];
+  // Kader und Front Office hat der Erste Tag schon gezeigt – kein zweiter Tipp beim ersten Klick
+  function ersterTagFertig() { const z = zustand(); z.ersterTag = 1; ['k-kader', 'k-fo'].forEach(id => { if (z.g[id] == null) z.g[id] = wochenIndex(); }); z.w = wochenIndex(); }
   function zielFinden(l) { for (const s of l) { const e = document.querySelector(s); if (e && e.getClientRects().length) return e; } return null; }
   function ersterTag(i) {
     i = i || 0;
-    const s = STATIONEN[i]; if (!s) { ERSTER.laeuft = false; zustand().ersterTag = 1; return; }
+    const s = STATIONEN[i]; if (!s) { ERSTER.laeuft = false; ersterTagFertig(); return; }
     // Fenster dazwischen (Philosophie, Sponsor, Trainer …): später an dieser Station weitermachen
     if (blockiert()) { ERSTER.laeuft = false; zustand().ersterSchritt = i; return; }
     ERSTER.laeuft = true;
@@ -210,7 +217,7 @@
     const z = zielFinden(s.ziel);
     if (z) try { z.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) { /* ohne */ }
     karte(s, { ziel: z, schritt: `Erster Tag · ${i + 1} von ${STATIONEN.length}`, knoepfe: [], weiterText: i < STATIONEN.length - 1 ? 'Weiter' : 'Los geht\'s',
-      weiter: () => setTimeout(() => ersterTag(i + 1), 250), abbruch: () => { ERSTER.laeuft = false; zustand().ersterTag = 1; } });
+      weiter: () => setTimeout(() => ersterTag(i + 1), 250), abbruch: () => { ERSTER.laeuft = false; ersterTagFertig(); } });
   }
   function ersterTagPruefen() {
     if (KD || !an() || !da() || ERSTER.laeuft) return;
